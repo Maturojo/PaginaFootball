@@ -6,6 +6,7 @@ const path = require('path');
 
 const app = express();
 
+// CORS
 app.use(cors({
   origin: [
     'http://localhost:3000',
@@ -18,6 +19,26 @@ app.use(cors({
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Conexión MongoDB reutilizable (crítico para serverless)
+let isConnected = false;
+const connectDB = async () => {
+  if (isConnected && mongoose.connection.readyState === 1) return;
+  await mongoose.connect(process.env.MONGODB_URI);
+  isConnected = true;
+};
+
+// Middleware que conecta ANTES de cada request (para serverless)
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    res.status(500).json({ message: 'Error de conexión a la base de datos' });
+  }
+});
+
+// Rutas
+app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/teams', require('./routes/teams'));
 app.use('/api/products', require('./routes/products'));
@@ -29,16 +50,16 @@ app.use('/api/jugadores', require('./routes/jugadores'));
 app.use('/api/noticias', require('./routes/noticias'));
 app.use('/api/inscripciones', require('./routes/inscripciones'));
 
-app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
-
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log('MongoDB conectado');
+// Arranque local
+if (process.env.LOCAL === 'true') {
+  connectDB().then(() => {
     app.listen(process.env.PORT || 5000, () =>
       console.log(`Servidor corriendo en puerto ${process.env.PORT || 5000}`)
     );
-  })
-  .catch(err => {
+  }).catch(err => {
     console.error('Error conectando MongoDB:', err.message);
     process.exit(1);
   });
+}
+
+module.exports = app;
