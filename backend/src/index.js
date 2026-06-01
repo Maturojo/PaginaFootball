@@ -1,44 +1,44 @@
-require('dotenv').config();
+try { require('dotenv').config(); } catch {}
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 
-// CORS
-app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'http://localhost:5173',
-    /\.vercel\.app$/,
-    process.env.FRONTEND_URL,
-  ].filter(Boolean),
-  credentials: true,
-}));
+app.use(cors({ origin: '*', credentials: true }));
 app.use(express.json());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Conexión MongoDB reutilizable (crítico para serverless)
+// Servir uploads: local = src/uploads, Vercel = /tmp
+const uploadsDir = process.env.LOCAL === 'true'
+  ? path.join(__dirname, 'uploads')
+  : '/tmp';
+try {
+  if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+} catch {}
+app.use('/uploads', express.static(uploadsDir));
+
+// MongoDB
 let isConnected = false;
 const connectDB = async () => {
   if (isConnected && mongoose.connection.readyState === 1) return;
   await mongoose.connect(process.env.MONGODB_URI);
   isConnected = true;
+  console.log('MongoDB conectado');
 };
 
-// Middleware que conecta ANTES de cada request (para serverless)
 app.use(async (req, res, next) => {
   try {
     await connectDB();
     next();
   } catch (err) {
-    res.status(500).json({ message: 'Error de conexión a la base de datos' });
+    console.error('DB Error:', err.message);
+    res.status(500).json({ message: 'Error de base de datos', error: err.message });
   }
 });
 
-// Rutas
-app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+app.get('/api/health', (req, res) => res.json({ status: 'ok', env: !!process.env.MONGODB_URI }));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/teams', require('./routes/teams'));
 app.use('/api/products', require('./routes/products'));
@@ -50,16 +50,12 @@ app.use('/api/jugadores', require('./routes/jugadores'));
 app.use('/api/noticias', require('./routes/noticias'));
 app.use('/api/inscripciones', require('./routes/inscripciones'));
 
-// Arranque local
 if (process.env.LOCAL === 'true') {
   connectDB().then(() => {
     app.listen(process.env.PORT || 5000, () =>
-      console.log(`Servidor corriendo en puerto ${process.env.PORT || 5000}`)
+      console.log(`Servidor en puerto ${process.env.PORT || 5000}`)
     );
-  }).catch(err => {
-    console.error('Error conectando MongoDB:', err.message);
-    process.exit(1);
-  });
+  }).catch(err => { console.error(err.message); process.exit(1); });
 }
 
 module.exports = app;

@@ -1,14 +1,7 @@
 const router = require('express').Router();
 const Product = require('../models/Product');
 const auth = require('../middleware/auth');
-const multer = require('multer');
-const path = require('path');
-
-const storage = multer.diskStorage({
-  destination: 'src/uploads/',
-  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
-});
-const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
+const upload = require('../middleware/upload');
 
 router.get('/', async (req, res) => {
   const products = await Product.find({ activo: true }).sort({ createdAt: -1 });
