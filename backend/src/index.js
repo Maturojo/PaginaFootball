@@ -38,7 +38,14 @@ app.use(async (req, res, next) => {
   }
 });
 
-app.get('/api/health', (req, res) => res.json({ status: 'ok', env: !!process.env.MONGODB_URI }));
+app.get('/api/health', async (req, res) => {
+  try {
+    await connectDB();
+    res.json({ status: 'ok', mongo: 'conectado', env: !!process.env.MONGODB_URI });
+  } catch (err) {
+    res.status(500).json({ status: 'error', message: err.message, env: !!process.env.MONGODB_URI });
+  }
+});
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/teams', require('./routes/teams'));
 app.use('/api/products', require('./routes/products'));
