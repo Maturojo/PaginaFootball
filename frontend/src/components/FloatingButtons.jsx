@@ -1,9 +1,21 @@
+import { useEffect, useState } from 'react';
+import api from '../api';
+
 export default function FloatingButtons() {
+  const [contacto, setContacto] = useState({ telefono: '5492235000000', instagram: 'ligafootballmdp' });
+
+  useEffect(() => {
+    api.get('/pages/contacto').then(r => { if (r.data?.contenido) setContacto(r.data.contenido); });
+  }, []);
+
+  const tel = contacto.telefono?.replace(/\D/g, '') || '5492235000000';
+  const ig = contacto.instagram || 'ligafootballmdp';
+
   return (
     <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
       {/* WhatsApp */}
       <a
-        href="https://wa.me/5492235000000"
+        href={`https://wa.me/${tel}`}
         target="_blank"
         rel="noreferrer"
         title="WhatsApp"
@@ -15,7 +27,7 @@ export default function FloatingButtons() {
       </a>
       {/* Instagram */}
       <a
-        href="https://instagram.com/ligafootballmdp"
+        href={`https://instagram.com/${ig}`}
         target="_blank"
         rel="noreferrer"
         title="Instagram"
