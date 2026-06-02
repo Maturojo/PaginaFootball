@@ -23,7 +23,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className={`text-white sticky top-0 z-50 border-b transition-all duration-300 ${scrolled ? 'bg-primary shadow-lg border-accent/20' : 'bg-transparent border-transparent'}`}>
+    <nav className={`text-white sticky top-0 z-50 border-b transition-all duration-300 ${scrolled ? 'bg-primary shadow-lg border-accent/20' : 'bg-gradient-to-b from-black/40 to-transparent border-transparent'}`}>
       <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-18 py-2">
         <Link to="/" className="flex items-center gap-3 font-bold text-xl tracking-wide">
           <img src="/logo.png" alt="Logo Liga" className="h-12 w-12 object-contain" />
