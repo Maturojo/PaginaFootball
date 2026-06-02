@@ -33,11 +33,11 @@ import AdminEstadisticas from './pages/admin/AdminEstadisticas';
 import AdminEventos from './pages/admin/AdminEventos';
 import AdminInscripciones from './pages/admin/AdminInscripciones';
 
-function PublicLayout({ children }) {
+function PublicLayout({ children, heroTop = false }) {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-      <main className="flex-1">{children}</main>
+      <main className={`flex-1 ${heroTop ? '' : 'pt-16'}`}>{children}</main>
       <Footer />
       <FloatingButtons />
     </div>
@@ -49,7 +49,7 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<PublicLayout><Inicio /></PublicLayout>} />
+          <Route path="/" element={<PublicLayout heroTop><Inicio /></PublicLayout>} />
           <Route path="/historia" element={<PublicLayout><Historia /></PublicLayout>} />
           <Route path="/equipos" element={<PublicLayout><Equipos /></PublicLayout>} />
           <Route path="/equipos/:id" element={<PublicLayout><EquipoDetalle /></PublicLayout>} />
