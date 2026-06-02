@@ -27,7 +27,7 @@ export default function EventoDetalle() {
   if (!evento) return <div className="bg-primary min-h-screen flex items-center justify-center"><p className="text-white/40">Evento no encontrado</p></div>;
 
   return (
-    <div className="bg-primary text-white min-h-screen">
+    <div className="bg-primary text-white min-h-screen pt-16">
       {/* Hero */}
       <section className="bg-secondary border-b border-accent/20 py-14 px-4">
         <div className="max-w-4xl mx-auto">

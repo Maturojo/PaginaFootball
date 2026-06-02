@@ -18,7 +18,7 @@ export default function NoticiaDetalle() {
   if (!noticia) return <div className="bg-primary min-h-screen flex items-center justify-center"><p className="text-white/40">Noticia no encontrada</p></div>;
 
   return (
-    <div className="bg-primary text-white min-h-screen">
+    <div className="bg-primary text-white min-h-screen pt-16">
       {noticia.imagen && (
         <div className="w-full h-72 md:h-96 overflow-hidden relative">
           <img src={imgSrc(noticia.imagen)} alt={noticia.titulo} className="w-full h-full object-cover" />

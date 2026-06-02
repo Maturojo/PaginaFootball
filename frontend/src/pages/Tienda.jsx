@@ -22,7 +22,7 @@ export default function Tienda() {
   const filtered = categoria === 'Todos' ? products : products.filter(p => p.categoria === categoria);
 
   return (
-    <div className="bg-primary text-white">
+    <div className="bg-primary text-white pt-16">
       <section className="bg-secondary border-b border-accent/20 py-20 px-4 text-center">
         <h1 className="text-4xl md:text-5xl font-extrabold text-white">Tienda Oficial</h1>
         <div className="w-16 h-1 bg-accent mx-auto mt-4 rounded" />

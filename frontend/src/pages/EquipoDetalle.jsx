@@ -46,7 +46,7 @@ export default function EquipoDetalle() {
   );
 
   return (
-    <div className="bg-primary text-white min-h-screen">
+    <div className="bg-primary text-white min-h-screen pt-16">
       {/* Hero del equipo */}
       <section className="bg-secondary border-b border-accent/20 py-16 px-4">
         <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-10">
