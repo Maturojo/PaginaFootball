@@ -28,11 +28,34 @@ async function seed() {
     { nombre: 'Templarios', descripcion: 'Los Templarios, equipo de Football Americano 7vs7 de Mar del Plata.', ciudad: 'Mar del Plata', categoria: 'Football Americano 7vs7', proximamente: false },
   ];
 
+  // Detectar logos automáticamente desde frontend/public/equipos/ sin importar extensión
+  const fs = require('fs');
+  const path = require('path');
+  const equiposDir = path.join(__dirname, '../../frontend/public/equipos');
+
+  const getLogoPath = (nombre) => {
+    const nombreLimpio = nombre.toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g, '') // quitar tildes
+      .replace(/\s+/g, '-'); // espacios a guiones
+    try {
+      const archivos = fs.readdirSync(equiposDir);
+      const archivo = archivos.find(f => f.toLowerCase().startsWith(nombreLimpio));
+      return archivo ? `/equipos/${archivo}` : '';
+    } catch { return ''; }
+  };
+
   for (const e of equipos) {
     const existing = await Team.findOne({ nombre: e.nombre });
-    // Solo actualiza campos de texto/categoría, NO sobreescribe el logo si ya tiene uno
     const update = { ...e };
-    if (existing?.logo) delete update.logo;
+    // Preservar logo subido por admin (que empieza con /uploads/)
+    // Reemplazar logos con URL localhost por la ruta correcta
+    const logoActual = existing?.logo || '';
+    if (logoActual.startsWith('/uploads/')) {
+      delete update.logo; // conservar logo subido via admin
+    } else {
+      // Detectar logo desde frontend/public/equipos/
+      update.logo = getLogoPath(e.nombre) || logoActual || '';
+    }
     await Team.findOneAndUpdate({ nombre: e.nombre }, update, { upsert: true, new: true });
   }
   console.log('Equipos actualizados (logos preservados)');

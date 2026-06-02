@@ -10,13 +10,9 @@ const app = express();
 app.use(cors({ origin: '*', credentials: true }));
 app.use(express.json());
 
-// Servir uploads: local = src/uploads, Vercel = /tmp
-const uploadsDir = process.env.LOCAL === 'true'
-  ? path.join(__dirname, 'uploads')
-  : '/tmp';
-try {
-  if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-} catch {}
+// Servir uploads locales
+const uploadsDir = path.join(__dirname, 'uploads');
+try { fs.mkdirSync(uploadsDir, { recursive: true }); } catch {}
 app.use('/uploads', express.static(uploadsDir));
 
 // MongoDB
@@ -41,7 +37,13 @@ app.use(async (req, res, next) => {
 app.get('/api/health', async (req, res) => {
   try {
     await connectDB();
-    res.json({ status: 'ok', mongo: 'conectado', env: !!process.env.MONGODB_URI });
+    res.json({
+      status: 'ok',
+      mongo: 'conectado',
+      env: !!process.env.MONGODB_URI,
+      cloudinary: !!process.env.CLOUDINARY_CLOUD_NAME,
+      cloudinaryName: process.env.CLOUDINARY_CLOUD_NAME || 'NO CONFIGURADO'
+    });
   } catch (err) {
     res.status(500).json({ status: 'error', message: err.message, env: !!process.env.MONGODB_URI });
   }

@@ -2,6 +2,7 @@ const router = require('express').Router();
 const Team = require('../models/Team');
 const auth = require('../middleware/auth');
 const upload = require('../middleware/upload');
+const fileUrl = require('../middleware/fileUrl');
 
 router.get('/', async (req, res) => {
   const teams = await Team.find({ activo: true }).sort({ nombre: 1 });
@@ -16,7 +17,7 @@ router.get('/all', auth, async (req, res) => {
 router.post('/', auth, upload.single('logo'), async (req, res) => {
   try {
     const data = { ...req.body };
-    if (req.file) data.logo = `/uploads/${req.file.filename}`;
+    if (req.file) data.logo = fileUrl(req.file);
     const team = await Team.create(data);
     res.status(201).json(team);
   } catch (err) {
@@ -27,7 +28,7 @@ router.post('/', auth, upload.single('logo'), async (req, res) => {
 router.put('/:id', auth, upload.single('logo'), async (req, res) => {
   try {
     const data = { ...req.body };
-    if (req.file) data.logo = `/uploads/${req.file.filename}`;
+    if (req.file) data.logo = fileUrl(req.file);
     const team = await Team.findByIdAndUpdate(req.params.id, data, { new: true });
     res.json(team);
   } catch (err) {

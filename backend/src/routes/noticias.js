@@ -2,6 +2,7 @@ const router = require('express').Router();
 const Noticia = require('../models/Noticia');
 const auth = require('../middleware/auth');
 const upload = require('../middleware/upload');
+const fileUrl = require('../middleware/fileUrl');
 
 router.get('/', async (req, res) => {
   const noticias = await Noticia.find({ activo: true }).sort({ createdAt: -1 });
@@ -19,14 +20,14 @@ router.get('/:id', async (req, res) => {
 router.post('/', auth, upload.single('imagen'), async (req, res) => {
   try {
     const data = { ...req.body };
-    if (req.file) data.imagen = `/uploads/${req.file.filename}`;
+    if (req.file) data.imagen = fileUrl(req.file);
     res.status(201).json(await Noticia.create(data));
   } catch (err) { res.status(400).json({ message: err.message }); }
 });
 router.put('/:id', auth, upload.single('imagen'), async (req, res) => {
   try {
     const data = { ...req.body };
-    if (req.file) data.imagen = `/uploads/${req.file.filename}`;
+    if (req.file) data.imagen = fileUrl(req.file);
     res.json(await Noticia.findByIdAndUpdate(req.params.id, data, { new: true }));
   } catch (err) { res.status(400).json({ message: err.message }); }
 });

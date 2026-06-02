@@ -2,6 +2,7 @@ const router = require('express').Router();
 const Evento = require('../models/Evento');
 const auth = require('../middleware/auth');
 const upload = require('../middleware/upload');
+const fileUrl = require('../middleware/fileUrl');
 
 router.get('/', async (req, res) => {
   const eventos = await Evento.find({ activo: true }).sort({ fecha: -1 });
@@ -22,7 +23,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', auth, upload.array('fotos', 20), async (req, res) => {
   try {
     const data = { ...req.body };
-    if (req.files?.length) data.fotos = req.files.map(f => `/uploads/${f.filename}`);
+    if (req.files?.length) data.fotos = req.files.map(f => fileUrl(f));
     const evento = await Evento.create(data);
     res.status(201).json(evento);
   } catch (err) {
@@ -34,7 +35,7 @@ router.put('/:id', auth, upload.array('fotos', 20), async (req, res) => {
   try {
     const existing = await Evento.findById(req.params.id);
     const data = { ...req.body };
-    const nuevasFotos = req.files?.map(f => `/uploads/${f.filename}`) || [];
+    const nuevasFotos = req.files?.map(f => fileUrl(f)) || [];
     // Mantener fotos existentes + agregar nuevas
     data.fotos = [...(existing.fotos || []), ...nuevasFotos];
     const evento = await Evento.findByIdAndUpdate(req.params.id, data, { new: true });
