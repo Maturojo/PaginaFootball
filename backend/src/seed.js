@@ -50,11 +50,12 @@ async function seed() {
     // Preservar logo subido por admin (que empieza con /uploads/)
     // Reemplazar logos con URL localhost por la ruta correcta
     const logoActual = existing?.logo || '';
-    if (logoActual.startsWith('/uploads/')) {
-      delete update.logo; // conservar logo subido via admin
+    const logoRepo = getLogoPath(e.nombre);
+    if (logoActual.startsWith('https://res.cloudinary.com/')) {
+      delete update.logo; // conservar logo subido a Cloudinary
     } else {
-      // Detectar logo desde frontend/public/equipos/
-      update.logo = getLogoPath(e.nombre) || logoActual || '';
+      // Usar logo del repo si existe, sino conservar el actual
+      update.logo = logoRepo || logoActual || '';
     }
     await Team.findOneAndUpdate({ nombre: e.nombre }, update, { upsert: true, new: true });
   }
