@@ -56,6 +56,11 @@ function PartidoCard({ p, logoMap }) {
           <span className="text-xs text-accent/60">⭐ MVP: <span className="text-accent font-semibold">{p.mvp}</span></span>
         </div>
       )}
+      {p.notas && (
+        <div className={`mt-3 pt-3 border-t border-white/5 text-xs leading-relaxed ${p.notas.includes('CAMPEONES') ? 'text-center text-yellow-400 font-bold text-sm' : 'text-white/40'}`}>
+          {p.notas}
+        </div>
+      )}
     </div>
   );
 }
