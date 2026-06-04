@@ -14,6 +14,14 @@ const TIPOS = {
   deflecciones:  { label: 'Deflecciones',   cols: ['DEFLEC'],                          keys: ['deflec'] },
 };
 
+const PREMIOS_ICONS = {
+  'MVP — Jugador Más Valioso': '🏆',
+  'JOF — Jugador Ofensivo':    '⚔️',
+  'JD — Jugador Defensivo':    '🛡️',
+  'JEV — Jugador Evolución':   '📈',
+  'NOV — Novato del Torneo':   '🌟',
+};
+
 const EQUIPO_COLORS = {
   KRA: 'bg-purple-600',
   TRI: 'bg-red-500',
@@ -128,13 +136,84 @@ function TablaLideres({ lideres }) {
   );
 }
 
+function TablaPremios({ lideres }) {
+  const premios     = lideres.find(l => l.tipo === 'premios');
+  const ofensivo    = lideres.find(l => l.tipo === 'equipo-ofensivo');
+  const defensivo   = lideres.find(l => l.tipo === 'equipo-defensivo');
+
+  return (
+    <div className="space-y-8">
+      {/* Premios individuales */}
+      {premios && (
+        <div className="bg-secondary border border-accent/20 rounded-xl overflow-hidden">
+          <div className="px-6 py-4 border-b border-accent/10">
+            <h2 className="text-lg font-bold text-white">🏅 Premios Individuales</h2>
+            <p className="text-white/40 text-sm">{premios.temporada}</p>
+          </div>
+          <div className="divide-y divide-white/5">
+            {premios.jugadores.map((j, i) => (
+              <div key={i} className={`flex items-center gap-4 px-6 py-4 ${j.premio.includes('MVP') ? 'bg-yellow-500/5' : ''}`}>
+                <span className="text-2xl w-8 text-center">{PREMIOS_ICONS[j.premio] || '🏅'}</span>
+                <div className="flex-1">
+                  <p className="text-xs text-accent/60 uppercase tracking-widest font-semibold">{j.premio}</p>
+                  <p className="font-bold text-white text-lg">#{j.numero} {j.jugador}</p>
+                </div>
+                <span className={`text-xs font-bold px-2 py-0.5 rounded text-white ${EQUIPO_COLORS[j.equipo] || 'bg-white/20'}`}>
+                  {j.equipo}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Equipo ofensivo y defensivo */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {[{ data: ofensivo, label: '⚔️ Equipo Ofensivo' }, { data: defensivo, label: '🛡️ Equipo Defensivo' }].map(({ data, label }) => data && (
+          <div key={label} className="bg-secondary border border-accent/20 rounded-xl overflow-hidden">
+            <div className="px-6 py-4 border-b border-accent/10">
+              <h2 className="text-lg font-bold text-white">{label}</h2>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-accent/10">
+                    <th className="text-left px-4 py-3 text-accent/70 font-semibold uppercase tracking-wide text-xs w-8">#</th>
+                    <th className="text-left px-4 py-3 text-accent/70 font-semibold uppercase tracking-wide text-xs">Jugador</th>
+                    <th className="text-center px-3 py-3 text-accent/70 font-semibold uppercase tracking-wide text-xs">Eq.</th>
+                    <th className="text-center px-3 py-3 text-accent/70 font-semibold uppercase tracking-wide text-xs">Votos</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.jugadores.map((j, i) => (
+                    <tr key={i} className={`border-b border-white/5 hover:bg-white/5 transition ${i === 0 ? 'bg-accent/5' : ''}`}>
+                      <td className="px-4 py-3">
+                        <span className={`font-bold ${i === 0 ? 'text-yellow-400' : i === 1 ? 'text-gray-400' : i === 2 ? 'text-orange-400' : 'text-white/30'}`}>{j.pos}</span>
+                      </td>
+                      <td className="px-4 py-3 font-semibold text-white whitespace-nowrap">#{j.numero} {j.nombre}</td>
+                      <td className="px-3 py-3 text-center">
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded text-white ${EQUIPO_COLORS[j.equipo] || 'bg-white/20'}`}>{j.equipo}</span>
+                      </td>
+                      <td className="px-3 py-3 text-center text-accent font-bold">{j.votos}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function Estadisticas() {
   const [searchParams] = useSearchParams();
   const [stats, setStats] = useState([]);
   const [lideres, setLideres] = useState([]);
   const [temporadas, setTemporadas] = useState([]);
   const [temporadaActiva, setTemporadaActiva] = useState('');
-  const [seccion, setSeccion] = useState(searchParams.get('seccion') || 'lideres');
+  const [seccion, setSeccion] = useState(searchParams.get('seccion') || 'premios');
   const [loading, setLoading] = useState(true);
   const [activaStat, setActivaStat] = useState(0);
 
@@ -171,20 +250,37 @@ export default function Estadisticas() {
         {!loading && (
           <>
             {/* Selector sección */}
-            <div className="flex gap-3 mb-8 justify-center">
-              <button
-                onClick={() => setSeccion('lideres')}
-                className={`px-6 py-2 rounded-lg font-bold transition ${seccion === 'lideres' ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/60 hover:text-white'}`}
-              >
-                🏆 Líderes
-              </button>
-              <button
-                onClick={() => setSeccion('posiciones')}
-                className={`px-6 py-2 rounded-lg font-bold transition ${seccion === 'posiciones' ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/60 hover:text-white'}`}
-              >
-                📊 Posiciones
-              </button>
+            <div className="flex flex-wrap gap-3 mb-8 justify-center">
+              {[['premios','🏅 Premios'], ['lideres','📈 Líderes'], ['posiciones','📊 Posiciones']].map(([v, l]) => (
+                <button key={v} onClick={() => setSeccion(v)}
+                  className={`px-6 py-2 rounded-lg font-bold transition ${seccion === v ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/60 hover:text-white'}`}>
+                  {l}
+                </button>
+              ))}
             </div>
+
+            {/* PREMIOS */}
+            {seccion === 'premios' && (
+              <>
+                {temporadas.length === 0 && <p className="text-center text-white/40">No hay premios cargados aún.</p>}
+                {temporadas.length > 0 && (
+                  <>
+                    {temporadas.length > 1 && (
+                      <div className="flex flex-wrap gap-2 mb-6 justify-center">
+                        {temporadas.map(t => (
+                          <button key={t} onClick={() => setTemporadaActiva(t)}
+                            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition ${temporadaActiva === t ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/60 hover:text-white'}`}>
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {temporadas.length === 1 && <p className="text-center text-accent font-bold mb-6 text-lg">{temporadaActiva}</p>}
+                    <TablaPremios lideres={lideres} />
+                  </>
+                )}
+              </>
+            )}
 
             {/* LÍDERES */}
             {seccion === 'lideres' && (
