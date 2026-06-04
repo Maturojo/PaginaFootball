@@ -207,6 +207,46 @@ function TablaPremios({ lideres }) {
   );
 }
 
+function PremiosSection() {
+  const [lideresPremios, setLideresPremios] = useState([]);
+  const [temporadas, setTemporadas] = useState([]);
+  const [temporadaActiva, setTemporadaActiva] = useState('');
+
+  useEffect(() => {
+    api.get('/lideres/temporadas').then(r => {
+      // Solo temporadas que tienen premios (no las de partidos individuales)
+      const principales = r.data.filter(t => !t.includes('Final') && !t.includes('Semi'));
+      setTemporadas(principales);
+      if (principales.length > 0) setTemporadaActiva(principales[0]);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (temporadaActiva) {
+      api.get(`/lideres?temporada=${encodeURIComponent(temporadaActiva)}`).then(r => setLideresPremios(r.data));
+    }
+  }, [temporadaActiva]);
+
+  if (temporadas.length === 0) return <p className="text-center text-white/40">No hay premios cargados aún.</p>;
+
+  return (
+    <>
+      {temporadas.length > 1 && (
+        <div className="flex flex-wrap gap-2 mb-6 justify-center">
+          {temporadas.map(t => (
+            <button key={t} onClick={() => setTemporadaActiva(t)}
+              className={`px-4 py-1.5 rounded-lg text-sm font-medium transition ${temporadaActiva === t ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/60 hover:text-white'}`}>
+              {t}
+            </button>
+          ))}
+        </div>
+      )}
+      {temporadas.length === 1 && <p className="text-center text-accent font-bold mb-6 text-lg">{temporadaActiva}</p>}
+      <TablaPremios lideres={lideresPremios} />
+    </>
+  );
+}
+
 export default function Estadisticas() {
   const [searchParams] = useSearchParams();
   const [stats, setStats] = useState([]);
@@ -261,25 +301,7 @@ export default function Estadisticas() {
 
             {/* PREMIOS */}
             {seccion === 'premios' && (
-              <>
-                {temporadas.length === 0 && <p className="text-center text-white/40">No hay premios cargados aún.</p>}
-                {temporadas.length > 0 && (
-                  <>
-                    {temporadas.length > 1 && (
-                      <div className="flex flex-wrap gap-2 mb-6 justify-center">
-                        {temporadas.map(t => (
-                          <button key={t} onClick={() => setTemporadaActiva(t)}
-                            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition ${temporadaActiva === t ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/60 hover:text-white'}`}>
-                            {t}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                    {temporadas.length === 1 && <p className="text-center text-accent font-bold mb-6 text-lg">{temporadaActiva}</p>}
-                    <TablaPremios lideres={lideres} />
-                  </>
-                )}
-              </>
+              <PremiosSection />
             )}
 
             {/* LÍDERES */}
