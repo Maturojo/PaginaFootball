@@ -12,13 +12,18 @@ function EventoForm({ initial, onSave, onCancel }) {
   });
 
   const onSubmit = async (data) => {
-    const form = new FormData();
-    Object.entries(data).forEach(([k, v]) => {
-      if (k === 'fotos') { if (v?.[0]) Array.from(v).forEach(f => form.append('fotos', f)); }
-      else form.append(k, v);
-    });
-    await onSave(form);
-    reset();
+    try {
+      const form = new FormData();
+      Object.entries(data).forEach(([k, v]) => {
+        if (k === 'fotos') { if (v?.[0]) Array.from(v).forEach(f => form.append('fotos', f)); }
+        else if (v !== undefined && v !== null) form.append(k, v);
+      });
+      await onSave(form);
+      reset();
+    } catch (err) {
+      console.error('Error al guardar evento:', err);
+      alert('Error al guardar: ' + (err.response?.data?.message || err.message));
+    }
   };
 
   return (
@@ -67,9 +72,13 @@ export default function AdminEventos() {
   useEffect(() => { load(); }, []);
 
   const handleSave = async (form) => {
-    if (editing) await api.put(`/eventos/${editing._id}`, form);
-    else await api.post('/eventos', form);
-    setShowForm(false); setEditing(null); load();
+    try {
+      if (editing) await api.put(`/eventos/${editing._id}`, form);
+      else await api.post('/eventos', form);
+      setShowForm(false); setEditing(null); load();
+    } catch (err) {
+      alert('Error: ' + (err.response?.data?.message || err.message));
+    }
   };
 
   const handleDelete = async (id) => {
