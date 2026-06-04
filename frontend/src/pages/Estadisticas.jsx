@@ -1,89 +1,237 @@
 import { useEffect, useState } from 'react';
 import api from '../api';
 
-const COLS = ['Equipo', 'PJ', 'PG', 'PP', 'PF', 'PC', 'Pts'];
+const COLS_STATS = ['Equipo', 'PJ', 'PG', 'PP', 'PF', 'PC', 'Pts'];
+
+const TIPOS = {
+  pase:          { label: 'Pase',          cols: ['PAS','COM','%','YDS','TD','INT'],  keys: ['pas','com','pct','yds','td','int'] },
+  corrida:       { label: 'Corrida',        cols: ['INT','YDS','PROM','TD'],           keys: ['int','yds','prom','td'] },
+  recepcion:     { label: 'Recepción',      cols: ['REC','YDS','PROM','TD'],           keys: ['rec','yds','prom','td'] },
+  flags:         { label: 'Flageos',        cols: ['FLAGS'],                           keys: ['flags'] },
+  intercepciones:{ label: 'Intercepciones', cols: ['INTS'],                            keys: ['ints'] },
+  sacks:         { label: 'Sacks',          cols: ['SACKS','SAFETY'],                  keys: ['sacks','safety'] },
+  deflecciones:  { label: 'Deflecciones',   cols: ['DEFLEC'],                          keys: ['deflec'] },
+};
+
+const EQUIPO_COLORS = {
+  KRA: 'bg-purple-600',
+  TRI: 'bg-red-500',
+  LIE: 'bg-orange-400',
+  ACO: 'bg-gray-500',
+};
+
+function TablaStandings({ stat }) {
+  return (
+    <div className="bg-secondary border border-accent/20 rounded-xl overflow-hidden">
+      <div className="px-6 py-4 border-b border-accent/10">
+        <h2 className="text-xl font-bold text-white">{stat.temporada} · {stat.categoria}</h2>
+        {stat.descripcion && <p className="text-white/40 text-sm mt-1">{stat.descripcion}</p>}
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-accent/10">
+              <th className="text-left px-6 py-3 text-accent/70 font-semibold uppercase tracking-wide text-xs">Pos</th>
+              {COLS_STATS.map(c => (
+                <th key={c} className={`py-3 px-3 text-accent/70 font-semibold uppercase tracking-wide text-xs ${c === 'Equipo' ? 'text-left' : 'text-center'}`}>{c}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {stat.tabla.slice().sort((a, b) => b.Pts - a.Pts).map((fila, i) => (
+              <tr key={i} className={`border-b border-white/5 hover:bg-white/5 transition ${i === 0 ? 'bg-accent/5' : ''}`}>
+                <td className="px-6 py-3"><span className={`font-bold ${i === 0 ? 'text-accent' : 'text-white/30'}`}>{i + 1}</span></td>
+                <td className="px-3 py-3 font-semibold text-white">{fila.equipo}</td>
+                <td className="px-3 py-3 text-center text-white/60">{fila.PJ}</td>
+                <td className="px-3 py-3 text-center text-green-400">{fila.PG}</td>
+                <td className="px-3 py-3 text-center text-red-400">{fila.PP}</td>
+                <td className="px-3 py-3 text-center text-white/60">{fila.PF}</td>
+                <td className="px-3 py-3 text-center text-white/60">{fila.PC}</td>
+                <td className="px-3 py-3 text-center font-extrabold text-accent">{fila.Pts}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function TablaLideres({ lideres }) {
+  const [tipoActivo, setTipoActivo] = useState('pase');
+
+  const tiposDisponibles = Object.keys(TIPOS).filter(t => lideres.some(l => l.tipo === t));
+  const lider = lideres.find(l => l.tipo === tipoActivo);
+  const config = TIPOS[tipoActivo];
+
+  return (
+    <div>
+      {/* Tabs de tipo */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        {tiposDisponibles.map(t => (
+          <button
+            key={t}
+            onClick={() => setTipoActivo(t)}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${
+              tipoActivo === t ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/60 hover:text-white hover:border-accent/50'
+            }`}
+          >
+            {TIPOS[t].label}
+          </button>
+        ))}
+      </div>
+
+      {lider && (
+        <div className="bg-secondary border border-accent/20 rounded-xl overflow-hidden">
+          <div className="px-6 py-4 border-b border-accent/10">
+            <h2 className="text-lg font-bold text-white">Líderes en {config.label}</h2>
+            <p className="text-white/40 text-sm">{lider.temporada}</p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-accent/10">
+                  <th className="text-left px-4 py-3 text-accent/70 font-semibold uppercase tracking-wide text-xs w-8">#</th>
+                  <th className="text-left px-4 py-3 text-accent/70 font-semibold uppercase tracking-wide text-xs">Jugador</th>
+                  <th className="text-center px-3 py-3 text-accent/70 font-semibold uppercase tracking-wide text-xs">Equipo</th>
+                  {config.cols.map(c => (
+                    <th key={c} className="text-center px-3 py-3 text-accent/70 font-semibold uppercase tracking-wide text-xs">{c}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {lider.jugadores.map((j, i) => (
+                  <tr key={i} className={`border-b border-white/5 hover:bg-white/5 transition ${i === 0 ? 'bg-accent/5' : ''}`}>
+                    <td className="px-4 py-3">
+                      <span className={`font-bold text-sm ${i === 0 ? 'text-yellow-400' : i === 1 ? 'text-gray-400' : i === 2 ? 'text-orange-400' : 'text-white/30'}`}>
+                        {j.pos}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 font-semibold text-white whitespace-nowrap">{j.nombre}</td>
+                    <td className="px-3 py-3 text-center">
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded text-white ${EQUIPO_COLORS[j.equipo] || 'bg-white/20'}`}>
+                        {j.equipo}
+                      </span>
+                    </td>
+                    {config.keys.map(k => (
+                      <td key={k} className="px-3 py-3 text-center text-white/70 font-medium">{j[k] ?? '-'}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Estadisticas() {
   const [stats, setStats] = useState([]);
+  const [lideres, setLideres] = useState([]);
+  const [temporadas, setTemporadas] = useState([]);
+  const [temporadaActiva, setTemporadaActiva] = useState('');
+  const [seccion, setSeccion] = useState('lideres'); // 'posiciones' | 'lideres'
   const [loading, setLoading] = useState(true);
-  const [activa, setActiva] = useState(0);
+  const [activaStat, setActivaStat] = useState(0);
 
   useEffect(() => {
-    api.get('/estadisticas').then(r => setStats(r.data)).finally(() => setLoading(false));
+    Promise.all([
+      api.get('/estadisticas'),
+      api.get('/lideres/temporadas'),
+    ]).then(([s, t]) => {
+      setStats(s.data);
+      setTemporadas(t.data);
+      if (t.data.length > 0) setTemporadaActiva(t.data[0]);
+    }).finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (temporadaActiva) {
+      api.get(`/lideres?temporada=${encodeURIComponent(temporadaActiva)}`).then(r => setLideres(r.data));
+    }
+  }, [temporadaActiva]);
 
   return (
     <div className="bg-primary text-white pt-16">
       <section className="bg-secondary border-b border-accent/20 py-20 px-4 text-center">
         <h1 className="text-4xl md:text-5xl font-extrabold text-white">Estadísticas</h1>
         <div className="w-16 h-1 bg-accent mx-auto mt-4 rounded" />
-        <p className="text-white/50 mt-4 text-lg">Tablas de posiciones por temporada</p>
+        <p className="text-white/50 mt-4 text-lg">Posiciones y líderes estadísticos</p>
       </section>
 
-      <section className="max-w-4xl mx-auto py-16 px-4">
-        {loading && <p className="text-center text-white/40">Cargando estadísticas...</p>}
-        {!loading && stats.length === 0 && (
-          <p className="text-center text-white/40">No hay estadísticas cargadas aún.</p>
-        )}
+      <section className="max-w-5xl mx-auto py-12 px-4">
+        {loading && <p className="text-center text-white/40">Cargando...</p>}
 
-        {stats.length > 0 && (
+        {!loading && (
           <>
-            {/* Tabs por temporada/categoría */}
-            <div className="flex flex-wrap gap-2 mb-8">
-              {stats.map((s, i) => (
-                <button
-                  key={s._id}
-                  onClick={() => setActiva(i)}
-                  className={`px-4 py-2 rounded-lg font-medium text-sm transition ${
-                    activa === i
-                      ? 'bg-accent text-white'
-                      : 'bg-secondary border border-accent/20 text-white/60 hover:border-accent/50 hover:text-white'
-                  }`}
-                >
-                  {s.temporada} — {s.categoria}
-                </button>
-              ))}
+            {/* Selector sección */}
+            <div className="flex gap-3 mb-8 justify-center">
+              <button
+                onClick={() => setSeccion('lideres')}
+                className={`px-6 py-2 rounded-lg font-bold transition ${seccion === 'lideres' ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/60 hover:text-white'}`}
+              >
+                🏆 Líderes
+              </button>
+              <button
+                onClick={() => setSeccion('posiciones')}
+                className={`px-6 py-2 rounded-lg font-bold transition ${seccion === 'posiciones' ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/60 hover:text-white'}`}
+              >
+                📊 Posiciones
+              </button>
             </div>
 
-            {/* Tabla activa */}
-            {stats[activa] && (
-              <div className="bg-secondary border border-accent/20 rounded-xl overflow-hidden">
-                <div className="px-6 py-4 border-b border-accent/10">
-                  <h2 className="text-xl font-bold text-white">{stats[activa].temporada} · {stats[activa].categoria}</h2>
-                  {stats[activa].descripcion && <p className="text-white/40 text-sm mt-1">{stats[activa].descripcion}</p>}
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-accent/10">
-                        <th className="text-left px-6 py-3 text-accent/70 font-semibold uppercase tracking-wide text-xs">Pos</th>
-                        {COLS.map(c => (
-                          <th key={c} className={`py-3 px-3 text-accent/70 font-semibold uppercase tracking-wide text-xs ${c === 'Equipo' ? 'text-left' : 'text-center'}`}>{c}</th>
+            {/* LÍDERES */}
+            {seccion === 'lideres' && (
+              <>
+                {temporadas.length === 0 && <p className="text-center text-white/40">No hay líderes cargados aún.</p>}
+                {temporadas.length > 0 && (
+                  <>
+                    {/* Selector temporada */}
+                    {temporadas.length > 1 && (
+                      <div className="flex flex-wrap gap-2 mb-6 justify-center">
+                        {temporadas.map(t => (
+                          <button
+                            key={t}
+                            onClick={() => setTemporadaActiva(t)}
+                            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition ${temporadaActiva === t ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/60 hover:text-white'}`}
+                          >
+                            {t}
+                          </button>
                         ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {stats[activa].tabla
-                        .slice()
-                        .sort((a, b) => b.Pts - a.Pts)
-                        .map((fila, i) => (
-                          <tr key={i} className={`border-b border-white/5 hover:bg-white/5 transition ${i === 0 ? 'bg-accent/5' : ''}`}>
-                            <td className="px-6 py-3">
-                              <span className={`font-bold ${i === 0 ? 'text-accent' : 'text-white/30'}`}>{i + 1}</span>
-                            </td>
-                            <td className="px-3 py-3 font-semibold text-white">{fila.equipo}</td>
-                            <td className="px-3 py-3 text-center text-white/60">{fila.PJ}</td>
-                            <td className="px-3 py-3 text-center text-green-400">{fila.PG}</td>
-                            <td className="px-3 py-3 text-center text-red-400">{fila.PP}</td>
-                            <td className="px-3 py-3 text-center text-white/60">{fila.PF}</td>
-                            <td className="px-3 py-3 text-center text-white/60">{fila.PC}</td>
-                            <td className="px-3 py-3 text-center font-extrabold text-accent">{fila.Pts}</td>
-                          </tr>
-                        ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+                      </div>
+                    )}
+                    {temporadas.length === 1 && (
+                      <p className="text-center text-accent font-bold mb-6 text-lg">{temporadaActiva}</p>
+                    )}
+                    <TablaLideres lideres={lideres} />
+                  </>
+                )}
+              </>
+            )}
+
+            {/* POSICIONES */}
+            {seccion === 'posiciones' && (
+              <>
+                {stats.length === 0 && <p className="text-center text-white/40">No hay tablas de posiciones cargadas aún.</p>}
+                {stats.length > 0 && (
+                  <>
+                    <div className="flex flex-wrap gap-2 mb-8">
+                      {stats.map((s, i) => (
+                        <button
+                          key={s._id}
+                          onClick={() => setActivaStat(i)}
+                          className={`px-4 py-2 rounded-lg font-medium text-sm transition ${activaStat === i ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/60 hover:border-accent/50 hover:text-white'}`}
+                        >
+                          {s.temporada} — {s.categoria}
+                        </button>
+                      ))}
+                    </div>
+                    {stats[activaStat] && <TablaStandings stat={stats[activaStat]} />}
+                  </>
+                )}
+              </>
             )}
           </>
         )}

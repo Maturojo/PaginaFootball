@@ -53,6 +53,7 @@ app.use('/api/teams', require('./routes/teams'));
 app.use('/api/products', require('./routes/products'));
 app.use('/api/pages', require('./routes/pages'));
 app.use('/api/estadisticas', require('./routes/estadisticas'));
+app.use('/api/lideres', require('./routes/lideres'));
 app.use('/api/eventos', require('./routes/eventos'));
 app.use('/api/partidos', require('./routes/partidos'));
 app.use('/api/jugadores', require('./routes/jugadores'));
