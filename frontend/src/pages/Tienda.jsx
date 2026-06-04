@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../api';
 
 import { API_URL } from '../config.js';
@@ -53,7 +54,7 @@ export default function Tienda() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filtered.map(product => (
-            <div key={product._id} className="bg-secondary border border-accent/20 rounded-2xl hover:border-accent/50 hover:-translate-y-1 transition-all duration-300 flex flex-col group overflow-hidden">
+            <Link key={product._id} to={`/tienda/${product._id}`} className="bg-secondary border border-accent/20 rounded-2xl hover:border-accent/50 hover:-translate-y-1 transition-all duration-300 flex flex-col group overflow-hidden">
               {/* Imagen */}
               <div className="relative bg-primary/50 h-52 flex items-center justify-center overflow-hidden">
                 {product.imagen ? (
@@ -98,7 +99,7 @@ export default function Tienda() {
                   </a>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
