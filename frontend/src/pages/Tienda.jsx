@@ -78,9 +78,7 @@ export default function Tienda() {
               <div className="p-4 flex flex-col flex-1">
                 <span className="text-xs text-accent/70 uppercase tracking-widest font-medium">{product.categoria}</span>
                 <h3 className="font-bold text-white mt-1 leading-tight">{product.nombre}</h3>
-                {product.descripcion && (
-                  <p className="text-xs text-white/40 mt-1 flex-1 line-clamp-2">{product.descripcion}</p>
-                )}
+                <p className="text-xs text-white/40 mt-1 flex-1 line-clamp-2">{product.descripcion || ' '}</p>
                 <div className="mt-3 flex items-center justify-between">
                   <span className="text-xl font-extrabold text-accent">${product.precio.toLocaleString('es-AR')}</span>
                   <a
