@@ -105,10 +105,16 @@ export default function Fixture() {
     }).finally(() => setLoading(false));
   }, []);
 
-  const ahora = new Date();
   const filtrados = partidos
     .filter(p => cat === 'Todos' || p.categoria === cat)
-    .filter(p => vista === 'todos' ? true : vista === 'proximos' ? p.estado !== 'finalizado' : p.estado === 'finalizado');
+    .filter(p => vista === 'todos' ? true : vista === 'proximos' ? p.estado !== 'finalizado' : p.estado === 'finalizado')
+    .sort((a, b) => {
+      // Programados primero, luego finalizados por fecha descendente
+      if (a.estado !== 'finalizado' && b.estado === 'finalizado') return -1;
+      if (a.estado === 'finalizado' && b.estado !== 'finalizado') return 1;
+      if (a.estado === 'finalizado' && b.estado === 'finalizado') return new Date(b.fecha) - new Date(a.fecha);
+      return new Date(a.fecha) - new Date(b.fecha);
+    });
 
   return (
     <div className="bg-primary text-white pt-16">
