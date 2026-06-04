@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import api from '../api';
 
 const COLS_STATS = ['Equipo', 'PJ', 'PG', 'PP', 'PF', 'PC', 'Pts'];
@@ -128,11 +129,12 @@ function TablaLideres({ lideres }) {
 }
 
 export default function Estadisticas() {
+  const [searchParams] = useSearchParams();
   const [stats, setStats] = useState([]);
   const [lideres, setLideres] = useState([]);
   const [temporadas, setTemporadas] = useState([]);
   const [temporadaActiva, setTemporadaActiva] = useState('');
-  const [seccion, setSeccion] = useState('lideres'); // 'posiciones' | 'lideres'
+  const [seccion, setSeccion] = useState(searchParams.get('seccion') || 'lideres');
   const [loading, setLoading] = useState(true);
   const [activaStat, setActivaStat] = useState(0);
 
@@ -143,7 +145,9 @@ export default function Estadisticas() {
     ]).then(([s, t]) => {
       setStats(s.data);
       setTemporadas(t.data);
-      if (t.data.length > 0) setTemporadaActiva(t.data[0]);
+      const paramTemporada = searchParams.get('temporada');
+      const defaultTemporada = paramTemporada && t.data.includes(paramTemporada) ? paramTemporada : t.data[0];
+      if (t.data.length > 0) setTemporadaActiva(defaultTemporada || t.data[0]);
     }).finally(() => setLoading(false));
   }, []);
 

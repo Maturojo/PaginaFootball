@@ -34,7 +34,7 @@ async function seed() {
     estado: 'finalizado',
     golesLocal: 39,
     golesVisitante: 34,
-    notas: 'Jugadores destacados — Krakens: Lucas Gabotto (5 rec 83 yds, 3 rush 65 yds 1 TD, 2 ints, 1 deflec, 2 flags), Angel Avila (12/24 192 yds 2 TDs/3 ints, 1 rush 15 yds TD, 1 rec 11 yds, 1 int, 1 deflec, 4 flags), Elvis Rodriguez (1/2 11 yds, 2 rec 56 yds, 2 deflecs, 5 flags). Tridentes: Javier Papagni (24/45 305 yds 4 TDs/3 int, 2 rush 13 yds), Pablo Corva (8 rec 80 yds 1 TD, 1 int, 1 deflec, 4 flags), Mauro Castillo (6 rec 100 yds 2 TDs).',
+    notas: '🟣 KRAKENS\n• Lucas Gabotto: 5 rec 83 yds · 3 rush 65 yds 1 TD · 2 ints · 1 deflec · 2 flags\n• Angel Avila: 12/24 192 yds 2 TDs/3 ints · 1 rush 15 yds TD · 1 rec 11 yds · 1 int · 1 deflec · 4 flags\n• Elvis Rodriguez: 1/2 11 yds · 2 rec 56 yds · 2 deflecs · 5 flags\n\n🔴 TRIDENTES\n• Javier Papagni: 24/45 305 yds 4 TDs/3 int · 2 rush 13 yds\n• Pablo Corva: 8 rec 80 yds 1 TD · 1 int · 1 deflec · 4 flags\n• Mauro Castillo: 6 rec 100 yds 2 TDs',
     activo: true,
   });
   console.log('✓ Semifinal cargada');

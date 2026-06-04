@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../api';
 
 import { API_URL } from '../config.js';
@@ -57,8 +58,28 @@ function PartidoCard({ p, logoMap }) {
         </div>
       )}
       {p.notas && (
-        <div className={`mt-3 pt-3 border-t border-white/5 text-xs leading-relaxed ${p.notas.includes('CAMPEONES') ? 'text-center text-yellow-400 font-bold text-sm' : 'text-white/40'}`}>
-          {p.notas}
+        <div className="mt-3 pt-3 border-t border-white/5">
+          {p.notas.includes('CAMPEONES') ? (
+            <p className="text-center text-yellow-400 font-bold text-sm">🏆 {p.notas.replace('🏆 ', '').replace(' 🏆', '')} 🏆</p>
+          ) : (
+            <div className="text-xs text-white/50 leading-relaxed space-y-0.5">
+              {p.notas.split('\n').map((line, i) => (
+                <p key={i} className={line.startsWith('•') ? 'pl-3 text-white/40' : 'font-semibold text-white/70 mt-2 first:mt-0'}>
+                  {line}
+                </p>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+      {p.jornada?.includes('Final') && !p.jornada?.includes('Semi') && (
+        <div className="mt-3 pt-3 border-t border-white/5 text-center">
+          <Link
+            to="/estadisticas?seccion=lideres&temporada=Final - Tazón del Mar IX"
+            className="inline-flex items-center gap-2 text-xs font-bold text-accent hover:text-accent-light transition border border-accent/30 hover:border-accent px-4 py-1.5 rounded-full"
+          >
+            📊 Ver estadísticas de la Final
+          </Link>
         </div>
       )}
     </div>
