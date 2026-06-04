@@ -91,7 +91,7 @@ export default function Fixture() {
   const [logoMap, setLogoMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [cat, setCat] = useState('Todos');
-  const [vista, setVista] = useState('proximos');
+  const [vista, setVista] = useState('todos');
 
   useEffect(() => {
     Promise.all([
@@ -108,7 +108,7 @@ export default function Fixture() {
   const ahora = new Date();
   const filtrados = partidos
     .filter(p => cat === 'Todos' || p.categoria === cat)
-    .filter(p => vista === 'proximos' ? p.estado !== 'finalizado' : p.estado === 'finalizado');
+    .filter(p => vista === 'todos' ? true : vista === 'proximos' ? p.estado !== 'finalizado' : p.estado === 'finalizado');
 
   return (
     <div className="bg-primary text-white pt-16">
@@ -121,7 +121,7 @@ export default function Fixture() {
       <section className="max-w-3xl mx-auto py-12 px-4">
         {/* Toggle próximos / resultados */}
         <div className="flex bg-secondary border border-accent/20 rounded-xl p-1 mb-6 w-fit mx-auto">
-          {[['proximos', '📅 Próximos'], ['resultados', '🏆 Resultados']].map(([v, l]) => (
+          {[['todos', '🗓️ Todos'], ['proximos', '📅 Próximos'], ['resultados', '🏆 Resultados']].map(([v, l]) => (
             <button key={v} onClick={() => setVista(v)}
               className={`px-5 py-2 rounded-lg text-sm font-semibold transition ${vista === v ? 'bg-accent text-white' : 'text-white/50 hover:text-white'}`}>
               {l}
