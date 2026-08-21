@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../api';
+import { findFallbackEvent } from '../data/events.js';
 
 import { API_URL } from '../config.js';
 
@@ -16,7 +17,10 @@ export default function EventoDetalle() {
   const [fotoIdx, setFotoIdx] = useState(0);
 
   useEffect(() => {
-    api.get(`/eventos/${id}`).then(r => setEvento(r.data)).finally(() => setLoading(false));
+    api.get(`/eventos/${id}`)
+      .then(r => setEvento(r.data || findFallbackEvent(id)))
+      .catch(() => setEvento(findFallbackEvent(id)))
+      .finally(() => setLoading(false));
   }, [id]);
 
   const abrirFoto = (idx) => { setFotoIdx(idx); setFotoAmpliada(evento.fotos[idx]); };

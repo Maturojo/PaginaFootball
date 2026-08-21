@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
+import { FALLBACK_EVENTS } from '../data/events.js';
 
 import { API_URL } from '../config.js';
 
@@ -13,7 +14,10 @@ export default function Eventos() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/eventos').then(r => setEventos(r.data)).finally(() => setLoading(false));
+    api.get('/eventos')
+      .then(r => setEventos(r.data?.length ? r.data : FALLBACK_EVENTS))
+      .catch(() => setEventos(FALLBACK_EVENTS))
+      .finally(() => setLoading(false));
   }, []);
 
   return (
