@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
+import { FALLBACK_PARTIDOS } from '../data/stats.js';
+import { teamLogoSrc } from '../utils/teamLogo.js';
 
-import { API_URL } from '../config.js';
 const CATS = ['Todos', 'Liga Football Flag', 'Football Flag Femenino', 'Football Americano 7vs7'];
 const ESTADOS = { programado: { label: 'Programado', color: 'bg-blue-500/20 text-blue-300' }, en_juego: { label: 'En juego', color: 'bg-green-500/20 text-green-300 animate-pulse' }, finalizado: { label: 'Finalizado', color: 'bg-white/10 text-white/50' }, cancelado: { label: 'Cancelado', color: 'bg-red-500/20 text-red-400' } };
 
-function logoSrc(l) { if (!l) return null; return l.startsWith('http') ? l : `${API_URL}${l}`; }
-
 function TeamLogo({ nombre, logoMap }) {
-  const logo = logoMap[nombre];
-  if (logo) return <img src={logoSrc(logo)} alt={nombre} className="w-16 h-16 object-contain" />;
+  const logo = logoMap[nombre] || teamLogoSrc({ nombre });
+  if (logo) return <img src={logo} alt={nombre} className="w-16 h-16 object-contain" />;
   return <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center text-2xl">🏈</div>;
 }
 
@@ -98,10 +97,13 @@ export default function Fixture() {
       api.get('/partidos'),
       api.get('/teams'),
     ]).then(([p, t]) => {
-      setPartidos(p.data);
+      setPartidos(p.data?.length ? p.data : FALLBACK_PARTIDOS);
       const map = {};
-      t.data.forEach(team => { if (team.logo) map[team.nombre] = team.logo; });
+      t.data.forEach(team => { if (team.logo) map[team.nombre] = teamLogoSrc(team); });
       setLogoMap(map);
+    }).catch(() => {
+      setPartidos(FALLBACK_PARTIDOS);
+      setLogoMap({});
     }).finally(() => setLoading(false));
   }, []);
 

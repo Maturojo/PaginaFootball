@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import api from '../api';
+import { teamLogoSrc } from '../utils/teamLogo.js';
 
 import { API_URL } from '../config.js';
 function fotoSrc(f) { return f?.startsWith('http') ? f : `${API_URL}${f}`; }
 
-const EQUIPOS = ['Todos', 'Acorazados', 'Liebres', 'Krakens', 'Tridentes', 'Nereidas', 'Atlantes'];
+const EQUIPOS = ['Todos', 'Acorazados', 'Liebres', 'Krakens', 'Tridentes', 'Nereidas', 'Atlantes', 'Bárbaros', 'Templarios'];
 
 export default function Jugadores() {
   const [jugadores, setJugadores] = useState([]);
@@ -52,7 +53,10 @@ export default function Jugadores() {
         <div className="flex flex-wrap gap-2 mb-8">
           {EQUIPOS.map(e => (
             <button key={e} onClick={() => setEquipo(e)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${equipo === e ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/50 hover:text-white hover:border-accent/50'}`}>
+              className={`min-h-10 px-3 py-1.5 rounded-full text-sm font-medium transition inline-flex items-center gap-2 ${equipo === e ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/50 hover:text-white hover:border-accent/50'}`}>
+              {e !== 'Todos' && (
+                <img src={teamLogoSrc({ nombre: e })} alt="" className="w-7 h-7 object-contain" />
+              )}
               {e}
             </button>
           ))}

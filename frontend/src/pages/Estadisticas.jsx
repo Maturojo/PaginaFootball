@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../api';
+import { FALLBACK_STATS, FALLBACK_TEMPORADAS, fallbackLideresByTemporada } from '../data/stats.js';
 
 const COLS_STATS = ['Equipo', 'PJ', 'PG', 'PP', 'PF', 'PC', 'Pts'];
 
@@ -215,7 +216,12 @@ function PremiosSection() {
   useEffect(() => {
     api.get('/lideres/temporadas').then(r => {
       // Solo temporadas que tienen premios (no las de partidos individuales)
-      const principales = r.data.filter(t => !t.includes('Final') && !t.includes('Semi'));
+      const temporadas = r.data?.length ? r.data : FALLBACK_TEMPORADAS;
+      const principales = temporadas.filter(t => !t.includes('Final') && !t.includes('Semi'));
+      setTemporadas(principales);
+      if (principales.length > 0) setTemporadaActiva(principales[0]);
+    }).catch(() => {
+      const principales = FALLBACK_TEMPORADAS.filter(t => !t.includes('Final') && !t.includes('Semi'));
       setTemporadas(principales);
       if (principales.length > 0) setTemporadaActiva(principales[0]);
     });
@@ -223,7 +229,9 @@ function PremiosSection() {
 
   useEffect(() => {
     if (temporadaActiva) {
-      api.get(`/lideres?temporada=${encodeURIComponent(temporadaActiva)}`).then(r => setLideresPremios(r.data));
+      api.get(`/lideres?temporada=${encodeURIComponent(temporadaActiva)}`)
+        .then(r => setLideresPremios(r.data?.length ? r.data : fallbackLideresByTemporada(temporadaActiva)))
+        .catch(() => setLideresPremios(fallbackLideresByTemporada(temporadaActiva)));
     }
   }, [temporadaActiva]);
 
@@ -262,17 +270,27 @@ export default function Estadisticas() {
       api.get('/estadisticas'),
       api.get('/lideres/temporadas'),
     ]).then(([s, t]) => {
-      setStats(s.data);
-      setTemporadas(t.data);
+      const statsData = s.data?.length ? s.data : FALLBACK_STATS;
+      const temporadasData = t.data?.length ? t.data : FALLBACK_TEMPORADAS;
+      setStats(statsData);
+      setTemporadas(temporadasData);
       const paramTemporada = searchParams.get('temporada');
-      const defaultTemporada = paramTemporada && t.data.includes(paramTemporada) ? paramTemporada : t.data[0];
-      if (t.data.length > 0) setTemporadaActiva(defaultTemporada || t.data[0]);
+      const defaultTemporada = paramTemporada && temporadasData.includes(paramTemporada) ? paramTemporada : temporadasData[0];
+      if (temporadasData.length > 0) setTemporadaActiva(defaultTemporada || temporadasData[0]);
+    }).catch(() => {
+      setStats(FALLBACK_STATS);
+      setTemporadas(FALLBACK_TEMPORADAS);
+      const paramTemporada = searchParams.get('temporada');
+      const defaultTemporada = paramTemporada && FALLBACK_TEMPORADAS.includes(paramTemporada) ? paramTemporada : FALLBACK_TEMPORADAS[0];
+      if (FALLBACK_TEMPORADAS.length > 0) setTemporadaActiva(defaultTemporada || FALLBACK_TEMPORADAS[0]);
     }).finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
     if (temporadaActiva) {
-      api.get(`/lideres?temporada=${encodeURIComponent(temporadaActiva)}`).then(r => setLideres(r.data));
+      api.get(`/lideres?temporada=${encodeURIComponent(temporadaActiva)}`)
+        .then(r => setLideres(r.data?.length ? r.data : fallbackLideresByTemporada(temporadaActiva)))
+        .catch(() => setLideres(fallbackLideresByTemporada(temporadaActiva)));
     }
   }, [temporadaActiva]);
 

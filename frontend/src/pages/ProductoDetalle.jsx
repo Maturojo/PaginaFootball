@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../api';
 import { API_URL } from '../config.js';
+import { findFallbackProduct } from '../data/products.js';
 
 function buildWhatsAppLink(product) {
   const phone = product.whatsapp || '5492235000000';
@@ -15,7 +16,10 @@ export default function ProductoDetalle() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get(`/products/${id}`).then(r => setProduct(r.data)).finally(() => setLoading(false));
+    api.get(`/products/${id}`)
+      .then(r => setProduct(r.data || findFallbackProduct(id)))
+      .catch(() => setProduct(findFallbackProduct(id)))
+      .finally(() => setLoading(false));
   }, [id]);
 
   if (loading) return (

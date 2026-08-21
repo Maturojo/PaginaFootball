@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
+import { FALLBACK_PRODUCTS } from '../data/products.js';
 
 import { API_URL } from '../config.js';
 
@@ -16,7 +17,10 @@ export default function Tienda() {
   const [categoria, setCategoria] = useState('Todos');
 
   useEffect(() => {
-    api.get('/products').then(r => setProducts(r.data)).finally(() => setLoading(false));
+    api.get('/products')
+      .then(r => setProducts(r.data?.length ? r.data : FALLBACK_PRODUCTS))
+      .catch(() => setProducts(FALLBACK_PRODUCTS))
+      .finally(() => setLoading(false));
   }, []);
 
   const categorias = ['Todos', ...new Set(products.map(p => p.categoria).filter(Boolean))];

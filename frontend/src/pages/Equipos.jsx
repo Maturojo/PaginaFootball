@@ -1,16 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
-
-import { API_URL } from '../config.js';
+import { FALLBACK_TEAMS } from '../data/teams.js';
+import { teamLogoSrc, teamSlug } from '../utils/teamLogo.js';
 
 export function slugify(str) {
-  return str.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '-');
-}
-
-function logoSrc(logo) {
-  if (!logo) return null;
-  return logo.startsWith('http') ? logo : `${API_URL}${logo}`;
+  return teamSlug(str);
 }
 
 const CATEGORIAS = [
@@ -20,6 +15,8 @@ const CATEGORIAS = [
 ];
 
 function TeamCard({ team }) {
+  const logo = teamLogoSrc(team);
+
   return (
     <Link
       to={`/equipos/${slugify(team.nombre)}`}
@@ -27,8 +24,8 @@ function TeamCard({ team }) {
       className="bg-secondary border border-accent/20 rounded-xl overflow-hidden hover:border-accent/60 hover:-translate-y-1 transition-all flex flex-col items-center group relative"
     >
       <div className="p-6 flex flex-col items-center w-full">
-        {team.logo ? (
-          <img src={logoSrc(team.logo)} alt={team.nombre} className="w-44 h-44 object-contain" />
+        {logo ? (
+          <img src={logo} alt={team.nombre} className="w-44 h-44 object-contain" />
         ) : (
           <div className="w-44 h-44 bg-accent/10 rounded-full flex items-center justify-center">
             <span className="text-7xl">🏈</span>
@@ -49,7 +46,10 @@ export default function Equipos() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/teams').then(r => setTeams(r.data)).finally(() => setLoading(false));
+    api.get('/teams')
+      .then(r => setTeams(r.data?.length ? r.data : FALLBACK_TEAMS))
+      .catch(() => setTeams(FALLBACK_TEAMS))
+      .finally(() => setLoading(false));
   }, []);
 
   return (

@@ -1,16 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import api from '../api';
-
-import { API_URL } from '../config.js';
-
-function logoSrc(logo) {
-  if (!logo) return null;
-  return logo.startsWith('http') ? logo : `${API_URL}${logo}`;
-}
+import { FALLBACK_TEAMS } from '../data/teams.js';
+import { teamLogoSrc, teamSlug } from '../utils/teamLogo.js';
 
 function slugify(str) {
-  return str.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '-');
+  return teamSlug(str);
 }
 
 export default function EquipoDetalle() {
@@ -22,9 +17,16 @@ export default function EquipoDetalle() {
 
   useEffect(() => {
     if (team) return;
+    const findTeam = teams => teams.find(t => t._id === id || slugify(t.nombre) === id);
+
     api.get('/teams')
       .then(r => {
-        const found = r.data.find(t => t._id === id || slugify(t.nombre) === id);
+        const found = findTeam(r.data) || findTeam(FALLBACK_TEAMS);
+        if (found) setTeam(found);
+        else setNotFound(true);
+      })
+      .catch(() => {
+        const found = findTeam(FALLBACK_TEAMS);
         if (found) setTeam(found);
         else setNotFound(true);
       })
@@ -45,15 +47,17 @@ export default function EquipoDetalle() {
     </div>
   );
 
+  const logo = teamLogoSrc(team);
+
   return (
     <div className="bg-primary text-white min-h-screen pt-16">
       {/* Hero del equipo */}
       <section className="bg-secondary border-b border-accent/20 py-16 px-4">
         <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-10">
           <div className="flex-shrink-0">
-            {team.logo ? (
+            {logo ? (
               <img
-                src={logoSrc(team.logo)}
+                src={logo}
                 alt={team.nombre}
                 className="w-44 h-44 object-contain drop-shadow-2xl"
               />
