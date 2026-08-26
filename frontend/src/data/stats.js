@@ -838,59 +838,169 @@ export const FALLBACK_LIDERES = [
   },
 ];
 
-export const FALLBACK_HISTORICOS = [
-  {
-    key: 'touchdowns',
-    titulo: 'Touchdowns',
-    abreviatura: 'TD',
-    jugadores: [
-      { pos: 1, nombre: 'Javier Papagni', equipo: 'TRI', valor: 25, partidos: 7 },
-      { pos: 2, nombre: 'Ángel Ávila', equipo: 'KRA', valor: 19, partidos: 7 },
-      { pos: 3, nombre: 'Agustín Luporini', equipo: 'LIE', valor: 16, partidos: 5 },
-      { pos: 4, nombre: 'Lucas Gabotto', equipo: 'KRA', valor: 10, partidos: 7 },
-      { pos: 5, nombre: 'Héctor González', equipo: 'LIE', valor: 10, partidos: 4 },
-      { pos: 6, nombre: 'Elvis Rodríguez', equipo: 'KRA', valor: 9, partidos: 5 },
-      { pos: 7, nombre: 'Emiliano Sánchez', equipo: 'LIE', valor: 7, partidos: 5 },
-      { pos: 8, nombre: 'Ignacio Cuesta', equipo: 'TRI', valor: 6, partidos: 5 },
-      { pos: 9, nombre: 'Mauro Castillo', equipo: 'TRI', valor: 6, partidos: 5 },
-      { pos: 10, nombre: 'Pablo Corva', equipo: 'TRI', valor: 5, partidos: 6 },
-    ],
-  },
-  {
-    key: 'yardas',
-    titulo: 'Yardas',
-    abreviatura: 'YDS',
-    jugadores: [
-      { pos: 1, nombre: 'Javier Papagni', equipo: 'TRI', valor: 1702, partidos: 7 },
-      { pos: 2, nombre: 'Ángel Ávila', equipo: 'KRA', valor: 1393, partidos: 7 },
-      { pos: 3, nombre: 'Agustín Luporini', equipo: 'LIE', valor: 1073, partidos: 5 },
-      { pos: 4, nombre: 'Lucas Gabotto', equipo: 'KRA', valor: 837, partidos: 7 },
-      { pos: 5, nombre: 'Elvis Rodríguez', equipo: 'KRA', valor: 522, partidos: 5 },
-      { pos: 6, nombre: 'Héctor González', equipo: 'LIE', valor: 407, partidos: 4 },
-      { pos: 7, nombre: 'Ignacio Cuesta', equipo: 'TRI', valor: 339, partidos: 5 },
-      { pos: 8, nombre: 'Pablo Corva', equipo: 'TRI', valor: 311, partidos: 6 },
-      { pos: 9, nombre: 'Mauro Castillo', equipo: 'TRI', valor: 309, partidos: 5 },
-      { pos: 10, nombre: 'Emiliano Sánchez', equipo: 'LIE', valor: 290, partidos: 5 },
-    ],
-  },
-  {
-    key: 'intercepciones',
-    titulo: 'Intercepciones',
-    abreviatura: 'INT',
-    jugadores: [
-      { pos: 1, nombre: 'Lucas Gabotto', equipo: 'KRA', valor: 7, partidos: 7 },
-      { pos: 2, nombre: 'Ignacio Cuesta', equipo: 'TRI', valor: 5, partidos: 5 },
-      { pos: 3, nombre: 'Ángel Ávila', equipo: 'KRA', valor: 4, partidos: 7 },
-      { pos: 4, nombre: 'Matías Rojo', equipo: 'LIE', valor: 4, partidos: 4 },
-      { pos: 5, nombre: 'Emiliano Sánchez', equipo: 'LIE', valor: 3, partidos: 5 },
-      { pos: 6, nombre: 'Elvis Rodríguez', equipo: 'KRA', valor: 3, partidos: 5 },
-      { pos: 7, nombre: 'Agustín Luporini', equipo: 'LIE', valor: 2, partidos: 4 },
-      { pos: 8, nombre: 'Ignacio Ríos', equipo: 'KRA', valor: 2, partidos: 5 },
-      { pos: 9, nombre: 'Pablo Corva', equipo: 'TRI', valor: 1, partidos: 5 },
-      { pos: 10, nombre: 'Iñaki Irurzun', equipo: 'TRI', valor: 1, partidos: 5 },
-    ],
-  },
+const HISTORICAL_GAME_COUNTS = {
+  'javier papagni': 7,
+  'angel avila': 7,
+  'agustin luporini': 5,
+  'lucas gabotto': 7,
+  'hector gonzalez': 4,
+  'elvis rodriguez': 5,
+  'emiliano sanchez': 5,
+  'ignacio cuesta': 5,
+  'mauro castillo': 5,
+  'pablo corva': 6,
+  'matias rojo': 4,
+  'ignacio rios': 5,
+  'inaki irurzun': 5,
+};
+
+const HISTORICAL_DISPLAY_NAMES = {
+  'angel avila': 'Ángel Ávila',
+  'agustin luporini': 'Agustín Luporini',
+  'elvis rodriguez': 'Elvis Rodríguez',
+  'emiliano sanchez': 'Emiliano Sánchez',
+  'hector gonzalez': 'Héctor González',
+  'ignacio rios': 'Ignacio Ríos',
+  'julian fernandez': 'Julián Fernández',
+  'matias rojo': 'Matías Rojo',
+  'ruben gabotto': 'Rubén Gabotto',
+};
+
+const HISTORICAL_EXTRA_STATS = [
+  { nombre: 'Javier Papagni', equipo: 'TRI', touchdowns: 4, yardas: 318 },
+  { nombre: 'Ángel Ávila', equipo: 'KRA', touchdowns: 2, yardas: 207, intercepciones: 1 },
+  { nombre: 'Lucas Gabotto', equipo: 'KRA', touchdowns: 1, yardas: 148, intercepciones: 2 },
+  { nombre: 'Elvis Rodríguez', equipo: 'KRA', yardas: 85 },
+  { nombre: 'Pablo Corva', equipo: 'TRI', touchdowns: 1, yardas: 80, intercepciones: 1 },
+  { nombre: 'Ignacio Cuesta', equipo: 'TRI', yardas: 9 },
 ];
+
+function normalizePlayerName(value) {
+  return String(value ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function sortedTop10(playersMap, statKey) {
+  let lastValue = null;
+  let lastPosition = 0;
+
+  return [...playersMap.values()]
+    .filter(player => player[statKey] > 0)
+    .sort((a, b) => b[statKey] - a[statKey] || a.nombre.localeCompare(b.nombre))
+    .slice(0, 10)
+    .map((player, index) => {
+      if (player[statKey] !== lastValue) {
+        lastPosition = index + 1;
+        lastValue = player[statKey];
+      }
+
+      return {
+        pos: lastPosition,
+        nombre: player.nombre,
+        equipo: player.equipo,
+        valor: player[statKey],
+        partidos: HISTORICAL_GAME_COUNTS[player.key] || player.temporadas.size,
+      };
+    });
+}
+
+function buildHistoricalPlayers(lideres) {
+  const playersMap = new Map();
+
+  const getPlayer = ({ nombre, equipo, temporada }) => {
+    const key = normalizePlayerName(nombre);
+    if (!key) return null;
+
+    if (!playersMap.has(key)) {
+      playersMap.set(key, {
+        key,
+        nombre: HISTORICAL_DISPLAY_NAMES[key] || nombre,
+        equipo,
+        touchdowns: 0,
+        yardas: 0,
+        intercepciones: 0,
+        temporadas: new Set(),
+      });
+    }
+
+    const player = playersMap.get(key);
+    player.nombre = HISTORICAL_DISPLAY_NAMES[key] || nombre;
+    player.equipo = equipo || player.equipo;
+    if (temporada) player.temporadas.add(temporada);
+    return player;
+  };
+
+  lideres.forEach(lider => {
+    if (!['pase', 'corrida', 'recepcion', 'intercepciones'].includes(lider.tipo)) return;
+
+    lider.jugadores.forEach(jugador => {
+      const player = getPlayer({ nombre: jugador.nombre, equipo: jugador.equipo, temporada: lider.temporada });
+      if (!player) return;
+
+      if (['pase', 'corrida', 'recepcion'].includes(lider.tipo)) {
+        player.touchdowns += Number(jugador.td) || 0;
+        player.yardas += Number(jugador.yds) || 0;
+      }
+
+      if (lider.tipo === 'intercepciones') {
+        player.intercepciones += Number(jugador.ints) || 0;
+      }
+    });
+  });
+
+  HISTORICAL_EXTRA_STATS.forEach(extra => {
+    const player = getPlayer({ nombre: extra.nombre, equipo: extra.equipo, temporada: 'Datos históricos' });
+    if (!player) return;
+
+    player.touchdowns += Number(extra.touchdowns) || 0;
+    player.yardas += Number(extra.yardas) || 0;
+    player.intercepciones += Number(extra.intercepciones) || 0;
+  });
+
+  return playersMap;
+}
+
+const HISTORICAL_PLAYERS = buildHistoricalPlayers(FALLBACK_LIDERES);
+
+function buildHistoricos(playersMap) {
+  return [
+    {
+      key: 'touchdowns',
+      titulo: 'Touchdowns',
+      abreviatura: 'TD',
+      jugadores: sortedTop10(playersMap, 'touchdowns'),
+    },
+    {
+      key: 'yardas',
+      titulo: 'Yardas',
+      abreviatura: 'YDS',
+      jugadores: sortedTop10(playersMap, 'yardas'),
+    },
+    {
+      key: 'intercepciones',
+      titulo: 'Intercepciones',
+      abreviatura: 'INT',
+      jugadores: sortedTop10(playersMap, 'intercepciones'),
+    },
+  ];
+}
+
+export const FALLBACK_HISTORICOS = buildHistoricos(HISTORICAL_PLAYERS);
+
+export function fallbackHistoricosByJugador(nombre) {
+  const key = normalizePlayerName(nombre);
+  const stats = HISTORICAL_PLAYERS.get(key);
+
+  return {
+    touchdowns: stats?.touchdowns || 0,
+    yardas: stats?.yardas || 0,
+    intercepciones: stats?.intercepciones || 0,
+  };
+}
 
 export const FALLBACK_TEMPORADAS = [...new Set(FALLBACK_LIDERES.map(l => l.temporada))];
 

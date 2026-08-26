@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../api';
 import { FALLBACK_PLAYERS, mergePlayers } from '../data/players.js';
-import { FALLBACK_LIDERES } from '../data/stats.js';
+import { FALLBACK_LIDERES, fallbackHistoricosByJugador } from '../data/stats.js';
 import { teamLogoSrc } from '../utils/teamLogo.js';
 
 import { API_URL } from '../config.js';
@@ -57,6 +57,17 @@ function playerHonors(player) {
     ofensivo,
     defensivo,
     total: premios.length + ofensivo.length + defensivo.length,
+  };
+}
+
+function playerAggregateStats(player) {
+  const stats = fallbackHistoricosByJugador(player.nombre);
+
+  return {
+    partidos: player.stats?.partidos ?? 0,
+    touchdowns: stats.touchdowns || player.stats?.touchdowns || 0,
+    intercepciones: stats.intercepciones || player.stats?.intercepciones || 0,
+    yardas: stats.yardas || player.stats?.yardas || 0,
   };
 }
 
@@ -155,7 +166,10 @@ export default function Jugadores() {
             {selected.bio && <p className="text-white/60 text-sm mt-4 text-center leading-relaxed">{selected.bio}</p>}
             {/* Stats */}
             <div className="grid grid-cols-4 gap-2 mt-6">
-              {[['PJ', selected.stats?.partidos], ['TD', selected.stats?.touchdowns], ['INT', selected.stats?.intercepciones], ['YDS', selected.stats?.yardas]].map(([l, v]) => (
+              {(() => {
+                const stats = playerAggregateStats(selected);
+                return [['PJ', stats.partidos], ['TD', stats.touchdowns], ['INT', stats.intercepciones], ['YDS', stats.yardas]];
+              })().map(([l, v]) => (
                 <div key={l} className="bg-primary/50 rounded-lg p-3 text-center">
                   <p className="text-accent font-extrabold text-xl">{v ?? 0}</p>
                   <p className="text-white/40 text-xs mt-0.5">{l}</p>
