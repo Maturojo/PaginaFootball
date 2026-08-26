@@ -165,27 +165,57 @@ function JerseyFace({ team, name, number, side }) {
 }
 
 function JerseyPreview({ team, name, number }) {
+  const style = TEAM_STYLES[team.nombre] || TEAM_STYLES.Acorazados;
+
   return (
     <div className="relative w-full max-w-md mx-auto aspect-[4/5] flex items-center justify-center [perspective:1200px]">
       <style>{`
         @keyframes jerseySpin {
-          0% { transform: rotateY(-24deg) rotateX(4deg); }
-          42% { transform: rotateY(156deg) rotateX(4deg); }
-          50% { transform: rotateY(180deg) rotateX(4deg); }
-          92% { transform: rotateY(336deg) rotateX(4deg); }
-          100% { transform: rotateY(336deg) rotateX(4deg); }
+          0%, 24% { transform: rotateY(-18deg) rotateX(3deg); }
+          38%, 62% { transform: rotateY(198deg) rotateX(3deg); }
+          76%, 100% { transform: rotateY(342deg) rotateX(3deg); }
         }
       `}</style>
       <div className="absolute inset-x-12 bottom-3 h-9 rounded-full bg-black/50 blur-xl" />
       <div className="relative w-full h-full [transform-style:preserve-3d] animate-[jerseySpin_9s_ease-in-out_infinite]">
-        <div className="absolute inset-0 [backface-visibility:hidden] [transform:translateZ(18px)]">
+        {[-18, -12, -6, 0, 6, 12, 18].map((z, i) => (
+          <div
+            key={z}
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              transform: `translateZ(${z}px) scale(${1 - Math.abs(z) * 0.0018})`,
+              opacity: i === 3 ? 0.32 : 0.12,
+              filter: 'blur(0.2px)',
+            }}
+          >
+            <svg viewBox="0 0 430 560" className="w-full h-full">
+              <path
+                d="M143 59 C160 42 179 35 215 35 C251 35 270 42 287 59 L376 92 C400 101 413 123 408 149 L390 242 C386 264 371 276 350 271 L304 260 L292 498 C291 515 279 525 262 525 H168 C151 525 139 515 138 498 L126 260 L80 271 C59 276 44 264 40 242 L22 149 C17 123 30 101 54 92 Z"
+                fill={i < 3 ? style.side : i > 3 ? '#0b1220' : style.body}
+              />
+            </svg>
+          </div>
+        ))}
+        <div
+          className="absolute left-[10%] top-[19%] h-[62%] w-16 rounded-[50%] blur-[1px]"
+          style={{
+            background: `linear-gradient(90deg, ${style.side}, rgba(0,0,0,.45))`,
+            transform: 'rotateY(88deg) translateZ(178px)',
+          }}
+        />
+        <div
+          className="absolute right-[10%] top-[19%] h-[62%] w-16 rounded-[50%] blur-[1px]"
+          style={{
+            background: `linear-gradient(90deg, rgba(255,255,255,.12), ${style.side})`,
+            transform: 'rotateY(88deg) translateZ(-178px)',
+          }}
+        />
+        <div className="absolute inset-0 [backface-visibility:hidden] [transform:translateZ(24px)]">
           <JerseyFace team={team} name={name} number={number} side="front" />
         </div>
-        <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)_translateZ(18px)]">
+        <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)_translateZ(24px)]">
           <JerseyFace team={team} name={name} number={number} side="back" />
         </div>
-        <div className="absolute left-[13%] top-[18%] h-[68%] w-10 rounded-full bg-black/30 blur-sm [transform:rotateY(90deg)_translateZ(156px)]" />
-        <div className="absolute right-[13%] top-[18%] h-[68%] w-10 rounded-full bg-white/10 blur-sm [transform:rotateY(90deg)_translateZ(-156px)]" />
       </div>
     </div>
   );
