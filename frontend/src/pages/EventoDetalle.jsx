@@ -6,6 +6,7 @@ import { findFallbackEvent } from '../data/events.js';
 import { API_URL } from '../config.js';
 
 function fotoSrc(f) {
+  if (f.startsWith('/eventos/')) return f;
   return f.startsWith('http') ? f : `${API_URL}${f}`;
 }
 

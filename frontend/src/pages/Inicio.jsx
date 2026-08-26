@@ -41,6 +41,9 @@ export default function Inicio() {
             <Link to="/tienda" className="border-2 border-accent/60 text-white font-bold px-8 py-3 rounded-full hover:bg-accent/20 transition">
               Ir a la Tienda
             </Link>
+            <Link to="/remeras" className="border-2 border-white/30 text-white font-bold px-8 py-3 rounded-full hover:bg-white/10 transition">
+              Encargar Remera
+            </Link>
           </div>
         </div>
       </section>
@@ -60,7 +63,7 @@ export default function Inicio() {
           {[
             { to: '/historia', icon: '📖', title: 'Nuestra Historia', desc: 'Conocé los orígenes y el recorrido de la liga desde 2016.' },
             { to: '/equipos', icon: '🏟️', title: 'Los Equipos', desc: 'Conocé los equipos que compiten en la liga temporada a temporada.' },
-            { to: '/tienda', icon: '👕', title: 'Tienda Oficial', desc: 'Camisetas, gorras y merchandise oficial de la liga.' },
+            { to: '/remeras', icon: '👕', title: 'Remeras Personalizadas', desc: 'Elegí tu equipo y encargá tu remera con nombre atrás.' },
           ].map(c => (
             <Link
               key={c.to}

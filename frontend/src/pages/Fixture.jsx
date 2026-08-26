@@ -13,9 +13,40 @@ function TeamLogo({ nombre, logoMap }) {
   return <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center text-2xl">🏈</div>;
 }
 
+function dateLabel(partido) {
+  return partido.fechaTexto || new Date(partido.fecha).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' });
+}
+
+function mergePartidos(apiPartidos = []) {
+  const ids = new Set(apiPartidos.map(partido => partido._id));
+  return [...apiPartidos, ...FALLBACK_PARTIDOS.filter(partido => !ids.has(partido._id))];
+}
+
 function PartidoCard({ p, logoMap }) {
   const finalizado = p.estado === 'finalizado';
   const estado = ESTADOS[p.estado] || ESTADOS.programado;
+
+  if (p.tipo === 'agenda') {
+    return (
+      <div className="bg-secondary border border-accent/20 rounded-xl p-5 hover:border-accent/40 transition">
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <span className="text-xs text-white/40">{p.jornada}</span>
+          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${estado.color}`}>{estado.label}</span>
+        </div>
+        <div className="flex items-center gap-5">
+          <div className="w-24 min-h-20 rounded-lg bg-accent/10 border border-accent/20 flex flex-col items-center justify-center text-center flex-shrink-0">
+            <p className="text-accent font-extrabold text-lg uppercase leading-tight">{dateLabel(p)}</p>
+          </div>
+          <div className="min-w-0">
+            <h3 className="font-extrabold text-white text-lg leading-tight">{p.titulo}</h3>
+            {p.lugar && <p className="text-white/40 text-sm mt-1">📍 {p.lugar}</p>}
+            {p.notas && <p className="text-white/50 text-sm mt-2">{p.notas}</p>}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-secondary border border-accent/20 rounded-xl p-5 hover:border-accent/40 transition">
       <div className="flex items-center justify-between mb-3">
@@ -38,7 +69,7 @@ function PartidoCard({ p, logoMap }) {
             </div>
           ) : (
             <div>
-              <p className="text-accent font-bold text-sm">{new Date(p.fecha).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}</p>
+              <p className="text-accent font-bold text-sm">{dateLabel(p)}</p>
               {p.hora && <p className="text-white/40 text-xs">{p.hora}hs</p>}
               <p className="text-white/20 text-2xl font-bold mt-1">VS</p>
             </div>
@@ -97,7 +128,7 @@ export default function Fixture() {
       api.get('/partidos'),
       api.get('/teams'),
     ]).then(([p, t]) => {
-      setPartidos(p.data?.length ? p.data : FALLBACK_PARTIDOS);
+      setPartidos(mergePartidos(p.data || []));
       const map = {};
       t.data.forEach(team => { if (team.logo) map[team.nombre] = teamLogoSrc(team); });
       setLogoMap(map);

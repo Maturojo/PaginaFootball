@@ -18,6 +18,7 @@ import Eventos from './pages/Eventos';
 import EventoDetalle from './pages/EventoDetalle';
 import Tienda from './pages/Tienda';
 import ProductoDetalle from './pages/ProductoDetalle';
+import Remeras from './pages/Remeras';
 import Contacto from './pages/Contacto';
 import Inscripcion from './pages/Inscripcion';
 
@@ -63,6 +64,7 @@ export default function App() {
           <Route path="/eventos/:id" element={<PublicLayout><EventoDetalle /></PublicLayout>} />
           <Route path="/tienda" element={<PublicLayout><Tienda /></PublicLayout>} />
           <Route path="/tienda/:id" element={<PublicLayout><ProductoDetalle /></PublicLayout>} />
+          <Route path="/remeras" element={<PublicLayout><Remeras /></PublicLayout>} />
           <Route path="/contacto" element={<PublicLayout><Contacto /></PublicLayout>} />
           <Route path="/inscripcion" element={<PublicLayout><Inscripcion /></PublicLayout>} />
 

@@ -6,7 +6,14 @@ import { FALLBACK_EVENTS } from '../data/events.js';
 import { API_URL } from '../config.js';
 
 function fotoSrc(f) {
+  if (f.startsWith('/eventos/')) return f;
   return f.startsWith('http') ? f : `${API_URL}${f}`;
+}
+
+function mergeEvents(apiEvents = []) {
+  const ids = new Set(apiEvents.map(evento => evento._id));
+  return [...apiEvents, ...FALLBACK_EVENTS.filter(evento => !ids.has(evento._id))]
+    .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 }
 
 export default function Eventos() {
@@ -15,7 +22,7 @@ export default function Eventos() {
 
   useEffect(() => {
     api.get('/eventos')
-      .then(r => setEventos(r.data?.length ? r.data : FALLBACK_EVENTS))
+      .then(r => setEventos(mergeEvents(r.data || [])))
       .catch(() => setEventos(FALLBACK_EVENTS))
       .finally(() => setLoading(false));
   }, []);

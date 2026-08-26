@@ -9,6 +9,7 @@ const links = [
   { to: '/estadisticas', label: 'Estadísticas' },
   { to: '/eventos', label: 'Eventos' },
   { to: '/tienda', label: 'Tienda' },
+  { to: '/remeras', label: 'Remeras' },
   { to: '/inscripcion', label: '¡Sumate!' },
 ];
 

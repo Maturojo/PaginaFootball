@@ -35,6 +35,20 @@ export default function Tienda() {
       </section>
 
       <section className="max-w-6xl mx-auto py-16 px-4">
+        <div className="bg-secondary border border-accent/20 rounded-xl p-6 mb-10 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+          <div>
+            <p className="text-accent text-xs font-bold uppercase tracking-widest">Nuevo</p>
+            <h2 className="text-2xl font-extrabold text-white mt-1">Remeras de equipos personalizadas</h2>
+            <p className="text-white/50 text-sm mt-2">Elegí el equipo, talle y el nombre que querés llevar atrás.</p>
+          </div>
+          <Link
+            to="/remeras"
+            className="bg-accent hover:bg-accent-light text-white font-bold px-6 py-3 rounded-xl text-center transition shadow-lg shadow-accent/20"
+          >
+            Encargar remera
+          </Link>
+        </div>
+
         <div className="flex flex-wrap gap-2 mb-8 justify-center">
           {categorias.map(c => (
             <button
