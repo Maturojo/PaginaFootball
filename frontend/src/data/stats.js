@@ -242,6 +242,19 @@ export const FALLBACK_PARTIDOS = [
     notas: 'KRAKENS\n• Ángel Ávila: 18/26, 135 yds, 2 TDs, 2 ints lanzadas · 4 rec, 75 yds\n• Elvis Rodríguez: 10/11, 107 yds, 1 TD · 1 int defensiva\n• Lucas Gabotto: 7 rec, 50 yds, 3 TDs · 2 ints defensivas\n• Ignacio Ríos: 1 sack · 1 deflec\n\nLIEBRES\n• Agustín Luporini: 13/33, 145 yds, 1 TD, 3 ints lanzadas\n• Héctor González: 4 rec, 69 yds, 1 TD · 3 rush, 29 yds\n• Emiliano Sánchez: 6 rec, 60 yds · 1 int defensiva',
   },
   {
+    _id: 'final-tazon-del-mar-x',
+    jornada: 'Final - Tazón del Mar X',
+    categoria: 'Liga Football Flag',
+    equipoLocal: 'Tridentes',
+    equipoVisitante: 'Krakens',
+    fecha: '2026-08-17',
+    fechaTexto: 'Final',
+    estado: 'finalizado',
+    golesLocal: 0,
+    golesVisitante: 35,
+    notas: 'KRAKENS CAMPEONES DEL TAZÓN DEL MAR X\n\nKRAKENS\n• Ángel Ávila: 20/33, 240 yds, 3 TDs, 1 int lanzada · 1 rush, 9 yds · 1 int defensiva · 1 deflec\n• Lucas Gabotto: 11 rec, 162 yds, 2 TDs · 1 rush, 5 yds · 1 deflec\n• Elvis Rodríguez: 4/5, 45 yds, 1 TD, 1 int lanzada · 3 rush, 60 yds, 1 TD · 2 ints defensivas\n• Leandro Cattaneo: 1 sack, 1 safety\n\nTRIDENTES\n• Javier Papagni: 10/30, 99 yds, 4 ints lanzadas\n• Ignacio Cuesta: 3 rec, 33 yds · 2 ints defensivas\n• Pablo Corva: 3 rec, 32 yds',
+  },
+  {
     _id: 'semifinal-tazon-del-mar-ix',
     jornada: 'Semifinal - Tazón del Mar IX',
     categoria: 'Liga Football Flag',
@@ -294,6 +307,38 @@ export const FALLBACK_STATS = [
 ];
 
 export const FALLBACK_LIDERES = [
+  {
+    temporada: 'Tazón del Mar X',
+    tipo: 'premios',
+    jugadores: [
+      { premio: 'MVP — Jugador Más Valioso', jugador: 'Lucas Gabotto', numero: 16, equipo: 'KRA' },
+      { premio: 'JOF — Jugador Ofensivo', jugador: 'Lucas Gabotto', numero: 16, equipo: 'KRA' },
+      { premio: 'JD — Jugador Defensivo', jugador: 'Lucas Gabotto', numero: 16, equipo: 'KRA' },
+      { premio: 'JEV — Jugador Evolución', jugador: 'Iñaki Irurzun', numero: 65, equipo: 'TRI' },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar X',
+    tipo: 'equipo-ofensivo',
+    jugadores: [
+      { pos: 1, nombre: 'Agustín Luporini', numero: 19, equipo: 'LIE', votos: '-' },
+      { pos: 2, nombre: 'Javier Papagni', numero: 8, equipo: 'TRI', votos: '-' },
+      { pos: 3, nombre: 'Matías Rojo', numero: 11, equipo: 'LIE', votos: '-' },
+      { pos: 4, nombre: 'Lucas Gabotto', numero: 16, equipo: 'KRA', votos: '-' },
+      { pos: 5, nombre: 'Iñaki Irurzun', numero: 65, equipo: 'TRI', votos: '-' },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar X',
+    tipo: 'equipo-defensivo',
+    jugadores: [
+      { pos: 1, nombre: 'Elvis Rodríguez', numero: 9, equipo: 'KRA', votos: '-' },
+      { pos: 2, nombre: 'Emiliano Sánchez', numero: 25, equipo: 'LIE', votos: '-' },
+      { pos: 3, nombre: 'Matías Rojo', numero: 11, equipo: 'LIE', votos: '-' },
+      { pos: 4, nombre: 'Lucas Gabotto', numero: 16, equipo: 'KRA', votos: '-' },
+      { pos: 5, nombre: 'Ignacio Cuesta', numero: 23, equipo: 'TRI', votos: '-' },
+    ],
+  },
   {
     temporada: 'Tazón del Mar X',
     tipo: 'pase',
@@ -412,6 +457,79 @@ export const FALLBACK_LIDERES = [
     ],
   },
   {
+    temporada: 'Final - Tazón del Mar X',
+    tipo: 'pase',
+    jugadores: [
+      { pos: 1, nombre: 'Ángel Ávila', equipo: 'KRA', pas: 33, com: 20, pct: 60, yds: 240, td: 3, int: 1 },
+      { pos: 2, nombre: 'Javier Papagni', equipo: 'TRI', pas: 30, com: 10, pct: 33, yds: 99, td: 0, int: 4 },
+      { pos: 3, nombre: 'Elvis Rodríguez', equipo: 'KRA', pas: 5, com: 4, pct: 80, yds: 45, td: 1, int: 1 },
+    ],
+  },
+  {
+    temporada: 'Final - Tazón del Mar X',
+    tipo: 'corrida',
+    jugadores: [
+      { pos: 1, nombre: 'Elvis Rodríguez', equipo: 'KRA', int: 3, yds: 60, prom: 20.0, td: 1 },
+      { pos: 2, nombre: 'Daniel Montes', equipo: 'KRA', int: 1, yds: 10, prom: 10.0, td: 0 },
+      { pos: 3, nombre: 'Ángel Ávila', equipo: 'KRA', int: 1, yds: 9, prom: 9.0, td: 0 },
+      { pos: 4, nombre: 'Emanuel Rodríguez', equipo: 'TRI', int: 2, yds: 6, prom: 3.0, td: 0 },
+      { pos: 5, nombre: 'Lucas Gabotto', equipo: 'KRA', int: 1, yds: 5, prom: 5.0, td: 0 },
+      { pos: 6, nombre: 'Leandro Cattaneo', equipo: 'KRA', int: 1, yds: 3, prom: 3.0, td: 0 },
+    ],
+  },
+  {
+    temporada: 'Final - Tazón del Mar X',
+    tipo: 'recepcion',
+    jugadores: [
+      { pos: 1, nombre: 'Lucas Gabotto', equipo: 'KRA', rec: 11, yds: 162, prom: 14.7, td: 2 },
+      { pos: 2, nombre: 'Daniel Montes', equipo: 'KRA', rec: 2, yds: 38, prom: 19.0, td: 1 },
+      { pos: 3, nombre: 'Julián Fernández', equipo: 'KRA', rec: 5, yds: 34, prom: 6.8, td: 1 },
+      { pos: 4, nombre: 'Ignacio Cuesta', equipo: 'TRI', rec: 3, yds: 33, prom: 11.0, td: 0 },
+      { pos: 5, nombre: 'Renzo Amado', equipo: 'KRA', rec: 3, yds: 33, prom: 11.0, td: 0 },
+      { pos: 6, nombre: 'Pablo Corva', equipo: 'TRI', rec: 3, yds: 32, prom: 10.6, td: 0 },
+    ],
+  },
+  {
+    temporada: 'Final - Tazón del Mar X',
+    tipo: 'intercepciones',
+    jugadores: [
+      { pos: 1, nombre: 'Ignacio Cuesta', equipo: 'TRI', ints: 2 },
+      { pos: 1, nombre: 'Elvis Rodríguez', equipo: 'KRA', ints: 2 },
+      { pos: 3, nombre: 'Ángel Ávila', equipo: 'KRA', ints: 1 },
+      { pos: 3, nombre: 'Ignacio Ríos', equipo: 'KRA', ints: 1 },
+    ],
+  },
+  {
+    temporada: 'Final - Tazón del Mar X',
+    tipo: 'sacks',
+    jugadores: [
+      { pos: 1, nombre: 'Leandro Cattaneo', equipo: 'KRA', sacks: 1, safety: 1 },
+    ],
+  },
+  {
+    temporada: 'Final - Tazón del Mar X',
+    tipo: 'deflecciones',
+    jugadores: [
+      { pos: 1, nombre: 'Ignacio Ríos', equipo: 'KRA', deflec: 2 },
+      { pos: 2, nombre: 'Daniel Montes', equipo: 'KRA', deflec: 1 },
+      { pos: 2, nombre: 'Ángel Ávila', equipo: 'KRA', deflec: 1 },
+      { pos: 2, nombre: 'Lucas Gabotto', equipo: 'KRA', deflec: 1 },
+      { pos: 2, nombre: 'Elvis Rodríguez', equipo: 'KRA', deflec: 1 },
+    ],
+  },
+  {
+    temporada: 'Final - Tazón del Mar X',
+    tipo: 'flags',
+    jugadores: [
+      { pos: 1, nombre: 'Ignacio Cuesta', equipo: 'TRI', flags: 5 },
+      { pos: 1, nombre: 'Lucas Gabotto', equipo: 'KRA', flags: 5 },
+      { pos: 3, nombre: 'Pablo Corva', equipo: 'TRI', flags: 3 },
+      { pos: 3, nombre: 'Daniel Montes', equipo: 'KRA', flags: 3 },
+      { pos: 5, nombre: 'Emanuel Rodríguez', equipo: 'TRI', flags: 2 },
+      { pos: 5, nombre: 'Ignacio Ríos', equipo: 'KRA', flags: 2 },
+    ],
+  },
+  {
     temporada: 'Tazón del Mar IX',
     tipo: 'premios',
     jugadores: [
@@ -512,6 +630,39 @@ export const FALLBACK_LIDERES = [
     tipo: 'deflecciones',
     jugadores: [
       { pos: 1, nombre: 'Elvis Rodriguez', equipo: 'KRA', deflec: 1 },
+    ],
+  },
+];
+
+export const FALLBACK_HISTORICOS = [
+  {
+    key: 'touchdowns',
+    titulo: 'Touchdowns',
+    abreviatura: 'TD',
+    jugadores: [
+      { pos: 1, nombre: 'Javier Papagni', equipo: 'TRI', valor: 23 },
+      { pos: 2, nombre: 'Ángel Ávila', equipo: 'KRA', valor: 19 },
+      { pos: 3, nombre: 'Lucas Gabotto', equipo: 'KRA', valor: 10 },
+    ],
+  },
+  {
+    key: 'yardas',
+    titulo: 'Yardas',
+    abreviatura: 'YDS',
+    jugadores: [
+      { pos: 1, nombre: 'Javier Papagni', equipo: 'TRI', valor: 1447 },
+      { pos: 2, nombre: 'Ángel Ávila', equipo: 'KRA', valor: 1393 },
+      { pos: 3, nombre: 'Lucas Gabotto', equipo: 'KRA', valor: 837 },
+    ],
+  },
+  {
+    key: 'intercepciones',
+    titulo: 'Intercepciones',
+    abreviatura: 'INT',
+    jugadores: [
+      { pos: 1, nombre: 'Lucas Gabotto', equipo: 'KRA', valor: 7 },
+      { pos: 2, nombre: 'Ignacio Cuesta', equipo: 'TRI', valor: 5 },
+      { pos: 3, nombre: 'Ángel Ávila', equipo: 'KRA', valor: 4 },
     ],
   },
 ];

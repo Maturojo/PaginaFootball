@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../api';
-import { FALLBACK_STATS, FALLBACK_TEMPORADAS, fallbackLideresByTemporada } from '../data/stats.js';
+import { FALLBACK_HISTORICOS, FALLBACK_STATS, FALLBACK_TEMPORADAS, fallbackLideresByTemporada } from '../data/stats.js';
 
 const COLS_STATS = ['Equipo', 'PJ', 'PG', 'PP', 'PF', 'PC', 'Pts'];
 
@@ -208,6 +208,42 @@ function TablaPremios({ lideres }) {
   );
 }
 
+function TablaHistoricos() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {FALLBACK_HISTORICOS.map(categoria => (
+        <div key={categoria.key} className="bg-secondary border border-accent/20 rounded-xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-accent/10">
+            <p className="text-xs text-accent/60 uppercase tracking-widest font-bold">Líderes históricos</p>
+            <h2 className="text-xl font-extrabold text-white mt-1">{categoria.titulo}</h2>
+          </div>
+          <div className="divide-y divide-white/5">
+            {categoria.jugadores.map(jugador => (
+              <div key={`${categoria.key}-${jugador.pos}-${jugador.nombre}`} className="px-5 py-4 flex items-center gap-4">
+                <span className={`w-9 h-9 rounded-lg flex items-center justify-center font-extrabold ${
+                  jugador.pos === 1 ? 'bg-yellow-400 text-primary' : jugador.pos === 2 ? 'bg-white/20 text-white' : 'bg-orange-500/80 text-white'
+                }`}>
+                  {jugador.pos}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="font-bold text-white truncate">{jugador.nombre}</p>
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded text-white ${EQUIPO_COLORS[jugador.equipo] || 'bg-white/20'}`}>
+                    {jugador.equipo}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-extrabold text-accent">{jugador.valor}</p>
+                  <p className="text-white/35 text-xs font-bold">{categoria.abreviatura}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function PremiosSection() {
   const [lideresPremios, setLideresPremios] = useState([]);
   const [temporadas, setTemporadas] = useState([]);
@@ -309,7 +345,7 @@ export default function Estadisticas() {
           <>
             {/* Selector sección */}
             <div className="flex flex-wrap gap-3 mb-8 justify-center">
-              {[['premios','🏅 Premios'], ['lideres','📈 Líderes'], ['posiciones','📊 Posiciones']].map(([v, l]) => (
+              {[['premios','🏅 Premios'], ['lideres','📈 Líderes'], ['historicos','🏛️ Históricos'], ['posiciones','📊 Posiciones']].map(([v, l]) => (
                 <button key={v} onClick={() => setSeccion(v)}
                   className={`px-6 py-2 rounded-lg font-bold transition ${seccion === v ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/60 hover:text-white'}`}>
                   {l}
@@ -349,6 +385,11 @@ export default function Estadisticas() {
                   </>
                 )}
               </>
+            )}
+
+            {/* HISTÓRICOS */}
+            {seccion === 'historicos' && (
+              <TablaHistoricos />
             )}
 
             {/* POSICIONES */}
