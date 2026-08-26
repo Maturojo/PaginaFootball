@@ -3,7 +3,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import api from '../../api';
 
 const CATEGORIAS = ['Liga Football Flag', 'Football Flag Femenino', 'Football Americano 7vs7'];
-const EQUIPOS = ['Acorazados', 'Liebres', 'Krakens', 'Tridentes', 'Nereidas', 'Atlantes', 'Bárbaros', 'Templarios'];
+const EQUIPOS = ['Liebres', 'Krakens', 'Tridentes', 'Nereidas', 'Atlantes', 'Bárbaros', 'Templarios'];
 
 function StatForm({ initial, onSave, onCancel }) {
   const defaultFila = { equipo: '', PJ: 0, PG: 0, PP: 0, PF: 0, PC: 0, Pts: 0 };

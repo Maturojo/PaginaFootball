@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import api from '../../api';
 
 const CATS = ['Liga Football Flag', 'Football Flag Femenino', 'Football Americano 7vs7'];
-const EQUIPOS = ['Acorazados', 'Liebres', 'Krakens', 'Tridentes', 'Nereidas', 'Atlantes', 'Bárbaros', 'Templarios'];
+const EQUIPOS = ['Liebres', 'Krakens', 'Tridentes', 'Nereidas', 'Atlantes', 'Bárbaros', 'Templarios'];
 const ESTADOS = ['programado', 'en_juego', 'finalizado', 'cancelado'];
 
 function PartidoForm({ initial, onSave, onCancel }) {

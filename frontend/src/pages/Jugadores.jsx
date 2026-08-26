@@ -7,7 +7,12 @@ import { teamLogoSrc } from '../utils/teamLogo.js';
 import { API_URL } from '../config.js';
 function fotoSrc(f) { return f?.startsWith('http') ? f : `${API_URL}${f}`; }
 
-const EQUIPOS = ['Todos', 'Acorazados', 'Liebres', 'Krakens', 'Tridentes', 'Nereidas', 'Atlantes', 'Bárbaros', 'Templarios'];
+const EQUIPOS = ['Todos', 'Liebres', 'Krakens', 'Tridentes', 'Nereidas', 'Atlantes', 'Bárbaros', 'Templarios'];
+const EQUIPOS_INACTIVOS = ['Acorazados'];
+
+function isActivePlayer(player) {
+  return !EQUIPOS_INACTIVOS.includes(player.equipo);
+}
 
 function normalizeName(value) {
   return String(value ?? '')
@@ -63,8 +68,8 @@ export default function Jugadores() {
 
   useEffect(() => {
     api.get('/jugadores')
-      .then(r => setJugadores(mergePlayers(r.data)))
-      .catch(() => setJugadores(FALLBACK_PLAYERS))
+      .then(r => setJugadores(mergePlayers(r.data).filter(isActivePlayer)))
+      .catch(() => setJugadores(FALLBACK_PLAYERS.filter(isActivePlayer)))
       .finally(() => setLoading(false));
   }, []);
 

@@ -15,6 +15,12 @@ const CATEGORIAS = [
   { key: 'Football Americano 7vs7', icon: '🏟️', descripcion: 'Equipos de football americano 7vs7' },
 ];
 
+const EQUIPOS_INACTIVOS = ['Acorazados'];
+
+function isActiveTeam(team) {
+  return !EQUIPOS_INACTIVOS.includes(team.nombre);
+}
+
 function TeamCard({ team, players = [] }) {
   const logo = teamLogoSrc(team);
   const rosterPreview = players.slice(0, 5);
@@ -75,7 +81,7 @@ export default function Equipos() {
         const apiTeams = teamsResult.status === 'fulfilled' ? teamsResult.value.data : [];
         const apiPlayers = playersResult.status === 'fulfilled' ? playersResult.value.data : [];
 
-        setTeams(apiTeams?.length ? apiTeams : FALLBACK_TEAMS);
+        setTeams((apiTeams?.length ? apiTeams : FALLBACK_TEAMS).filter(isActiveTeam));
         setPlayers(mergePlayers(apiPlayers));
       })
       .finally(() => setLoading(false));

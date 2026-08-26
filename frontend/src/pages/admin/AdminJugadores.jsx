@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import api from '../../api';
 
 import { API_URL } from '../../config.js';
-const EQUIPOS = ['Acorazados', 'Liebres', 'Krakens', 'Tridentes', 'Nereidas', 'Atlantes'];
+const EQUIPOS = ['Liebres', 'Krakens', 'Tridentes', 'Nereidas', 'Atlantes'];
 const POSICIONES = ['Quarterback', 'Wide Receiver', 'Running Back', 'Lineman', 'Linebacker', 'Cornerback', 'Safety', 'Otra'];
 
 function JugadorForm({ initial, onSave, onCancel }) {

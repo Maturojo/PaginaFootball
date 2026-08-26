@@ -1,14 +1,5 @@
 export const FALLBACK_TEAMS = [
   {
-    _id: 'acorazados',
-    nombre: 'Acorazados',
-    descripcion: 'Los Acorazados de Mar del Plata, uno de los equipos mas fuertes de la liga.',
-    colores: 'Gris y negro',
-    anioFundacion: 2016,
-    ciudad: 'Mar del Plata',
-    categoria: 'Liga Football Flag',
-  },
-  {
     _id: 'liebres',
     nombre: 'Liebres',
     descripcion: 'Las Liebres, conocidas por su velocidad y agilidad en el campo de juego.',
