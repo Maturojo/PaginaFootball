@@ -1,12 +1,59 @@
 import { useEffect, useState } from 'react';
 import api from '../api';
 import { FALLBACK_PLAYERS, mergePlayers } from '../data/players.js';
+import { FALLBACK_LIDERES } from '../data/stats.js';
 import { teamLogoSrc } from '../utils/teamLogo.js';
 
 import { API_URL } from '../config.js';
 function fotoSrc(f) { return f?.startsWith('http') ? f : `${API_URL}${f}`; }
 
 const EQUIPOS = ['Todos', 'Acorazados', 'Liebres', 'Krakens', 'Tridentes', 'Nereidas', 'Atlantes', 'Bárbaros', 'Templarios'];
+
+function normalizeName(value) {
+  return String(value ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function samePlayer(entryName, playerName) {
+  return normalizeName(entryName) === normalizeName(playerName);
+}
+
+function playerHonors(player) {
+  const premios = [];
+  const ofensivo = [];
+  const defensivo = [];
+
+  FALLBACK_LIDERES.forEach(lider => {
+    if (lider.tipo === 'premios') {
+      lider.jugadores
+        .filter(j => samePlayer(j.jugador, player.nombre))
+        .forEach(j => premios.push({ temporada: lider.temporada, label: j.premio.split('—')[0].trim() }));
+    }
+
+    if (lider.tipo === 'equipo-ofensivo') {
+      lider.jugadores
+        .filter(j => samePlayer(j.nombre, player.nombre))
+        .forEach(() => ofensivo.push(lider.temporada));
+    }
+
+    if (lider.tipo === 'equipo-defensivo') {
+      lider.jugadores
+        .filter(j => samePlayer(j.nombre, player.nombre))
+        .forEach(() => defensivo.push(lider.temporada));
+    }
+  });
+
+  return {
+    premios,
+    ofensivo,
+    defensivo,
+    total: premios.length + ofensivo.length + defensivo.length,
+  };
+}
 
 export default function Jugadores() {
   const [jugadores, setJugadores] = useState([]);
@@ -110,6 +157,30 @@ export default function Jugadores() {
                 </div>
               ))}
             </div>
+            {(() => {
+              const honors = playerHonors(selected);
+              return (
+                <div className="grid grid-cols-3 gap-2 mt-3">
+                  {[
+                    ['Premios', honors.premios.length],
+                    ['Ofensivo', honors.ofensivo.length],
+                    ['Defensivo', honors.defensivo.length],
+                  ].map(([label, value]) => (
+                    <div key={label} className="bg-primary/40 rounded-lg p-3 text-center border border-white/5">
+                      <p className="text-white font-extrabold text-lg">{value}</p>
+                      <p className="text-white/40 text-xs mt-0.5">{label}</p>
+                    </div>
+                  ))}
+                  {honors.total > 0 && (
+                    <div className="col-span-3 bg-primary/30 rounded-lg px-3 py-2 text-xs text-white/55 leading-relaxed">
+                      {honors.premios.length > 0 && <p><span className="text-accent font-bold">Premios:</span> {honors.premios.map(p => `${p.label} (${p.temporada})`).join(' · ')}</p>}
+                      {honors.ofensivo.length > 0 && <p><span className="text-accent font-bold">Equipo ofensivo:</span> {honors.ofensivo.join(' · ')}</p>}
+                      {honors.defensivo.length > 0 && <p><span className="text-accent font-bold">Equipo defensivo:</span> {honors.defensivo.join(' · ')}</p>}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </div>
         </div>
       )}
