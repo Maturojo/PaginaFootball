@@ -41,88 +41,124 @@ function JerseyFace({ team, name, number, side }) {
   const isBack = side === 'back';
   const gradientId = `jersey-gradient-${team._id}-${side}`;
   const shadowId = `jersey-shadow-${team._id}-${side}`;
+  const fabricId = `jersey-fabric-${team._id}-${side}`;
   const bodyFill = style.body2 ? `url(#${gradientId})` : style.body;
 
   return (
-    <svg viewBox="0 0 360 460" role="img" aria-label={`${side === 'front' ? 'Frente' : 'Dorso'} remera ${team.nombre}`} className="w-full h-full drop-shadow-2xl">
+    <svg viewBox="0 0 430 560" role="img" aria-label={`${side === 'front' ? 'Frente' : 'Dorso'} remera ${team.nombre}`} className="w-full h-full drop-shadow-2xl">
       <defs>
         <linearGradient id={gradientId} x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stopColor={style.body} />
-          <stop offset="58%" stopColor={style.body} />
+          <stop offset="56%" stopColor={style.body} />
           <stop offset="100%" stopColor={style.body2 || style.body} />
         </linearGradient>
         <filter id={shadowId} x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="14" stdDeviation="12" floodColor="#000000" floodOpacity="0.42" />
+          <feDropShadow dx="0" dy="18" stdDeviation="14" floodColor="#000000" floodOpacity="0.48" />
+        </filter>
+        <filter id={fabricId}>
+          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" />
+          <feColorMatrix type="saturate" values="0" />
+          <feComponentTransfer>
+            <feFuncA type="table" tableValues="0 0.11" />
+          </feComponentTransfer>
         </filter>
         <linearGradient id={`${gradientId}-shine`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.34" />
-          <stop offset="45%" stopColor="#ffffff" stopOpacity="0" />
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.4" />
+          <stop offset="30%" stopColor="#ffffff" stopOpacity="0.08" />
+          <stop offset="60%" stopColor="#000000" stopOpacity="0" />
+          <stop offset="100%" stopColor="#000000" stopOpacity="0.32" />
+        </linearGradient>
+        <linearGradient id={`${gradientId}-center`} x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#000000" stopOpacity="0.18" />
+          <stop offset="18%" stopColor="#ffffff" stopOpacity="0.16" />
+          <stop offset="50%" stopColor="#ffffff" stopOpacity="0.02" />
+          <stop offset="82%" stopColor="#000000" stopOpacity="0.16" />
           <stop offset="100%" stopColor="#000000" stopOpacity="0.28" />
         </linearGradient>
       </defs>
 
       <g filter={`url(#${shadowId})`}>
-        <path d="M120 44 L154 24 H206 L240 44 L316 80 L288 160 L258 148 V414 H102 V148 L72 160 L44 80 Z" fill={bodyFill} />
-        <path d="M44 80 L120 44 L104 148 L72 160 Z" fill={style.side} />
-        <path d="M240 44 L316 80 L288 160 L256 148 Z" fill={style.side} />
-        <path d="M154 24 H206 L222 49 C210 70 150 70 138 49 Z" fill={style.side} />
-        <path d="M154 24 H206" stroke={style.trim} strokeWidth="8" strokeLinecap="round" />
-        <path d="M74 156 L44 80 M286 156 L316 80" stroke={style.trim} strokeWidth="8" strokeLinecap="round" opacity="0.9" />
-        <path d="M120 44 L154 24 H206 L240 44 L316 80 L288 160 L258 148 V414 H102 V148 L72 160 L44 80 Z" fill={`url(#${gradientId}-shine)`} />
+        <path d="M143 59 C160 42 179 35 215 35 C251 35 270 42 287 59 L376 92 C400 101 413 123 408 149 L390 242 C386 264 371 276 350 271 L304 260 L292 498 C291 515 279 525 262 525 H168 C151 525 139 515 138 498 L126 260 L80 271 C59 276 44 264 40 242 L22 149 C17 123 30 101 54 92 Z" fill={bodyFill} />
+        <path d="M54 92 L143 59 C132 104 126 162 126 260 L80 271 C59 276 44 264 40 242 L22 149 C17 123 30 101 54 92 Z" fill={style.side} />
+        <path d="M287 59 L376 92 C400 101 413 123 408 149 L390 242 C386 264 371 276 350 271 L304 260 C304 162 298 104 287 59 Z" fill={style.side} />
+        <path d="M168 39 H262 L281 62 C264 104 166 104 149 62 Z" fill={style.side} />
+        <path d="M161 42 L195 100 L215 75 L235 100 L269 42" fill="none" stroke={style.trim} strokeWidth="10" strokeLinejoin="round" strokeLinecap="round" />
+        <path d="M165 42 H265" stroke="#ffffff" strokeWidth="2" opacity="0.45" strokeLinecap="round" />
+        <path d="M74 266 L40 98 M356 266 L390 98" stroke={style.trim} strokeWidth="9" strokeLinecap="round" opacity="0.95" />
+        <path d="M143 59 C160 42 179 35 215 35 C251 35 270 42 287 59 L376 92 C400 101 413 123 408 149 L390 242 C386 264 371 276 350 271 L304 260 L292 498 C291 515 279 525 262 525 H168 C151 525 139 515 138 498 L126 260 L80 271 C59 276 44 264 40 242 L22 149 C17 123 30 101 54 92 Z" fill={`url(#${gradientId}-shine)`} />
+        <path d="M143 59 C160 42 179 35 215 35 C251 35 270 42 287 59 L376 92 C400 101 413 123 408 149 L390 242 C386 264 371 276 350 271 L304 260 L292 498 C291 515 279 525 262 525 H168 C151 525 139 515 138 498 L126 260 L80 271 C59 276 44 264 40 242 L22 149 C17 123 30 101 54 92 Z" filter={`url(#${fabricId})`} opacity="0.55" />
+        <path d="M135 87 C157 119 273 119 295 87" fill="none" stroke="#000000" strokeWidth="2" opacity="0.16" />
+        <path d="M132 259 C148 304 282 304 298 259" fill="none" stroke="#ffffff" strokeWidth="2" opacity="0.12" />
 
         {style.pattern === 'bolts' && (
           <g fill={style.trim} opacity="0.55">
-            <path d="M144 68 L188 210 H154 L214 388 L174 238 H208 Z" />
-            <path d="M230 80 L264 170 H238 L276 294 L226 154 H250 Z" opacity="0.65" />
+            <path d="M166 102 L218 252 H178 L250 458 L204 282 H244 Z" />
+            <path d="M262 112 L300 204 H272 L316 334 L260 182 H286 Z" opacity="0.62" />
           </g>
         )}
         {style.pattern === 'speed' && (
           <g stroke={style.trim} strokeWidth="9" strokeLinecap="round" opacity="0.5">
-            <path d="M112 116 C148 100 198 96 246 110" />
-            <path d="M112 144 C156 128 208 126 254 140" />
+            <path d="M130 146 C174 124 236 124 292 140" />
+            <path d="M128 176 C184 154 246 156 304 172" />
           </g>
         )}
         {style.pattern === 'waves' && (
           <g stroke={style.trim} strokeWidth="7" fill="none" opacity="0.55">
-            <path d="M106 294 C136 268 172 320 206 292 S254 276 280 302" />
-            <path d="M98 326 C134 300 170 350 208 320 S252 306 284 332" />
+            <path d="M128 334 C164 304 204 360 244 330 S294 312 324 344" />
+            <path d="M118 370 C160 338 202 392 246 358 S296 342 330 376" />
           </g>
         )}
         {style.pattern === 'armor' && (
           <g stroke={style.trim} strokeWidth="5" opacity="0.42">
-            <path d="M116 92 L244 92" />
-            <path d="M108 132 L252 132" />
-            <path d="M108 172 L252 172" />
+            <path d="M142 128 L288 128" />
+            <path d="M134 170 L296 170" />
+            <path d="M134 212 L296 212" />
           </g>
         )}
         {style.pattern === 'side' && (
           <g fill={style.side} opacity="0.72">
-            <path d="M102 122 C130 164 132 320 110 414 H102 Z" />
-            <path d="M258 122 C230 164 228 320 250 414 H258 Z" />
+            <path d="M126 132 C154 198 154 384 140 516 H132 Z" />
+            <path d="M304 132 C276 198 276 384 290 516 H298 Z" />
           </g>
         )}
 
         <g textAnchor="middle" fontFamily="Impact, Arial Black, Arial, sans-serif">
           {!isBack && (
             <>
-              <text x="180" y="139" fontSize="33" fill={style.chest} stroke={style.outline} strokeWidth="2" paintOrder="stroke" letterSpacing="1">
+              <text x="215" y="170" fontSize="40" fill={style.chest} stroke={style.outline} strokeWidth="2.5" paintOrder="stroke" letterSpacing="1.3">
                 {team.nombre.toUpperCase()}
               </text>
-              <image href={teamLogoSrc(team)} x="150" y="154" width="60" height="60" preserveAspectRatio="xMidYMid meet" />
+              <image href={teamLogoSrc(team)} x="187" y="72" width="56" height="56" preserveAspectRatio="xMidYMid meet" />
+              <text x="100" y="115" transform="rotate(-18 100 115)" fontSize="30" fill={style.number} stroke={style.outline} strokeWidth="2" paintOrder="stroke">
+                {displayNumber}
+              </text>
+              <text x="330" y="115" transform="rotate(18 330 115)" fontSize="30" fill={style.number} stroke={style.outline} strokeWidth="2" paintOrder="stroke">
+                {displayNumber}
+              </text>
             </>
           )}
           {isBack && (
-            <text x="180" y="134" fontSize="34" fill={style.chest} stroke={style.outline} strokeWidth="2" paintOrder="stroke" letterSpacing="1">
+            <text x="215" y="154" fontSize="38" fill={style.chest} stroke={style.outline} strokeWidth="2.5" paintOrder="stroke" letterSpacing="1.2">
               {displayName}
             </text>
           )}
-          <text x="180" y={isBack ? 288 : 308} fontSize="126" fill={style.number} stroke={style.outline} strokeWidth="7" paintOrder="stroke">
+          <text x="215" y={isBack ? 330 : 352} fontSize="154" fill={style.number} stroke={style.outline} strokeWidth="9" paintOrder="stroke">
             {displayNumber}
           </text>
         </g>
 
-        <path d="M112 64 C124 210 118 300 104 408" stroke="#000000" strokeWidth="2" opacity="0.14" />
-        <path d="M248 64 C236 210 242 300 256 408" stroke="#ffffff" strokeWidth="2" opacity="0.18" />
+        {!isBack && (
+          <g>
+            <rect x="238" y="454" width="48" height="24" rx="3" fill="#111827" opacity="0.82" />
+            <rect x="242" y="458" width="17" height="16" rx="2" fill={style.trim} />
+            <text x="268" y="469" textAnchor="middle" fontFamily="Arial, sans-serif" fontSize="7" fill="#ffffff" fontWeight="700">
+              MDP
+            </text>
+          </g>
+        )}
+        <path d="M134 78 C148 226 146 378 138 502" stroke="#000000" strokeWidth="2" opacity="0.12" />
+        <path d="M296 78 C282 226 284 378 292 502" stroke="#ffffff" strokeWidth="2" opacity="0.2" />
+        <path d="M138 498 C172 510 258 510 292 498" fill="none" stroke="#000000" strokeWidth="2" opacity="0.18" />
       </g>
     </svg>
   );
@@ -130,7 +166,7 @@ function JerseyFace({ team, name, number, side }) {
 
 function JerseyPreview({ team, name, number }) {
   return (
-    <div className="relative w-full max-w-sm mx-auto aspect-[4/5] flex items-center justify-center [perspective:1100px]">
+    <div className="relative w-full max-w-md mx-auto aspect-[4/5] flex items-center justify-center [perspective:1200px]">
       <style>{`
         @keyframes jerseySpin {
           0% { transform: rotateY(-24deg) rotateX(4deg); }
@@ -140,7 +176,7 @@ function JerseyPreview({ team, name, number }) {
           100% { transform: rotateY(336deg) rotateX(4deg); }
         }
       `}</style>
-      <div className="absolute inset-x-10 bottom-3 h-8 rounded-full bg-black/50 blur-xl" />
+      <div className="absolute inset-x-12 bottom-3 h-9 rounded-full bg-black/50 blur-xl" />
       <div className="relative w-full h-full [transform-style:preserve-3d] animate-[jerseySpin_9s_ease-in-out_infinite]">
         <div className="absolute inset-0 [backface-visibility:hidden] [transform:translateZ(18px)]">
           <JerseyFace team={team} name={name} number={number} side="front" />
@@ -148,8 +184,8 @@ function JerseyPreview({ team, name, number }) {
         <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)_translateZ(18px)]">
           <JerseyFace team={team} name={name} number={number} side="back" />
         </div>
-        <div className="absolute left-[13%] top-[18%] h-[67%] w-9 rounded-full bg-black/30 blur-sm [transform:rotateY(90deg)_translateZ(132px)]" />
-        <div className="absolute right-[13%] top-[18%] h-[67%] w-9 rounded-full bg-white/10 blur-sm [transform:rotateY(90deg)_translateZ(-132px)]" />
+        <div className="absolute left-[13%] top-[18%] h-[68%] w-10 rounded-full bg-black/30 blur-sm [transform:rotateY(90deg)_translateZ(156px)]" />
+        <div className="absolute right-[13%] top-[18%] h-[68%] w-10 rounded-full bg-white/10 blur-sm [transform:rotateY(90deg)_translateZ(-156px)]" />
       </div>
     </div>
   );
