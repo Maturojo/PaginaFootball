@@ -7,6 +7,8 @@ const TEAM_LOGOS = {
   krakens: '/equipos/krakens.png',
   liebres: '/equipos/liebres.png',
   nereidas: '/equipos/nereidas.png',
+  sirenas: '/equipos/sirenas.jpg',
+  corales: '/equipos/corales.jpg',
   templarios: '/equipos/templarios.png',
   tridentes: '/equipos/tridentes.png',
 };

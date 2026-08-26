@@ -11,9 +11,16 @@ const TEAM_STYLES = {
   Krakens: { body: '#111827', side: '#7e22ce', trim: '#a78bfa', chest: '#ffffff', number: '#7e22ce', outline: '#bfdbfe', text: '#ffffff', pattern: 'side' },
   Tridentes: { body: '#991b1b', side: '#b45309', trim: '#facc15', chest: '#f8fafc', number: '#111827', outline: '#facc15', text: '#ffffff', pattern: 'bolts' },
   Nereidas: { body: '#38bdf8', body2: '#8b5cf6', side: '#075985', trim: '#ec4899', chest: '#f9a8d4', number: '#1d4ed8', outline: '#f472b6', text: '#ffffff', pattern: 'gradient' },
+  Sirenas: { body: '#bca7d9', side: '#25264b', trim: '#f3eee1', chest: '#f8fafc', number: '#bca7d9', outline: '#f3eee1', text: '#ffffff', pattern: 'waves' },
+  Corales: { body: '#0b1530', side: '#ec4899', trim: '#f472b6', chest: '#f8fafc', number: '#f8fafc', outline: '#db2777', text: '#ffffff', pattern: 'side' },
   Atlantes: { body: '#1d4ed8', side: '#0f172a', trim: '#38bdf8', chest: '#f8fafc', number: '#facc15', outline: '#ffffff', text: '#ffffff', pattern: 'waves' },
   Bárbaros: { body: '#111827', side: '#92400e', trim: '#d97706', chest: '#facc15', number: '#facc15', outline: '#111827', text: '#ffffff', pattern: 'armor' },
   Templarios: { body: '#374151', side: '#111827', trim: '#d4af37', chest: '#d4af37', number: '#d4af37', outline: '#111827', text: '#ffffff', pattern: 'clean' },
+};
+
+const TEAM_JERSEY_IMAGES = {
+  Sirenas: '/remeras/sirenas.jpeg',
+  Corales: '/remeras/corales.jpeg',
 };
 
 function normalizeName(value) {
@@ -166,6 +173,7 @@ function JerseyFace({ team, name, number, side }) {
 
 function JerseyPreview({ team, name, number }) {
   const style = TEAM_STYLES[team.nombre] || TEAM_STYLES.Acorazados;
+  const jerseyImage = TEAM_JERSEY_IMAGES[team.nombre];
 
   return (
     <div className="relative w-full max-w-md mx-auto aspect-[4/5] flex items-center justify-center [perspective:1200px]">
@@ -210,8 +218,16 @@ function JerseyPreview({ team, name, number }) {
             transform: 'rotateY(88deg) translateZ(-178px)',
           }}
         />
-        <div className="absolute inset-0 [backface-visibility:hidden] [transform:translateZ(24px)]">
-          <JerseyFace team={team} name={name} number={number} side="front" />
+        <div className="absolute inset-0 [backface-visibility:hidden] [transform:translateZ(24px)] flex items-center justify-center">
+          {jerseyImage ? (
+            <img
+              src={jerseyImage}
+              alt={`Remera ${team.nombre}`}
+              className="max-h-[94%] max-w-[88%] object-contain [filter:drop-shadow(0_28px_24px_rgba(0,0,0,0.42))]"
+            />
+          ) : (
+            <JerseyFace team={team} name={name} number={number} side="front" />
+          )}
         </div>
         <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)_translateZ(24px)]">
           <JerseyFace team={team} name={name} number={number} side="back" />
@@ -222,7 +238,7 @@ function JerseyPreview({ team, name, number }) {
 }
 
 export default function Remeras() {
-  const equipos = FALLBACK_TEAMS.filter(team => !team.esSeleccion);
+  const equipos = FALLBACK_TEAMS.filter(team => !team.esSeleccion && !team.oculto);
   const [equipoId, setEquipoId] = useState(equipos[0]._id);
   const [talle, setTalle] = useState('M');
   const [nombre, setNombre] = useState('');

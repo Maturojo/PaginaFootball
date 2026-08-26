@@ -7,7 +7,7 @@ import { teamLogoSrc } from '../utils/teamLogo.js';
 import { API_URL } from '../config.js';
 function fotoSrc(f) { return f?.startsWith('http') ? f : `${API_URL}${f}`; }
 
-const EQUIPOS = ['Todos', 'Liebres', 'Krakens', 'Tridentes', 'Nereidas', 'Atlantes', 'Bárbaros', 'Templarios'];
+const EQUIPOS = ['Todos', 'Liebres', 'Krakens', 'Tridentes', 'Nereidas', 'Sirenas', 'Corales', 'Atlantes', 'Bárbaros', 'Templarios'];
 const EQUIPOS_INACTIVOS = ['Acorazados'];
 
 function isActivePlayer(player) {

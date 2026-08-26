@@ -18,11 +18,13 @@ async function seed() {
 
   // Equipos — upsert por nombre para no perder logos ya subidos
   const equipos = [
-    { nombre: 'Acorazados', descripcion: 'Los Acorazados de Mar del Plata, uno de los equipos más fuertes de la liga.', colores: 'Gris y negro', anioFundacion: 2016, ciudad: 'Mar del Plata', categoria: 'Liga Football Flag' },
+    { nombre: 'Acorazados', descripcion: 'Los Acorazados de Mar del Plata, uno de los equipos más fuertes de la liga.', colores: 'Gris y negro', anioFundacion: 2016, ciudad: 'Mar del Plata', categoria: 'Liga Football Flag', activo: false },
     { nombre: 'Liebres', descripcion: 'Las Liebres, conocidas por su velocidad y agilidad en el campo de juego.', colores: 'Naranja y negro', anioFundacion: 2016, ciudad: 'Mar del Plata', categoria: 'Liga Football Flag' },
     { nombre: 'Krakens', descripcion: 'Los Krakens, implacables y poderosos como la bestia que los representa.', colores: 'Violeta y negro', anioFundacion: 2016, ciudad: 'Mar del Plata', categoria: 'Liga Football Flag' },
     { nombre: 'Tridentes', descripcion: 'Los Tridentes, potencia ofensiva de la liga de football americano MDP.', colores: 'Verde y dorado', anioFundacion: 2016, ciudad: 'Mar del Plata', categoria: 'Liga Football Flag' },
     { nombre: 'Nereidas', descripcion: 'Las Nereidas, nombradas en honor a las ninfas del mar, orgullo de la costa atlántica y único equipo femenino de la liga.', colores: 'Azul y blanco', anioFundacion: 2016, ciudad: 'Mar del Plata', categoria: 'Football Flag Femenino' },
+    { nombre: 'Sirenas', descripcion: 'Sirenas es uno de los equipos femeninos de flag football de Mar del Plata.', colores: 'Lila, blanco y azul', anioFundacion: 2025, ciudad: 'Mar del Plata', categoria: 'Football Flag Femenino' },
+    { nombre: 'Corales', descripcion: 'Corales es uno de los equipos femeninos de flag football de Mar del Plata.', colores: 'Azul, rosa y blanco', anioFundacion: 2025, ciudad: 'Mar del Plata', categoria: 'Football Flag Femenino' },
     { nombre: 'Atlantes', descripcion: 'Atlantes es la selección de Mar del Plata, representando lo mejor del football americano de la ciudad en el formato 7vs7.', colores: 'Azul y dorado', anioFundacion: 2016, ciudad: 'Mar del Plata', categoria: 'Football Americano 7vs7', esSeleccion: true },
     { nombre: 'Bárbaros', descripcion: 'Los Bárbaros, equipo de Football Americano 7vs7 de Mar del Plata.', ciudad: 'Mar del Plata', categoria: 'Football Americano 7vs7', proximamente: false },
     { nombre: 'Templarios', descripcion: 'Los Templarios, equipo de Football Americano 7vs7 de Mar del Plata.', ciudad: 'Mar del Plata', categoria: 'Football Americano 7vs7', proximamente: false },

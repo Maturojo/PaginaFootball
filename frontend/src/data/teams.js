@@ -46,6 +46,24 @@ export const FALLBACK_TEAMS = [
     categoria: 'Football Flag Femenino',
   },
   {
+    _id: 'sirenas',
+    nombre: 'Sirenas',
+    descripcion: 'Sirenas es uno de los equipos femeninos de flag football de Mar del Plata.',
+    colores: 'Lila, blanco y azul',
+    anioFundacion: 2025,
+    ciudad: 'Mar del Plata',
+    categoria: 'Football Flag Femenino',
+  },
+  {
+    _id: 'corales',
+    nombre: 'Corales',
+    descripcion: 'Corales es uno de los equipos femeninos de flag football de Mar del Plata.',
+    colores: 'Azul, rosa y blanco',
+    anioFundacion: 2025,
+    ciudad: 'Mar del Plata',
+    categoria: 'Football Flag Femenino',
+  },
+  {
     _id: 'atlantes',
     nombre: 'Atlantes',
     descripcion: 'Atlantes es la seleccion de Mar del Plata en el formato 7vs7.',
@@ -70,3 +88,18 @@ export const FALLBACK_TEAMS = [
     categoria: 'Football Americano 7vs7',
   },
 ];
+
+function teamKey(team) {
+  return String(team?.nombre || team?._id || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, '-')
+    .trim();
+}
+
+export function mergeTeams(apiTeams = []) {
+  const existing = new Set(apiTeams.map(teamKey));
+  const missingFallbacks = FALLBACK_TEAMS.filter(team => !existing.has(teamKey(team)));
+  return [...apiTeams, ...missingFallbacks];
+}

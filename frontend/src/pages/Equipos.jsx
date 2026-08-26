@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
 import { FALLBACK_PLAYERS, mergePlayers, playersForTeam } from '../data/players.js';
-import { FALLBACK_TEAMS } from '../data/teams.js';
+import { FALLBACK_TEAMS, mergeTeams } from '../data/teams.js';
 import { teamLogoSrc, teamSlug } from '../utils/teamLogo.js';
 
 export function slugify(str) {
@@ -11,7 +11,7 @@ export function slugify(str) {
 
 const CATEGORIAS = [
   { key: 'Liga Football Flag', icon: '🏈', descripcion: 'Equipos de la liga de football flag de Mar del Plata' },
-  { key: 'Football Flag Femenino', icon: '⚡', descripcion: 'Equipo femenino de football flag' },
+  { key: 'Football Flag Femenino', icon: '⚡', descripcion: 'Equipos femeninos de football flag' },
   { key: 'Football Americano 7vs7', icon: '🏟️', descripcion: 'Equipos de football americano 7vs7' },
 ];
 
@@ -81,7 +81,7 @@ export default function Equipos() {
         const apiTeams = teamsResult.status === 'fulfilled' ? teamsResult.value.data : [];
         const apiPlayers = playersResult.status === 'fulfilled' ? playersResult.value.data : [];
 
-        setTeams((apiTeams?.length ? apiTeams : FALLBACK_TEAMS).filter(isActiveTeam));
+        setTeams(mergeTeams(apiTeams).filter(isActiveTeam));
         setPlayers(mergePlayers(apiPlayers));
       })
       .finally(() => setLoading(false));

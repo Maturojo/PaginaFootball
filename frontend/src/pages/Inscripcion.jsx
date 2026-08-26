@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import api from '../api';
 
-const EQUIPOS = ['Sin preferencia', 'Liebres', 'Krakens', 'Tridentes', 'Nereidas', 'Atlantes'];
+const EQUIPOS = ['Sin preferencia', 'Liebres', 'Krakens', 'Tridentes', 'Nereidas', 'Sirenas', 'Corales', 'Atlantes'];
 const POSICIONES = ['No sé aún', 'Quarterback (QB)', 'Wide Receiver (WR)', 'Running Back (RB)', 'Lineman (OL/DL)', 'Linebacker (LB)', 'Cornerback (CB)', 'Safety (S)', 'Otra'];
 
 export default function Inscripcion() {
