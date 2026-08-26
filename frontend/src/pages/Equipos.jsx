@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
+import { FALLBACK_PLAYERS, mergePlayers, playersForTeam } from '../data/players.js';
 import { FALLBACK_TEAMS } from '../data/teams.js';
 import { teamLogoSrc, teamSlug } from '../utils/teamLogo.js';
 
@@ -14,8 +15,9 @@ const CATEGORIAS = [
   { key: 'Football Americano 7vs7', icon: '🏟️', descripcion: 'Equipos de football americano 7vs7' },
 ];
 
-function TeamCard({ team }) {
+function TeamCard({ team, players = [] }) {
   const logo = teamLogoSrc(team);
+  const rosterPreview = players.slice(0, 5);
 
   return (
     <Link
@@ -31,6 +33,27 @@ function TeamCard({ team }) {
             <span className="text-7xl">🏈</span>
           </div>
         )}
+        <h3 className="text-xl font-extrabold text-white mt-4">{team.nombre}</h3>
+        {players.length > 0 && (
+          <div className="w-full mt-5 border-t border-accent/10 pt-4">
+            <div className="flex items-center justify-between text-xs uppercase tracking-wide">
+              <span className="text-accent font-bold">Plantel</span>
+              <span className="text-white/40">{players.length} jugadores</span>
+            </div>
+            <ul className="mt-3 space-y-1.5 text-sm text-white/60">
+              {rosterPreview.map(player => (
+                <li key={player._id} className="flex items-center gap-2">
+                  <span className="w-9 text-accent/80 font-bold">#{player.numero}</span>
+                  <span className="min-w-0 flex-1 truncate">{player.nombre}</span>
+                  <span className="text-white/30 text-xs">{player.posicion}</span>
+                </li>
+              ))}
+            </ul>
+            {players.length > rosterPreview.length && (
+              <p className="text-white/35 text-xs mt-3">+{players.length - rosterPreview.length} más</p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Barra azul que sube desde abajo en hover */}
@@ -43,12 +66,18 @@ function TeamCard({ team }) {
 
 export default function Equipos() {
   const [teams, setTeams] = useState([]);
+  const [players, setPlayers] = useState(FALLBACK_PLAYERS);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/teams')
-      .then(r => setTeams(r.data?.length ? r.data : FALLBACK_TEAMS))
-      .catch(() => setTeams(FALLBACK_TEAMS))
+    Promise.allSettled([api.get('/teams'), api.get('/jugadores')])
+      .then(([teamsResult, playersResult]) => {
+        const apiTeams = teamsResult.status === 'fulfilled' ? teamsResult.value.data : [];
+        const apiPlayers = playersResult.status === 'fulfilled' ? playersResult.value.data : [];
+
+        setTeams(apiTeams?.length ? apiTeams : FALLBACK_TEAMS);
+        setPlayers(mergePlayers(apiPlayers));
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -90,7 +119,9 @@ export default function Equipos() {
                       <div className="flex-1 h-px bg-accent/20" />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                      {seleccion.map(team => <TeamCard key={team._id} team={team} />)}
+                      {seleccion.map(team => (
+                        <TeamCard key={team._id} team={team} players={playersForTeam(team.nombre, players)} />
+                      ))}
                     </div>
                   </>
                 )}
@@ -103,7 +134,9 @@ export default function Equipos() {
                       <div className="flex-1 h-px bg-white/10" />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {resto.map(team => <TeamCard key={team._id} team={team} />)}
+                      {resto.map(team => (
+                        <TeamCard key={team._id} team={team} players={playersForTeam(team.nombre, players)} />
+                      ))}
                     </div>
                   </>
                 )}
@@ -122,7 +155,9 @@ export default function Equipos() {
                 <div className="flex-1 h-px bg-accent/20 ml-4" />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {equipos.map(team => <TeamCard key={team._id} team={team} />)}
+                {equipos.map(team => (
+                  <TeamCard key={team._id} team={team} players={playersForTeam(team.nombre, players)} />
+                ))}
               </div>
             </section>
           );

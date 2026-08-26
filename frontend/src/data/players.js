@@ -168,3 +168,30 @@ export const FALLBACK_PLAYERS = [
   player({ equipo: 'Liebres', numero: 21, nombre: 'Lauro Ibarra', posicion: 'C' }),
   player({ equipo: 'Liebres', numero: 37, nombre: 'Héctor González', posicion: 'WR' }),
 ];
+
+function normalizeKey(value) {
+  return String(value ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function playerKey(player) {
+  return [player.equipo, player.numero, player.nombre].map(normalizeKey).join('|');
+}
+
+export function mergePlayers(apiPlayers = []) {
+  const safeApiPlayers = Array.isArray(apiPlayers) ? apiPlayers : [];
+  const existing = new Set(safeApiPlayers.map(playerKey));
+  const missingFallbacks = FALLBACK_PLAYERS.filter(player => !existing.has(playerKey(player)));
+
+  return [...safeApiPlayers, ...missingFallbacks];
+}
+
+export function playersForTeam(teamName, players = FALLBACK_PLAYERS) {
+  const normalizedTeam = normalizeKey(teamName);
+
+  return players.filter(player => normalizeKey(player.equipo) === normalizedTeam);
+}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import api from '../api';
+import { FALLBACK_PLAYERS, mergePlayers, playersForTeam } from '../data/players.js';
 import { FALLBACK_TEAMS } from '../data/teams.js';
 import { teamLogoSrc, teamSlug } from '../utils/teamLogo.js';
 
@@ -12,6 +13,7 @@ export default function EquipoDetalle() {
   const { id } = useParams();
   const location = useLocation();
   const [team, setTeam] = useState(location.state?.team || null);
+  const [players, setPlayers] = useState(FALLBACK_PLAYERS);
   const [loading, setLoading] = useState(!location.state?.team);
   const [notFound, setNotFound] = useState(false);
 
@@ -33,6 +35,12 @@ export default function EquipoDetalle() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  useEffect(() => {
+    api.get('/jugadores')
+      .then(r => setPlayers(mergePlayers(r.data)))
+      .catch(() => setPlayers(FALLBACK_PLAYERS));
+  }, []);
+
   if (loading) return (
     <div className="bg-primary min-h-screen flex items-center justify-center">
       <p className="text-white/40 text-lg">Cargando...</p>
@@ -48,6 +56,7 @@ export default function EquipoDetalle() {
   );
 
   const logo = teamLogoSrc(team);
+  const roster = playersForTeam(team.nombre, players);
 
   return (
     <div className="bg-primary text-white min-h-screen pt-16">
@@ -104,12 +113,22 @@ export default function EquipoDetalle() {
           </p>
 
           {/* Plantel si hay jugadores */}
-          {team.jugadores && team.jugadores.length > 0 && (
+          {(roster.length > 0 || team.jugadores?.length > 0) && (
             <div className="mt-10">
               <h2 className="text-xl font-bold text-accent mb-4 uppercase tracking-wide">Plantel</h2>
               <div className="w-10 h-0.5 bg-accent mb-5 rounded" />
-              <ul className="grid grid-cols-2 gap-2">
-                {team.jugadores.map((j, i) => (
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {roster.length > 0 ? roster.map(player => (
+                  <li key={player._id} className="bg-secondary border border-accent/10 rounded-lg px-4 py-3 text-sm">
+                    <div className="flex items-center gap-3">
+                      <span className="w-10 text-accent font-extrabold">#{player.numero}</span>
+                      <div className="min-w-0">
+                        <p className="text-white font-bold truncate">{player.nombre}</p>
+                        <p className="text-white/40 text-xs">{player.posicion}</p>
+                      </div>
+                    </div>
+                  </li>
+                )) : team.jugadores.map((j, i) => (
                   <li key={i} className="bg-secondary border border-accent/10 rounded-lg px-4 py-2.5 text-white/70 text-sm">
                     🏈 {j}
                   </li>
@@ -144,6 +163,12 @@ export default function EquipoDetalle() {
                 <div>
                   <dt className="text-white/30 text-xs uppercase">Colores</dt>
                   <dd className="text-white font-medium mt-0.5">{team.colores}</dd>
+                </div>
+              )}
+              {roster.length > 0 && (
+                <div>
+                  <dt className="text-white/30 text-xs uppercase">Jugadores</dt>
+                  <dd className="text-white font-medium mt-0.5">{roster.length}</dd>
                 </div>
               )}
             </dl>
