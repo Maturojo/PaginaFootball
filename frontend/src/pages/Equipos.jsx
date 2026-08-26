@@ -18,7 +18,7 @@ const CATEGORIAS = [
 const EQUIPOS_INACTIVOS = ['Acorazados'];
 
 function isActiveTeam(team) {
-  return !EQUIPOS_INACTIVOS.includes(team.nombre);
+  return !team.oculto && !EQUIPOS_INACTIVOS.includes(team.nombre);
 }
 
 function TeamCard({ team, players = [] }) {
