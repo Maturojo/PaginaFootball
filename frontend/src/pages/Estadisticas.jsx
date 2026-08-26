@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../api';
-import { FALLBACK_HISTORICOS, FALLBACK_STATS, FALLBACK_TEMPORADAS, fallbackLideresByTemporada } from '../data/stats.js';
+import { FALLBACK_HISTORICOS, FALLBACK_LIDERES, FALLBACK_STATS, FALLBACK_TEMPORADAS, fallbackLideresByTemporada } from '../data/stats.js';
 
 const COLS_STATS = ['Equipo', 'PJ', 'PG', 'PP', 'PF', 'PC', 'Pts'];
 
@@ -209,42 +209,121 @@ function TablaPremios({ lideres }) {
 }
 
 function TablaHistoricos() {
+  const temporadasHistoricas = [...new Set(
+    FALLBACK_LIDERES
+      .filter(l => !l.temporada.includes('Final') && !l.temporada.includes('Semi'))
+      .map(l => l.temporada)
+  )];
+  const premiosPorTemporada = temporadasHistoricas
+    .map(temporada => ({
+      temporada,
+      premios: FALLBACK_LIDERES.find(l => l.temporada === temporada && l.tipo === 'premios')?.jugadores || [],
+      ofensivo: FALLBACK_LIDERES.find(l => l.temporada === temporada && l.tipo === 'equipo-ofensivo')?.jugadores || [],
+      defensivo: FALLBACK_LIDERES.find(l => l.temporada === temporada && l.tipo === 'equipo-defensivo')?.jugadores || [],
+    }))
+    .filter(t => t.premios.length || t.ofensivo.length || t.defensivo.length);
+  const premiosHistoricos = [
+    { codigo: 'MVP', titulo: 'MVP', subtitulo: 'Jugador Más Valioso' },
+    { codigo: 'JEV', titulo: 'Jugador Evolución', subtitulo: 'Mayor crecimiento' },
+    { codigo: 'NOV', titulo: 'Rookie', subtitulo: 'Novato del torneo' },
+  ];
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {FALLBACK_HISTORICOS.map(categoria => (
-        <div key={categoria.key} className="bg-secondary border border-accent/20 rounded-xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-accent/10">
-            <p className="text-xs text-accent/60 uppercase tracking-widest font-bold">Líderes históricos</p>
-            <h2 className="text-xl font-extrabold text-white mt-1">{categoria.titulo}</h2>
-          </div>
-          <div className="divide-y divide-white/5">
-            {categoria.jugadores.map(jugador => (
-              <div key={`${categoria.key}-${jugador.pos}-${jugador.nombre}`} className="px-5 py-4 flex items-center gap-4">
-                <span className={`w-9 h-9 rounded-lg flex items-center justify-center font-extrabold ${
-                  jugador.pos === 1 ? 'bg-yellow-400 text-primary' : jugador.pos === 2 ? 'bg-white/20 text-white' : 'bg-orange-500/80 text-white'
-                }`}>
-                  {jugador.pos}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="font-bold text-white truncate">{jugador.nombre}</p>
-                  <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded text-white ${EQUIPO_COLORS[jugador.equipo] || 'bg-white/20'}`}>
-                      {jugador.equipo}
-                    </span>
-                    <span className="text-xs font-bold px-2 py-0.5 rounded bg-white/10 text-white/60">
-                      {jugador.partidos} PJ
-                    </span>
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {FALLBACK_HISTORICOS.map(categoria => (
+          <div key={categoria.key} className="bg-secondary border border-accent/20 rounded-xl overflow-hidden">
+            <div className="px-5 py-4 border-b border-accent/10">
+              <p className="text-xs text-accent/60 uppercase tracking-widest font-bold">Líderes históricos</p>
+              <h2 className="text-xl font-extrabold text-white mt-1">{categoria.titulo}</h2>
+            </div>
+            <div className="divide-y divide-white/5">
+              {categoria.jugadores.map(jugador => (
+                <div key={`${categoria.key}-${jugador.pos}-${jugador.nombre}`} className="px-5 py-4 flex items-center gap-4">
+                  <span className={`w-9 h-9 rounded-lg flex items-center justify-center font-extrabold ${
+                    jugador.pos === 1 ? 'bg-yellow-400 text-primary' : jugador.pos === 2 ? 'bg-white/20 text-white' : jugador.pos === 3 ? 'bg-orange-500/80 text-white' : 'bg-white/10 text-white/60'
+                  }`}>
+                    {jugador.pos}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-white truncate">{jugador.nombre}</p>
+                    <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded text-white ${EQUIPO_COLORS[jugador.equipo] || 'bg-white/20'}`}>
+                        {jugador.equipo}
+                      </span>
+                      <span className="text-xs font-bold px-2 py-0.5 rounded bg-white/10 text-white/60">
+                        {jugador.partidos} PJ
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-extrabold text-accent">{jugador.valor}</p>
+                    <p className="text-white/35 text-xs font-bold">{categoria.abreviatura}</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-2xl font-extrabold text-accent">{jugador.valor}</p>
-                  <p className="text-white/35 text-xs font-bold">{categoria.abreviatura}</p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {premiosHistoricos.map(premio => (
+          <div key={premio.codigo} className="bg-secondary border border-accent/20 rounded-xl overflow-hidden">
+            <div className="px-5 py-4 border-b border-accent/10">
+              <p className="text-xs text-accent/60 uppercase tracking-widest font-bold">Premios históricos</p>
+              <h2 className="text-xl font-extrabold text-white mt-1">{premio.titulo}</h2>
+              <p className="text-white/40 text-xs mt-1">{premio.subtitulo}</p>
+            </div>
+            <div className="divide-y divide-white/5">
+              {premiosPorTemporada.map(({ temporada, premios }) => {
+                const ganador = premios.find(p => p.premio.startsWith(premio.codigo));
+                if (!ganador) return null;
+
+                return (
+                  <div key={`${premio.codigo}-${temporada}`} className="px-5 py-4">
+                    <p className="text-white/40 text-xs font-bold uppercase tracking-wide">{temporada}</p>
+                    <div className="mt-2 flex items-center justify-between gap-3">
+                      <p className="font-bold text-white truncate">#{ganador.numero} {ganador.jugador}</p>
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded text-white ${EQUIPO_COLORS[ganador.equipo] || 'bg-white/20'}`}>
+                        {ganador.equipo}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {[{ key: 'ofensivo', label: 'Equipo Ofensivo' }, { key: 'defensivo', label: 'Equipo Defensivo' }].map(({ key, label }) => (
+          <div key={key} className="bg-secondary border border-accent/20 rounded-xl overflow-hidden">
+            <div className="px-5 py-4 border-b border-accent/10">
+              <p className="text-xs text-accent/60 uppercase tracking-widest font-bold">Equipos ideales históricos</p>
+              <h2 className="text-xl font-extrabold text-white mt-1">{label}</h2>
+            </div>
+            <div className="divide-y divide-white/5">
+              {premiosPorTemporada.filter(t => t[key].length).map(item => (
+                <div key={`${key}-${item.temporada}`} className="px-5 py-4">
+                  <p className="text-white/40 text-xs font-bold uppercase tracking-wide mb-3">{item.temporada}</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {item[key].map(jugador => (
+                      <div key={`${key}-${item.temporada}-${jugador.nombre}`} className="bg-primary/40 rounded-lg px-3 py-2 flex items-center justify-between gap-2">
+                        <span className="font-bold text-white text-sm truncate">#{jugador.numero} {jugador.nombre}</span>
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded text-white ${EQUIPO_COLORS[jugador.equipo] || 'bg-white/20'}`}>
+                          {jugador.equipo}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
