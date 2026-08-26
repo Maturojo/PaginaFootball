@@ -19,8 +19,8 @@ const TEAM_STYLES = {
 };
 
 const TEAM_JERSEY_IMAGES = {
-  Sirenas: '/remeras/sirenas.jpeg',
-  Corales: '/remeras/corales.jpeg',
+  Sirenas: '/remeras/sirenas.png',
+  Corales: '/remeras/corales.png',
 };
 
 function normalizeName(value) {
@@ -173,26 +173,26 @@ function JerseyFace({ team, name, number, side }) {
 
 function JerseyPreview({ team, name, number }) {
   const style = TEAM_STYLES[team.nombre] || TEAM_STYLES.Acorazados;
-  const jerseyImage = TEAM_JERSEY_IMAGES[team.nombre];
 
   return (
-    <div className="relative w-full max-w-md mx-auto aspect-[4/5] flex items-center justify-center [perspective:1200px]">
+    <div className="relative w-full max-w-md mx-auto aspect-[4/5] flex items-center justify-center [perspective:1400px]">
       <style>{`
         @keyframes jerseySpin {
-          0%, 24% { transform: rotateY(-18deg) rotateX(3deg); }
-          38%, 62% { transform: rotateY(198deg) rotateX(3deg); }
-          76%, 100% { transform: rotateY(342deg) rotateX(3deg); }
+          0%, 18% { transform: rotateY(-24deg) rotateX(4deg); }
+          34%, 56% { transform: rotateY(204deg) rotateX(4deg); }
+          74%, 100% { transform: rotateY(336deg) rotateX(4deg); }
         }
       `}</style>
-      <div className="absolute inset-x-12 bottom-3 h-9 rounded-full bg-black/50 blur-xl" />
-      <div className="relative w-full h-full [transform-style:preserve-3d] animate-[jerseySpin_9s_ease-in-out_infinite]">
-        {[-18, -12, -6, 0, 6, 12, 18].map((z, i) => (
+      <div className="absolute inset-x-12 bottom-3 h-10 rounded-full bg-black/55 blur-2xl" />
+      <div className="absolute inset-8 rounded-full bg-accent/10 blur-3xl" />
+      <div className="relative w-full h-full [transform-style:preserve-3d] animate-[jerseySpin_10s_ease-in-out_infinite]">
+        {[-36, -28, -20, -12, -4, 4, 12, 20, 28, 36].map((z, i) => (
           <div
             key={z}
             className="absolute inset-0 pointer-events-none"
             style={{
-              transform: `translateZ(${z}px) scale(${1 - Math.abs(z) * 0.0018})`,
-              opacity: i === 3 ? 0.32 : 0.12,
+              transform: `translateZ(${z}px) scale(${1 - Math.abs(z) * 0.0015})`,
+              opacity: i === 4 || i === 5 ? 0.26 : 0.1,
               filter: 'blur(0.2px)',
             }}
           >
@@ -218,18 +218,10 @@ function JerseyPreview({ team, name, number }) {
             transform: 'rotateY(88deg) translateZ(-178px)',
           }}
         />
-        <div className="absolute inset-0 [backface-visibility:hidden] [transform:translateZ(24px)] flex items-center justify-center">
-          {jerseyImage ? (
-            <img
-              src={jerseyImage}
-              alt={`Remera ${team.nombre}`}
-              className="max-h-[94%] max-w-[88%] object-contain [filter:drop-shadow(0_28px_24px_rgba(0,0,0,0.42))]"
-            />
-          ) : (
-            <JerseyFace team={team} name={name} number={number} side="front" />
-          )}
+        <div className="absolute inset-0 [backface-visibility:hidden] [transform:translateZ(46px)] flex items-center justify-center">
+          <JerseyFace team={team} name={name} number={number} side="front" />
         </div>
-        <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)_translateZ(24px)]">
+        <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)_translateZ(46px)]">
           <JerseyFace team={team} name={name} number={number} side="back" />
         </div>
       </div>
@@ -252,6 +244,7 @@ export default function Remeras() {
   );
 
   const whatsappLink = buildWhatsAppLink({ equipo: equipo.nombre, talle, nombre, numero, corte, notas });
+  const jerseyImage = TEAM_JERSEY_IMAGES[equipo.nombre];
 
   return (
     <div className="bg-primary text-white pt-16">
@@ -374,6 +367,16 @@ export default function Remeras() {
               <img src={teamLogoSrc(equipo)} alt="" className="w-16 h-16 object-contain" />
             </div>
             <JerseyPreview team={equipo} name={nombre} number={numero} />
+            {jerseyImage && (
+              <div className="mt-5 border border-accent/15 bg-primary/40 rounded-xl p-3">
+                <p className="text-white/35 text-xs uppercase font-bold tracking-widest mb-3">Diseño real</p>
+                <img
+                  src={jerseyImage}
+                  alt={`Diseño de remera ${equipo.nombre}`}
+                  className="mx-auto max-h-48 w-full object-contain"
+                />
+              </div>
+            )}
             <div className="mt-6 grid grid-cols-3 gap-2 text-center text-sm">
               <div className="bg-primary/50 rounded-lg p-3">
                 <p className="text-white/30 text-xs uppercase">Talle</p>

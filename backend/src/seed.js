@@ -41,7 +41,13 @@ async function seed() {
       .replace(/\s+/g, '-'); // espacios a guiones
     try {
       const archivos = fs.readdirSync(equiposDir);
-      const archivo = archivos.find(f => f.toLowerCase().startsWith(nombreLimpio));
+      const archivo = archivos
+        .filter(f => f.toLowerCase().startsWith(nombreLimpio))
+        .sort((a, b) => {
+          const aPng = a.toLowerCase().endsWith('.png') ? -1 : 0;
+          const bPng = b.toLowerCase().endsWith('.png') ? -1 : 0;
+          return aPng - bPng || a.localeCompare(b);
+        })[0];
       return archivo ? `/equipos/${archivo}` : '';
     } catch { return ''; }
   };
