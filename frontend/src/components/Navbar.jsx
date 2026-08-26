@@ -3,6 +3,7 @@ import { Link, NavLink } from 'react-router-dom';
 
 const links = [
   { to: '/', label: 'Inicio' },
+  { to: '/historia', label: 'Historia' },
   { to: '/fixture', label: 'Fixture' },
   { to: '/equipos', label: 'Equipos' },
   { to: '/jugadores', label: 'Jugadores' },
@@ -25,7 +26,7 @@ export default function Navbar() {
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-300 ${scrolled ? 'bg-primary text-white shadow-lg border-accent/20' : 'bg-transparent text-white border-transparent'}`} style={!scrolled ? { textShadow: '0 1px 4px rgba(0,0,0,0.8)' } : {}}>
-      <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-18 py-2">
+      <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-18 py-2">
         <Link to="/" className="flex items-center gap-3 font-bold text-xl tracking-wide">
           <img src="/logo.png" alt="Logo Liga" className="h-12 w-12 object-contain" />
           <div className="leading-tight">
@@ -35,7 +36,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop */}
-        <ul className="hidden md:flex gap-1">
+        <ul className="hidden xl:flex gap-1">
           {links.map(l => (
             <li key={l.to}>
               <NavLink
@@ -52,7 +53,7 @@ export default function Navbar() {
         </ul>
 
         {/* Mobile toggle */}
-        <button onClick={() => setOpen(!open)} className="md:hidden p-2 rounded hover:bg-white/10">
+        <button onClick={() => setOpen(!open)} className="xl:hidden p-2 rounded hover:bg-white/10">
           <span className="block w-6 h-0.5 bg-white mb-1.5" />
           <span className="block w-6 h-0.5 bg-white mb-1.5" />
           <span className="block w-6 h-0.5 bg-white" />
@@ -60,7 +61,7 @@ export default function Navbar() {
       </div>
 
       {open && (
-        <ul className="md:hidden bg-primary border-t border-accent/20 px-4 pb-4">
+        <ul className="xl:hidden bg-primary border-t border-accent/20 px-4 pb-4">
           {links.map(l => (
             <li key={l.to}>
               <NavLink
