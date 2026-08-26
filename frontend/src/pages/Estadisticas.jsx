@@ -227,9 +227,14 @@ function TablaHistoricos() {
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="font-bold text-white truncate">{jugador.nombre}</p>
-                  <span className={`text-xs font-bold px-2 py-0.5 rounded text-white ${EQUIPO_COLORS[jugador.equipo] || 'bg-white/20'}`}>
-                    {jugador.equipo}
-                  </span>
+                  <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded text-white ${EQUIPO_COLORS[jugador.equipo] || 'bg-white/20'}`}>
+                      {jugador.equipo}
+                    </span>
+                    <span className="text-xs font-bold px-2 py-0.5 rounded bg-white/10 text-white/60">
+                      {jugador.partidos} PJ
+                    </span>
+                  </div>
                 </div>
                 <div className="text-right">
                   <p className="text-2xl font-extrabold text-accent">{jugador.valor}</p>
