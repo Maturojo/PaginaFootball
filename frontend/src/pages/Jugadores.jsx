@@ -1,11 +1,33 @@
 import { useEffect, useState } from 'react';
 import api from '../api';
+import { FALLBACK_PLAYERS } from '../data/players.js';
 import { teamLogoSrc } from '../utils/teamLogo.js';
 
 import { API_URL } from '../config.js';
 function fotoSrc(f) { return f?.startsWith('http') ? f : `${API_URL}${f}`; }
 
 const EQUIPOS = ['Todos', 'Acorazados', 'Liebres', 'Krakens', 'Tridentes', 'Nereidas', 'Atlantes', 'Bárbaros', 'Templarios'];
+
+function normalizeKey(value) {
+  return String(value ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function playerKey(player) {
+  return [player.equipo, player.numero, player.nombre].map(normalizeKey).join('|');
+}
+
+function mergePlayers(apiPlayers = []) {
+  const safeApiPlayers = Array.isArray(apiPlayers) ? apiPlayers : [];
+  const existing = new Set(safeApiPlayers.map(playerKey));
+  const missingFallbacks = FALLBACK_PLAYERS.filter(player => !existing.has(playerKey(player)));
+
+  return [...safeApiPlayers, ...missingFallbacks];
+}
 
 export default function Jugadores() {
   const [jugadores, setJugadores] = useState([]);
@@ -14,7 +36,10 @@ export default function Jugadores() {
   const [selected, setSelected] = useState(null);
 
   useEffect(() => {
-    api.get('/jugadores').then(r => setJugadores(r.data)).finally(() => setLoading(false));
+    api.get('/jugadores')
+      .then(r => setJugadores(mergePlayers(r.data)))
+      .catch(() => setJugadores(FALLBACK_PLAYERS))
+      .finally(() => setLoading(false));
   }, []);
 
   const filtrados = equipo === 'Todos' ? jugadores : jugadores.filter(j => j.equipo === equipo);
