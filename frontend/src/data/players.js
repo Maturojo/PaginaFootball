@@ -70,7 +70,7 @@ export const FALLBACK_PLAYERS = [
     numero: 74,
     nombre: 'Iñaki Irurzun',
     posicion: 'C',
-    stats: { partidos: 4, touchdowns: 6, intercepciones: 1, yardas: 233 },
+    stats: { partidos: 4, touchdowns: 3, intercepciones: 1, yardas: 233 },
   }),
   player({ equipo: 'Tridentes', numero: 79, nombre: 'Diego Parrotta', posicion: 'R', stats: { partidos: 2, touchdowns: 0, intercepciones: 0, yardas: 57 } }),
   player({ equipo: 'Tridentes', numero: 'S/N', nombre: 'Francisco Toni', posicion: 'WR', stats: { partidos: 2, touchdowns: 1, intercepciones: 0, yardas: 45 } }),
@@ -80,7 +80,7 @@ export const FALLBACK_PLAYERS = [
     numero: 53,
     nombre: 'Ángel Ávila',
     posicion: 'QB',
-    stats: { partidos: 6, touchdowns: 16, intercepciones: 3, yardas: 1175 },
+    stats: { partidos: 6, touchdowns: 16, intercepciones: 3, yardas: 1144 },
   }),
   player({
     equipo: 'Krakens',
@@ -140,7 +140,7 @@ export const FALLBACK_PLAYERS = [
     numero: 11,
     nombre: 'Matías Rojo',
     posicion: 'WR',
-    stats: { partidos: 4, touchdowns: 2, intercepciones: 4, yardas: 253 },
+    stats: { partidos: 4, touchdowns: 4, intercepciones: 4, yardas: 253 },
   }),
   player({
     equipo: 'Liebres',
@@ -148,7 +148,7 @@ export const FALLBACK_PLAYERS = [
     nombre: 'Emiliano Sánchez',
     posicion: 'WR',
     capitan: true,
-    stats: { partidos: 5, touchdowns: 7, intercepciones: 3, yardas: 258 },
+    stats: { partidos: 5, touchdowns: 7, intercepciones: 3, yardas: 290 },
   }),
   player({ equipo: 'Liebres', numero: 37, nombre: 'Gustavo Duarte', posicion: 'WR' }),
   player({
@@ -174,7 +174,7 @@ export const FALLBACK_PLAYERS = [
     stats: { partidos: 1, touchdowns: 0, intercepciones: 0, yardas: 0 },
   }),
   player({ equipo: 'Liebres', numero: 21, nombre: 'Lauro Ibarra', posicion: 'C', stats: { partidos: 4, touchdowns: 0, intercepciones: 0, yardas: 65 } }),
-  player({ equipo: 'Liebres', numero: 37, nombre: 'Héctor González', posicion: 'WR', stats: { partidos: 4, touchdowns: 6, intercepciones: 0, yardas: 407 } }),
+  player({ equipo: 'Liebres', numero: 37, nombre: 'Héctor González', posicion: 'WR', stats: { partidos: 4, touchdowns: 10, intercepciones: 0, yardas: 407 } }),
 ];
 
 function normalizeKey(value) {
