@@ -175,6 +175,37 @@ export const FALLBACK_PLAYERS = [
   }),
   player({ equipo: 'Liebres', numero: 21, nombre: 'Lauro Ibarra', posicion: 'C', stats: { partidos: 4, touchdowns: 0, intercepciones: 0, yardas: 65 } }),
   player({ equipo: 'Liebres', numero: 37, nombre: 'Héctor González', posicion: 'WR', stats: { partidos: 4, touchdowns: 10, intercepciones: 0, yardas: 407 } }),
+  player({ equipo: 'Liebres', numero: 'S/N', nombre: 'Braian Pourrain', posicion: 'WR', stats: { partidos: 1, touchdowns: 1, intercepciones: 1, yardas: 88 } }),
+
+  player({
+    equipo: 'Acorazados',
+    numero: 'S/N',
+    nombre: 'Ángel Ávila',
+    posicion: 'QB',
+    stats: { partidos: 3, touchdowns: 0, intercepciones: 0, yardas: 0 },
+  }),
+  player({
+    equipo: 'Acorazados',
+    numero: 'S/N',
+    nombre: 'Matías Rojo',
+    posicion: 'WR',
+    stats: { partidos: 3, touchdowns: 0, intercepciones: 0, yardas: 0 },
+  }),
+  player({
+    equipo: 'Acorazados',
+    numero: 'S/N',
+    nombre: 'Ignacio Cuesta',
+    posicion: 'WR',
+    stats: { partidos: 3, touchdowns: 0, intercepciones: 0, yardas: 0 },
+  }),
+  player({
+    equipo: 'Tridentes',
+    numero: 22,
+    nombre: 'Joaquín Gainza',
+    posicion: 'WR',
+    esMVP: true,
+    stats: { partidos: 1, touchdowns: 4, intercepciones: 1, yardas: 176 },
+  }),
 ];
 
 function normalizeKey(value) {
