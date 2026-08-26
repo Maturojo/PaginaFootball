@@ -22,18 +22,6 @@ function samePlayer(entryName, playerName) {
   return normalizeName(entryName) === normalizeName(playerName);
 }
 
-const TEAM_CODES = {
-  Acorazados: 'ACO',
-  Liebres: 'LIE',
-  Krakens: 'KRA',
-  Tridentes: 'TRI',
-};
-
-function sameTeam(entryTeam, playerTeam) {
-  if (!entryTeam) return true;
-  return normalizeName(entryTeam) === normalizeName(TEAM_CODES[playerTeam] || playerTeam);
-}
-
 function playerHonors(player) {
   const premios = [];
   const ofensivo = [];
@@ -42,20 +30,20 @@ function playerHonors(player) {
   FALLBACK_LIDERES.forEach(lider => {
     if (lider.tipo === 'premios') {
       lider.jugadores
-        .filter(j => samePlayer(j.jugador, player.nombre) && sameTeam(j.equipo, player.equipo))
-        .forEach(j => premios.push({ temporada: lider.temporada, label: j.premio.split('—')[0].trim() }));
+        .filter(j => samePlayer(j.jugador, player.nombre))
+        .forEach(j => premios.push({ temporada: lider.temporada, label: j.premio.split('—')[0].trim(), equipo: j.equipo }));
     }
 
     if (lider.tipo === 'equipo-ofensivo') {
       lider.jugadores
-        .filter(j => samePlayer(j.nombre, player.nombre) && sameTeam(j.equipo, player.equipo))
-        .forEach(() => ofensivo.push(lider.temporada));
+        .filter(j => samePlayer(j.nombre, player.nombre))
+        .forEach(j => ofensivo.push({ temporada: lider.temporada, equipo: j.equipo }));
     }
 
     if (lider.tipo === 'equipo-defensivo') {
       lider.jugadores
-        .filter(j => samePlayer(j.nombre, player.nombre) && sameTeam(j.equipo, player.equipo))
-        .forEach(() => defensivo.push(lider.temporada));
+        .filter(j => samePlayer(j.nombre, player.nombre))
+        .forEach(j => defensivo.push({ temporada: lider.temporada, equipo: j.equipo }));
     }
   });
 
@@ -185,9 +173,9 @@ export default function Jugadores() {
                   ))}
                   {honors.total > 0 && (
                     <div className="col-span-3 bg-primary/30 rounded-lg px-3 py-2 text-xs text-white/55 leading-relaxed">
-                      {honors.premios.length > 0 && <p><span className="text-accent font-bold">Premios:</span> {honors.premios.map(p => `${p.label} (${p.temporada})`).join(' · ')}</p>}
-                      {honors.ofensivo.length > 0 && <p><span className="text-accent font-bold">Equipo ofensivo:</span> {honors.ofensivo.join(' · ')}</p>}
-                      {honors.defensivo.length > 0 && <p><span className="text-accent font-bold">Equipo defensivo:</span> {honors.defensivo.join(' · ')}</p>}
+                      {honors.premios.length > 0 && <p><span className="text-accent font-bold">Premios:</span> {honors.premios.map(p => `${p.label} (${p.temporada}${p.equipo ? ` · ${p.equipo}` : ''})`).join(' · ')}</p>}
+                      {honors.ofensivo.length > 0 && <p><span className="text-accent font-bold">Equipo ofensivo:</span> {honors.ofensivo.map(p => `${p.temporada}${p.equipo ? ` · ${p.equipo}` : ''}`).join(' · ')}</p>}
+                      {honors.defensivo.length > 0 && <p><span className="text-accent font-bold">Equipo defensivo:</span> {honors.defensivo.map(p => `${p.temporada}${p.equipo ? ` · ${p.equipo}` : ''}`).join(' · ')}</p>}
                     </div>
                   )}
                 </div>
