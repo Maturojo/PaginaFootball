@@ -3,6 +3,7 @@ import api from '../api';
 import { API_URL } from '../config.js';
 
 const FALLBACK_TITLE = 'Historia';
+const FALLBACK_BACKGROUND = '/historia/fondo-historia.jpg';
 
 const FALLBACK_TEXT = `El desarrollo del Fútbol Americano en la ciudad de Mar del Plata es un proceso reciente, caracterizado por un crecimiento sostenido a partir de iniciativas locales y un fuerte componente comunitario. Fútbol Americano Mar del Plata nació en 2016 cuando un grupo de jóvenes empezaron con las primeras prácticas deportivas en Parque Camet. Estas primeras convocatorias, organizadas de manera independiente, lograron reunir rápidamente a un número significativo de participantes, evidenciando el interés existente y el potencial de desarrollo del deporte a nivel local.
 
@@ -39,7 +40,7 @@ const STATS = [
 ];
 
 function imageSrc(src) {
-  if (!src) return '/logo.png';
+  if (!src) return FALLBACK_BACKGROUND;
   return src.startsWith('/') ? `${API_URL}${src}` : src;
 }
 
@@ -74,8 +75,8 @@ export default function Historia() {
         style={{
           backgroundImage: `linear-gradient(90deg, rgba(5, 10, 18, 0.95) 0%, rgba(9, 18, 31, 0.86) 48%, rgba(9, 18, 31, 0.52) 100%), url(${backgroundImage})`,
           backgroundPosition: 'center',
-          backgroundSize: data.imagen ? 'cover' : 'min(64vw, 620px)',
-          backgroundRepeat: data.imagen ? 'no-repeat' : 'no-repeat',
+          backgroundSize: 'cover',
+          backgroundRepeat: 'no-repeat',
         }}
       >
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_30%,rgba(83,149,211,0.24),transparent_36%)]" />
