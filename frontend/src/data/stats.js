@@ -884,6 +884,24 @@ function normalizePlayerName(value) {
     .trim();
 }
 
+const ROMAN_SEASONS = {
+  I: 1,
+  II: 2,
+  III: 3,
+  IV: 4,
+  V: 5,
+  VI: 6,
+  VII: 7,
+  VIII: 8,
+  IX: 9,
+  X: 10,
+};
+
+function seasonRank(temporada) {
+  const match = String(temporada ?? '').match(/Tazón del Mar\s+([IVX]+)/i);
+  return ROMAN_SEASONS[match?.[1]?.toUpperCase()] || 0;
+}
+
 function sortedTop10(playersMap, statKey) {
   let lastValue = null;
   let lastPosition = 0;
@@ -924,12 +942,18 @@ function buildHistoricalPlayers(lideres) {
         yardas: 0,
         intercepciones: 0,
         temporadas: new Set(),
+        latestSeasonRank: 0,
       });
     }
 
     const player = playersMap.get(key);
+    const currentSeasonRank = seasonRank(temporada);
+
     player.nombre = HISTORICAL_DISPLAY_NAMES[key] || nombre;
-    player.equipo = equipo || player.equipo;
+    if (equipo && currentSeasonRank >= player.latestSeasonRank) {
+      player.equipo = equipo;
+      player.latestSeasonRank = currentSeasonRank;
+    }
     if (temporada) player.temporadas.add(temporada);
     return player;
   };
@@ -953,7 +977,7 @@ function buildHistoricalPlayers(lideres) {
   });
 
   HISTORICAL_EXTRA_STATS.forEach(extra => {
-    const player = getPlayer({ nombre: extra.nombre, equipo: extra.equipo, temporada: 'Datos históricos' });
+    const player = getPlayer({ nombre: extra.nombre, temporada: 'Datos históricos' });
     if (!player) return;
 
     player.touchdowns += Number(extra.touchdowns) || 0;
