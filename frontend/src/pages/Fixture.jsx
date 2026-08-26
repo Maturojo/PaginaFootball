@@ -22,6 +22,19 @@ function mergePartidos(apiPartidos = []) {
   return [...apiPartidos, ...FALLBACK_PARTIDOS.filter(partido => !ids.has(partido._id))];
 }
 
+function SectionTitle({ children, count }) {
+  return (
+    <div className="flex items-center gap-4 py-2">
+      <div className="h-px flex-1 bg-accent/25" />
+      <span className="text-xs font-extrabold uppercase tracking-widest text-accent">
+        {children}
+        <span className="ml-2 text-white/30">({count})</span>
+      </span>
+      <div className="h-px flex-1 bg-accent/25" />
+    </div>
+  );
+}
+
 function PartidoCard({ p, logoMap }) {
   const finalizado = p.estado === 'finalizado';
   const estado = ESTADOS[p.estado] || ESTADOS.programado;
@@ -148,6 +161,8 @@ export default function Fixture() {
       if (a.estado === 'finalizado' && b.estado === 'finalizado') return new Date(b.fecha) - new Date(a.fecha);
       return new Date(a.fecha) - new Date(b.fecha);
     });
+  const programados = filtrados.filter(p => p.estado !== 'finalizado');
+  const finalizados = filtrados.filter(p => p.estado === 'finalizado');
 
   return (
     <div className="bg-primary text-white pt-16">
@@ -183,8 +198,26 @@ export default function Fixture() {
           <p className="text-center text-white/40 py-10">No hay partidos en esta sección aún.</p>
         )}
 
-        <div className="space-y-4">
-          {filtrados.map(p => <PartidoCard key={p._id} p={p} logoMap={logoMap} />)}
+        <div className="space-y-5">
+          {programados.length > 0 && (
+            <section className="space-y-4">
+              <SectionTitle count={programados.length}>Programados</SectionTitle>
+              {programados.map(p => <PartidoCard key={p._id} p={p} logoMap={logoMap} />)}
+            </section>
+          )}
+
+          {programados.length > 0 && finalizados.length > 0 && (
+            <div className="py-2">
+              <div className="h-px bg-white/10" />
+            </div>
+          )}
+
+          {finalizados.length > 0 && (
+            <section className="space-y-4">
+              <SectionTitle count={finalizados.length}>Finalizados</SectionTitle>
+              {finalizados.map(p => <PartidoCard key={p._id} p={p} logoMap={logoMap} />)}
+            </section>
+          )}
         </div>
       </section>
     </div>
