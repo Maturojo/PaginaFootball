@@ -1,5 +1,19 @@
 export const FALLBACK_PRODUCTS = [
   {
+    _id: 'remera-10-anos',
+    nombre: 'Remera 10 años',
+    precio: 25000,
+    descripcion: 'Remera conmemorativa FAMDQ 10 años, diseño blanco con frente y dorso.',
+    categoria: 'Indumentaria',
+    stock: 20,
+    whatsapp: '5492235000000',
+    imagen: '/tienda/remera-10-anos-frente.jpg',
+    imagenes: [
+      '/tienda/remera-10-anos-frente.jpg',
+      '/tienda/remera-10-anos-dorso.jpg',
+    ],
+  },
+  {
     _id: 'remera-entrenamiento-city-hall',
     nombre: 'Remera de entrenamiento - CITY HALL',
     precio: 25000,

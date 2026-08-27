@@ -83,21 +83,37 @@ async function seed() {
       '/tienda/remera-entrenamiento-city-hall-dorso.png',
     ],
   };
+  const anniversaryShirt = {
+    nombre: 'Remera 10 años',
+    precio: 25000,
+    descripcion: 'Remera conmemorativa FAMDQ 10 años, diseño blanco con frente y dorso.',
+    categoria: 'Indumentaria',
+    stock: 20,
+    whatsapp: '5492235000000',
+    imagen: '/tienda/remera-10-anos-frente.jpg',
+    imagenes: [
+      '/tienda/remera-10-anos-frente.jpg',
+      '/tienda/remera-10-anos-dorso.jpg',
+    ],
+  };
+  const fixedProducts = [anniversaryShirt, cityHallTrainingShirt];
   const productCount = await Product.countDocuments();
   if (productCount === 0) {
     await Product.insertMany([
-      cityHallTrainingShirt,
+      ...fixedProducts,
       { nombre: 'Camiseta Oficial Liga', precio: 3500, descripcion: 'Camiseta oficial de la Liga de Football Americano MDP.', categoria: 'Indumentaria', stock: 20, whatsapp: '5492235000000' },
       { nombre: 'Gorra Liga MDP', precio: 1800, descripcion: 'Gorra bordada con el logo de la liga.', categoria: 'Accesorios', stock: 15, whatsapp: '5492235000000' },
       { nombre: 'Pelota Oficial', precio: 4200, descripcion: 'Pelota reglamentaria para entrenamiento.', categoria: 'Equipamiento', stock: 5, whatsapp: '5492235000000' },
     ]);
     console.log('Productos creados');
   }
-  await Product.findOneAndUpdate(
-    { nombre: cityHallTrainingShirt.nombre },
-    { $setOnInsert: cityHallTrainingShirt },
-    { upsert: true, new: true }
-  );
+  for (const product of fixedProducts) {
+    await Product.findOneAndUpdate(
+      { nombre: product.nombre },
+      { $setOnInsert: product },
+      { upsert: true, new: true }
+    );
+  }
 
   // Páginas
   const pages = [
