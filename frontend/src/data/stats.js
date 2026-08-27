@@ -1231,6 +1231,33 @@ export const FALLBACK_LIDERES = [
     ],
   },
   {
+    temporada: 'Tazón del Mar V',
+    tipo: 'intercepciones',
+    jugadores: [
+      { pos: 1, nombre: 'Ignacio Cuesta', equipo: 'LIE', ints: 2 },
+      { pos: 2, nombre: 'Mateo Pignol', equipo: 'ACO', ints: 1 },
+      { pos: 3, nombre: 'Ezequiel Ringa', equipo: 'KRA', ints: 1 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar V',
+    tipo: 'sacks',
+    jugadores: [
+      { pos: 1, nombre: 'Gabriel Rodríguez', equipo: 'TRI', sacks: 8, safety: 0 },
+      { pos: 2, nombre: 'Ignacio Ríos', equipo: 'ACO', sacks: 8, safety: 0 },
+      { pos: 3, nombre: 'Juan Cruz Décima', equipo: 'TRI', sacks: 8, safety: 0 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar V',
+    tipo: 'tackles',
+    jugadores: [
+      { pos: 1, nombre: 'Ignacio Cuesta', equipo: 'LIE', tackles: 11 },
+      { pos: 2, nombre: 'Raúl Montenegro', equipo: 'LIE', tackles: 8 },
+      { pos: 3, nombre: 'Elvis Rodríguez', equipo: 'ACO', tackles: 7 },
+    ],
+  },
+  {
     temporada: 'Tazón del Mar VIII',
     tipo: 'equipo-ofensivo',
     jugadores: [

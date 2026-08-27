@@ -22,6 +22,7 @@ const TIPOS = {
   intercepciones:{ label: 'Intercepciones', cols: ['INTS'],                            keys: ['ints'] },
   sacks:         { label: 'Sacks',          cols: ['SACKS','SAFETY'],                  keys: ['sacks','safety'] },
   deflecciones:  { label: 'Deflecciones',   cols: ['DEFLEC'],                          keys: ['deflec'] },
+  tackles:       { label: 'Tackles',        cols: ['TACKLES'],                         keys: ['tackles'] },
 };
 
 const PREMIOS_ICONS = {
