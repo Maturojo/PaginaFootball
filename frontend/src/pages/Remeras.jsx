@@ -171,118 +171,24 @@ function JerseyFace({ team, name, number, side }) {
   );
 }
 
-function RealJerseyFace({ team, src }) {
-  const style = TEAM_STYLES[team.nombre] || TEAM_STYLES.Acorazados;
-
-  return (
-    <div className="absolute inset-0 flex items-center justify-center [transform-style:preserve-3d]">
-      {[...Array(12)].map((_, index) => {
-        const depth = -42 + index * 7;
-        const isCenter = index > 4 && index < 8;
-
-        return (
-          <img
-            key={depth}
-            src={src}
-            alt=""
-            aria-hidden="true"
-            className="absolute max-h-[96%] max-w-[88%] object-contain"
-            style={{
-              opacity: isCenter ? 0.22 : 0.1,
-              filter: `brightness(${0.36 + index * 0.035}) saturate(0.78) blur(${index < 3 ? 0.45 : 0.1}px)`,
-              transform: `translateZ(${depth}px) scale(${1 - Math.abs(depth) * 0.0012})`,
-            }}
-          />
-        );
-      })}
-
-      <div
-        className="absolute left-[15%] top-[13%] h-[70%] w-14 rounded-[50%] opacity-80 blur-[0.3px]"
-        style={{
-          background: `linear-gradient(90deg, rgba(0,0,0,0.56), ${style.side})`,
-          transform: 'rotateY(82deg) translateZ(178px)',
-        }}
-      />
-      <div
-        className="absolute right-[15%] top-[13%] h-[70%] w-14 rounded-[50%] opacity-70 blur-[0.3px]"
-        style={{
-          background: `linear-gradient(90deg, ${style.side}, rgba(0,0,0,0.6))`,
-          transform: 'rotateY(-82deg) translateZ(178px)',
-        }}
-      />
-
-      <div className="relative max-h-[96%] max-w-[88%] [transform-style:preserve-3d] [transform:translateZ(54px)]">
-        <img
-          src={src}
-          alt={`Remera ${team.nombre}`}
-          className="block w-full h-full object-contain [filter:drop-shadow(0_30px_24px_rgba(0,0,0,0.5))]"
-        />
-        <div className="absolute inset-0 pointer-events-none rounded-[30%] bg-[linear-gradient(105deg,rgba(255,255,255,0.32),rgba(255,255,255,0.04)_34%,rgba(0,0,0,0.1)_68%,rgba(0,0,0,0.24))] mix-blend-soft-light" />
-        <div className="absolute inset-y-[9%] left-[42%] w-[16%] pointer-events-none bg-white/25 blur-xl opacity-35" />
-      </div>
-    </div>
-  );
-}
-
 function JerseyPreview({ team, name, number }) {
-  const style = TEAM_STYLES[team.nombre] || TEAM_STYLES.Acorazados;
   const jerseyImage = TEAM_JERSEY_IMAGES[team.nombre];
 
   return (
-    <div className="relative w-full max-w-md mx-auto aspect-[4/5] flex items-center justify-center [perspective:1400px]">
-      <style>{`
-        @keyframes jerseySpin {
-          0%, 18% { transform: rotateY(-24deg) rotateX(4deg); }
-          34%, 56% { transform: rotateY(204deg) rotateX(4deg); }
-          74%, 100% { transform: rotateY(336deg) rotateX(4deg); }
-        }
-      `}</style>
-      <div className="absolute inset-x-12 bottom-3 h-10 rounded-full bg-black/55 blur-2xl" />
+    <div className="relative w-full max-w-md mx-auto aspect-[4/5] flex items-center justify-center">
+      <div className="absolute inset-x-12 bottom-3 h-10 rounded-full bg-black/45 blur-2xl" />
       <div className="absolute inset-8 rounded-full bg-accent/10 blur-3xl" />
-      <div className="relative w-full h-full [transform-style:preserve-3d] animate-[jerseySpin_10s_ease-in-out_infinite]">
-        {[-36, -28, -20, -12, -4, 4, 12, 20, 28, 36].map((z, i) => (
-          <div
-            key={z}
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              transform: `translateZ(${z}px) scale(${1 - Math.abs(z) * 0.0015})`,
-              opacity: i === 4 || i === 5 ? 0.26 : 0.1,
-              filter: 'blur(0.2px)',
-            }}
-          >
-            <svg viewBox="0 0 430 560" className="w-full h-full">
-              <path
-                d="M143 59 C160 42 179 35 215 35 C251 35 270 42 287 59 L376 92 C400 101 413 123 408 149 L390 242 C386 264 371 276 350 271 L304 260 L292 498 C291 515 279 525 262 525 H168 C151 525 139 515 138 498 L126 260 L80 271 C59 276 44 264 40 242 L22 149 C17 123 30 101 54 92 Z"
-                fill={i < 3 ? style.side : i > 3 ? '#0b1220' : style.body}
-              />
-            </svg>
-          </div>
-        ))}
-        <div
-          className="absolute left-[10%] top-[19%] h-[62%] w-16 rounded-[50%] blur-[1px]"
-          style={{
-            background: `linear-gradient(90deg, ${style.side}, rgba(0,0,0,.45))`,
-            transform: 'rotateY(88deg) translateZ(178px)',
-          }}
+      {jerseyImage ? (
+        <img
+          src={jerseyImage}
+          alt={`Remera ${team.nombre}`}
+          className="relative max-h-[96%] max-w-[90%] object-contain drop-shadow-2xl"
         />
-        <div
-          className="absolute right-[10%] top-[19%] h-[62%] w-16 rounded-[50%] blur-[1px]"
-          style={{
-            background: `linear-gradient(90deg, rgba(255,255,255,.12), ${style.side})`,
-            transform: 'rotateY(88deg) translateZ(-178px)',
-          }}
-        />
-        <div className="absolute inset-0 [backface-visibility:hidden] [transform:translateZ(46px)] flex items-center justify-center">
-          {jerseyImage ? (
-            <RealJerseyFace team={team} src={jerseyImage} />
-          ) : (
-            <JerseyFace team={team} name={name} number={number} side="front" />
-          )}
+      ) : (
+        <div className="relative w-full h-full">
+          <JerseyFace team={team} name={name} number={number} side="front" />
         </div>
-        <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)_translateZ(46px)]">
-          <JerseyFace team={team} name={name} number={number} side="back" />
-        </div>
-      </div>
+      )}
     </div>
   );
 }
