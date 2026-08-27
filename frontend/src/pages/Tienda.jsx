@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
-import { FALLBACK_PRODUCTS } from '../data/products.js';
+import { FALLBACK_PRODUCTS, mergeFallbackProducts } from '../data/products.js';
 
 import { API_URL } from '../config.js';
 
@@ -11,6 +11,12 @@ function buildWhatsAppLink(product) {
   return `https://wa.me/${phone}?text=${msg}`;
 }
 
+function productImageSrc(src) {
+  if (!src) return '';
+  if (src.startsWith('/uploads/')) return `${API_URL}${src}`;
+  return src;
+}
+
 export default function Tienda() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +24,7 @@ export default function Tienda() {
 
   useEffect(() => {
     api.get('/products')
-      .then(r => setProducts(r.data?.length ? r.data : FALLBACK_PRODUCTS))
+      .then(r => setProducts(r.data?.length ? mergeFallbackProducts(r.data) : FALLBACK_PRODUCTS))
       .catch(() => setProducts(FALLBACK_PRODUCTS))
       .finally(() => setLoading(false));
   }, []);
@@ -77,7 +83,7 @@ export default function Tienda() {
               <div className="relative bg-primary/50 h-52 flex items-center justify-center overflow-hidden">
                 {product.imagen ? (
                   <img
-                    src={product.imagen.startsWith('/') ? `${API_URL}${product.imagen}` : product.imagen}
+                    src={productImageSrc(product.imagen)}
                     alt={product.nombre}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />

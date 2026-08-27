@@ -10,10 +10,17 @@ function buildWhatsAppLink(product) {
   return `https://wa.me/${phone}?text=${msg}`;
 }
 
+function productImageSrc(src) {
+  if (!src) return '';
+  if (src.startsWith('/uploads/')) return `${API_URL}${src}`;
+  return src;
+}
+
 export default function ProductoDetalle() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState(0);
 
   useEffect(() => {
     api.get(`/products/${id}`)
@@ -35,9 +42,8 @@ export default function ProductoDetalle() {
     </div>
   );
 
-  const imagenSrc = product.imagen
-    ? product.imagen.startsWith('/') ? `${API_URL}${product.imagen}` : product.imagen
-    : null;
+  const imagenes = product.imagenes?.length ? product.imagenes : product.imagen ? [product.imagen] : [];
+  const imagenSrc = productImageSrc(imagenes[selectedImage] || imagenes[0]);
 
   return (
     <div className="bg-primary text-white min-h-screen pt-16">
@@ -51,11 +57,29 @@ export default function ProductoDetalle() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* Imagen */}
-          <div className="bg-secondary border border-accent/20 rounded-2xl overflow-hidden flex items-center justify-center aspect-square">
-            {imagenSrc ? (
-              <img src={imagenSrc} alt={product.nombre} className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-9xl opacity-20">🏈</span>
+          <div>
+            <div className="bg-secondary border border-accent/20 rounded-2xl overflow-hidden flex items-center justify-center aspect-square">
+              {imagenSrc ? (
+                <img src={imagenSrc} alt={product.nombre} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-9xl opacity-20">🏈</span>
+              )}
+            </div>
+            {imagenes.length > 1 && (
+              <div className="grid grid-cols-2 gap-3 mt-3">
+                {imagenes.map((src, index) => (
+                  <button
+                    key={src}
+                    type="button"
+                    onClick={() => setSelectedImage(index)}
+                    className={`bg-secondary border rounded-xl overflow-hidden aspect-[4/3] transition ${
+                      selectedImage === index ? 'border-accent' : 'border-accent/20 hover:border-accent/50'
+                    }`}
+                  >
+                    <img src={productImageSrc(src)} alt={`${product.nombre} ${index + 1}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
             )}
           </div>
 

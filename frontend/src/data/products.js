@@ -1,5 +1,19 @@
 export const FALLBACK_PRODUCTS = [
   {
+    _id: 'remera-entrenamiento-city-hall',
+    nombre: 'Remera de entrenamiento - CITY HALL',
+    precio: 25000,
+    descripcion: 'Remera de entrenamiento FAMDQ City Hall, diseño azul con frente y dorso.',
+    categoria: 'Indumentaria',
+    stock: 20,
+    whatsapp: '5492235000000',
+    imagen: '/tienda/remera-entrenamiento-city-hall-frente.png',
+    imagenes: [
+      '/tienda/remera-entrenamiento-city-hall-frente.png',
+      '/tienda/remera-entrenamiento-city-hall-dorso.png',
+    ],
+  },
+  {
     _id: 'camiseta-oficial-liga',
     nombre: 'Camiseta Oficial Liga',
     precio: 3500,
@@ -30,4 +44,10 @@ export const FALLBACK_PRODUCTS = [
 
 export function findFallbackProduct(id) {
   return FALLBACK_PRODUCTS.find(product => product._id === id);
+}
+
+export function mergeFallbackProducts(products) {
+  const names = new Set(products.map(product => product.nombre?.toLowerCase()));
+  const missing = FALLBACK_PRODUCTS.filter(product => !names.has(product.nombre.toLowerCase()));
+  return [...missing, ...products];
 }

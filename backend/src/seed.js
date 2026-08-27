@@ -70,15 +70,34 @@ async function seed() {
   console.log('Equipos actualizados (logos preservados)');
 
   // Productos
+  const cityHallTrainingShirt = {
+    nombre: 'Remera de entrenamiento - CITY HALL',
+    precio: 25000,
+    descripcion: 'Remera de entrenamiento FAMDQ City Hall, diseño azul con frente y dorso.',
+    categoria: 'Indumentaria',
+    stock: 20,
+    whatsapp: '5492235000000',
+    imagen: '/tienda/remera-entrenamiento-city-hall-frente.png',
+    imagenes: [
+      '/tienda/remera-entrenamiento-city-hall-frente.png',
+      '/tienda/remera-entrenamiento-city-hall-dorso.png',
+    ],
+  };
   const productCount = await Product.countDocuments();
   if (productCount === 0) {
     await Product.insertMany([
+      cityHallTrainingShirt,
       { nombre: 'Camiseta Oficial Liga', precio: 3500, descripcion: 'Camiseta oficial de la Liga de Football Americano MDP.', categoria: 'Indumentaria', stock: 20, whatsapp: '5492235000000' },
       { nombre: 'Gorra Liga MDP', precio: 1800, descripcion: 'Gorra bordada con el logo de la liga.', categoria: 'Accesorios', stock: 15, whatsapp: '5492235000000' },
       { nombre: 'Pelota Oficial', precio: 4200, descripcion: 'Pelota reglamentaria para entrenamiento.', categoria: 'Equipamiento', stock: 5, whatsapp: '5492235000000' },
     ]);
     console.log('Productos creados');
   }
+  await Product.findOneAndUpdate(
+    { nombre: cityHallTrainingShirt.nombre },
+    { $setOnInsert: cityHallTrainingShirt },
+    { upsert: true, new: true }
+  );
 
   // Páginas
   const pages = [
