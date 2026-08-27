@@ -7,8 +7,9 @@ function fotoSrc(f) { return f?.startsWith('http') ? f : `${API_URL}${f}`; }
 
 export default function Inicio() {
   const [data, setData] = useState({
-    titulo: 'Fútbol Americano Mar del Plata',
-    subtitulo: 'La pasión del gridiron en la ciudad feliz',
+    titulo: 'Fútbol Americano',
+    titulo2: 'Mar del Plata',
+    subtitulo: 'Football Equipado – Flag Football 5vs5 Femenino y Masculino',
     descripcion: 'Somos la liga oficial de Football Americano de Mar del Plata.',
   });
   const [fotos, setFotos] = useState([]);
@@ -32,17 +33,18 @@ export default function Inicio() {
         <div className="relative max-w-4xl mx-auto text-center">
           <img src="/logo.png" alt="Logo Liga" className="h-36 w-36 object-contain mx-auto mb-8 drop-shadow-2xl" />
           <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-4">Est. 2016 · Mar del Plata · Argentina</p>
-          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 text-white">{data.titulo}</h1>
+          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 text-white">{data.titulo}</h1> 
+          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 text-white">{data.titulo2}</h1>                                
           <p className="text-xl text-white/70 mb-10">{data.subtitulo}</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link to="/equipos" className="bg-accent text-white font-bold px-8 py-3 rounded-full hover:bg-accent-light transition shadow-lg shadow-accent/30">
-              Ver Equipos
+            <Link to="/inscripcion" className="bg-accent text-white font-bold px-8 py-3 rounded-full hover:bg-accent-light transition shadow-lg shadow-accent/30">
+              SUMATE
             </Link>
             <Link to="/tienda" className="border-2 border-accent/60 text-white font-bold px-8 py-3 rounded-full hover:bg-accent/20 transition">
               Ir a la Tienda
             </Link>
             <Link to="/remeras" className="border-2 border-white/30 text-white font-bold px-8 py-3 rounded-full hover:bg-white/10 transition">
-              Encargar Remera
+              Diseña tu remera
             </Link>
           </div>
         </div>

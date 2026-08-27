@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 import api from '../api';
 
 export default function FloatingButtons() {
-  const [contacto, setContacto] = useState({ telefono: '5492235000000', instagram: 'ligafootballmdp' });
+  const [contacto, setContacto] = useState({ telefono: '5492236661385', instagram: 'footballamericanomdq' });
 
   useEffect(() => {
     api.get('/pages/contacto').then(r => { if (r.data?.contenido) setContacto(r.data.contenido); });
   }, []);
 
-  const tel = contacto.telefono?.replace(/\D/g, '') || '5492235000000';
-  const ig = contacto.instagram || 'ligafootballmdp';
+  const tel = contacto.telefono?.replace(/\D/g, '') || '5492236661385';
+  const ig = contacto.instagram || 'footballamericanomdq';
 
   return (
     <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
