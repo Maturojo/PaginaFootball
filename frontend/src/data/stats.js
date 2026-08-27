@@ -1195,6 +1195,42 @@ export const FALLBACK_LIDERES = [
     ],
   },
   {
+    temporada: 'Tazón del Mar V',
+    tipo: 'touchdowns',
+    jugadores: [
+      { pos: 1, nombre: 'Luca Ringa', equipo: 'KRA', td: 8 },
+      { pos: 2, nombre: 'Matías Rojo', equipo: 'ACO', td: 5 },
+      { pos: 3, nombre: 'Lucas Gabotto', equipo: 'TRI', td: 4 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar V',
+    tipo: 'pase',
+    jugadores: [
+      { pos: 1, nombre: 'Jano Bisonni', equipo: 'KRA', yds: 802 },
+      { pos: 2, nombre: 'Agustín Luporini', equipo: 'LIE', yds: 528 },
+      { pos: 3, nombre: 'Elvis Rodríguez', equipo: 'ACO', yds: 510 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar V',
+    tipo: 'recepcion',
+    jugadores: [
+      { pos: 1, nombre: 'Matías Rojo', equipo: 'ACO', yds: 802 },
+      { pos: 2, nombre: 'Luca Ringa', equipo: 'KRA', yds: 295 },
+      { pos: 3, nombre: 'Emiliano Sánchez', equipo: 'LIE', yds: 275 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar V',
+    tipo: 'corrida',
+    jugadores: [
+      { pos: 1, nombre: 'Javier Papagni', equipo: 'TRI', yds: 180 },
+      { pos: 2, nombre: 'Jano Bisonni', equipo: 'KRA', yds: 100 },
+      { pos: 3, nombre: 'Lucas Gabotto', equipo: 'TRI', yds: 90 },
+    ],
+  },
+  {
     temporada: 'Tazón del Mar VIII',
     tipo: 'equipo-ofensivo',
     jugadores: [
@@ -1504,11 +1540,15 @@ function buildHistoricalPlayers(lideres) {
   };
 
   lideres.forEach(lider => {
-    if (!['pase', 'corrida', 'recepcion', 'intercepciones'].includes(lider.tipo)) return;
+    if (!['touchdowns', 'pase', 'corrida', 'recepcion', 'intercepciones'].includes(lider.tipo)) return;
 
     lider.jugadores.forEach(jugador => {
       const player = getPlayer({ nombre: jugador.nombre, equipo: jugador.equipo, temporada: lider.temporada });
       if (!player) return;
+
+      if (lider.tipo === 'touchdowns') {
+        player.touchdowns += Number(jugador.td) || 0;
+      }
 
       if (['pase', 'corrida', 'recepcion'].includes(lider.tipo)) {
         player.touchdowns += Number(jugador.td) || 0;

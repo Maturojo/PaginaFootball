@@ -14,6 +14,7 @@ import {
 const COLS_STATS = ['Equipo', 'PJ', 'PG', 'PP', 'PF', 'PC', 'Pts'];
 
 const TIPOS = {
+  touchdowns:    { label: 'Touchdowns',    cols: ['TD'],                              keys: ['td'] },
   pase:          { label: 'Pase',          cols: ['PAS','COM','%','YDS','TD','INT'],  keys: ['pas','com','pct','yds','td','int'] },
   corrida:       { label: 'Corrida',        cols: ['INT','YDS','PROM','TD'],           keys: ['int','yds','prom','td'] },
   recepcion:     { label: 'Recepción',      cols: ['REC','YDS','PROM','TD'],           keys: ['rec','yds','prom','td'] },
