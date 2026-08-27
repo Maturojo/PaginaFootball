@@ -79,6 +79,14 @@ function TablaLideres({ lideres }) {
   const [tipoActivo, setTipoActivo] = useState('pase');
 
   const tiposDisponibles = Object.keys(TIPOS).filter(t => lideres.some(l => l.tipo === t));
+  if (tiposDisponibles.length === 0) {
+    return (
+      <p className="text-center text-white/40 bg-secondary border border-accent/20 rounded-xl px-6 py-10">
+        No hay tablas de líderes cargadas para esta temporada.
+      </p>
+    );
+  }
+
   const tipoVisible = tiposDisponibles.includes(tipoActivo) ? tipoActivo : tiposDisponibles[0];
   const lider = lideres.find(l => l.tipo === tipoVisible);
   const config = TIPOS[tipoVisible];
@@ -393,6 +401,10 @@ export default function Estadisticas() {
   const [seccion, setSeccion] = useState(searchParams.get('seccion') || 'premios');
   const [loading, setLoading] = useState(true);
   const [activaStat, setActivaStat] = useState(0);
+  const temporadasConLideres = temporadas.filter(temporada =>
+    fallbackLideresByTemporada(temporada).some(lider => TIPOS[lider.tipo])
+    || (temporada === temporadaActiva && lideres.some(lider => TIPOS[lider.tipo]))
+  );
 
   useEffect(() => {
     Promise.all([
@@ -422,6 +434,12 @@ export default function Estadisticas() {
         .catch(() => setLideres(fallbackLideresByTemporada(temporadaActiva)));
     }
   }, [temporadaActiva]);
+
+  useEffect(() => {
+    if (seccion === 'lideres' && temporadasConLideres.length > 0 && !temporadasConLideres.includes(temporadaActiva)) {
+      setTemporadaActiva(temporadasConLideres[0]);
+    }
+  }, [seccion, temporadaActiva, temporadasConLideres]);
 
   return (
     <div className="bg-primary text-white pt-16">
@@ -454,13 +472,13 @@ export default function Estadisticas() {
             {/* LÍDERES */}
             {seccion === 'lideres' && (
               <>
-                {temporadas.length === 0 && <p className="text-center text-white/40">No hay líderes cargados aún.</p>}
-                {temporadas.length > 0 && (
+                {temporadasConLideres.length === 0 && <p className="text-center text-white/40">No hay líderes cargados aún.</p>}
+                {temporadasConLideres.length > 0 && (
                   <>
                     {/* Selector temporada */}
-                    {temporadas.length > 1 && (
+                    {temporadasConLideres.length > 1 && (
                       <div className="flex flex-wrap gap-2 mb-6 justify-center">
-                        {temporadas.map(t => (
+                        {temporadasConLideres.map(t => (
                           <button
                             key={t}
                             onClick={() => setTemporadaActiva(t)}
@@ -471,7 +489,7 @@ export default function Estadisticas() {
                         ))}
                       </div>
                     )}
-                    {temporadas.length === 1 && (
+                    {temporadasConLideres.length === 1 && (
                       <p className="text-center text-accent font-bold mb-6 text-lg">{temporadaActiva}</p>
                     )}
                     <TablaLideres lideres={lideres} />
