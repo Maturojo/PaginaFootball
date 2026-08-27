@@ -38,6 +38,35 @@ const EQUIPO_COLORS = {
   ACO: 'bg-gray-500',
 };
 
+const ROMAN_ORDER = {
+  I: 1,
+  II: 2,
+  III: 3,
+  IV: 4,
+  V: 5,
+  VI: 6,
+  VII: 7,
+  VIII: 8,
+  IX: 9,
+  X: 10,
+  XI: 11,
+};
+
+function temporadaNumero(temporada) {
+  const match = String(temporada ?? '').match(/Tazón del Mar\s+([IVX]+)/i);
+  return ROMAN_ORDER[match?.[1]?.toUpperCase()] || 0;
+}
+
+function ordenarTemporadasDesc(temporadas) {
+  return [...temporadas].sort((a, b) => temporadaNumero(b) - temporadaNumero(a) || String(a).localeCompare(String(b)));
+}
+
+function jugadorConNumero(jugador) {
+  return jugador.numero && jugador.numero !== 'S/N'
+    ? `#${jugador.numero} ${jugador.nombre || jugador.jugador}`
+    : (jugador.nombre || jugador.jugador);
+}
+
 function TablaStandings({ stat }) {
   return (
     <div className="bg-secondary border border-accent/20 rounded-xl overflow-hidden">
@@ -174,7 +203,7 @@ function TablaPremios({ lideres }) {
                 <span className="text-2xl w-8 text-center">{PREMIOS_ICONS[j.premio] || '🏅'}</span>
                 <div className="flex-1">
                   <p className="text-xs text-accent/60 uppercase tracking-widest font-semibold">{j.premio}</p>
-                  <p className="font-bold text-white text-lg">#{j.numero} {j.jugador}</p>
+                  <p className="font-bold text-white text-lg">{jugadorConNumero(j)}</p>
                 </div>
                 <span className={`text-xs font-bold px-2 py-0.5 rounded text-white ${EQUIPO_COLORS[j.equipo] || 'bg-white/20'}`}>
                   {j.equipo}
@@ -208,7 +237,7 @@ function TablaPremios({ lideres }) {
                       <td className="px-4 py-3">
                         <span className={`font-bold ${i === 0 ? 'text-yellow-400' : i === 1 ? 'text-gray-400' : i === 2 ? 'text-orange-400' : 'text-white/30'}`}>{j.pos}</span>
                       </td>
-                      <td className="px-4 py-3 font-semibold text-white whitespace-nowrap">#{j.numero} {j.nombre}</td>
+                      <td className="px-4 py-3 font-semibold text-white whitespace-nowrap">{jugadorConNumero(j)}</td>
                       <td className="px-3 py-3 text-center">
                         <span className={`text-xs font-bold px-2 py-0.5 rounded text-white ${EQUIPO_COLORS[j.equipo] || 'bg-white/20'}`}>{j.equipo}</span>
                       </td>
@@ -226,11 +255,11 @@ function TablaPremios({ lideres }) {
 }
 
 function TablaHistoricos() {
-  const temporadasHistoricas = [...new Set(
+  const temporadasHistoricas = ordenarTemporadasDesc([...new Set(
     FALLBACK_LIDERES
       .filter(l => !l.temporada.includes('Final') && !l.temporada.includes('Semi'))
       .map(l => l.temporada)
-  )];
+  )]);
   const premiosPorTemporada = temporadasHistoricas
     .map(temporada => ({
       temporada,
@@ -301,7 +330,7 @@ function TablaHistoricos() {
                   <div key={`${premio.codigo}-${temporada}`} className="px-5 py-4">
                     <p className="text-white/40 text-xs font-bold uppercase tracking-wide">{temporada}</p>
                     <div className="mt-2 flex items-center justify-between gap-3">
-                      <p className="font-bold text-white truncate">#{ganador.numero} {ganador.jugador}</p>
+                      <p className="font-bold text-white truncate">{jugadorConNumero(ganador)}</p>
                       <span className={`text-xs font-bold px-2 py-0.5 rounded text-white ${EQUIPO_COLORS[ganador.equipo] || 'bg-white/20'}`}>
                         {ganador.equipo}
                       </span>
@@ -324,11 +353,17 @@ function TablaHistoricos() {
             <div className="divide-y divide-white/5">
               {premiosPorTemporada.filter(t => t[key].length).map(item => (
                 <div key={`${key}-${item.temporada}`} className="px-5 py-4">
-                  <p className="text-white/40 text-xs font-bold uppercase tracking-wide mb-3">{item.temporada}</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="flex items-center justify-between gap-3 mb-3">
+                    <p className="text-white/40 text-xs font-bold uppercase tracking-wide">{item.temporada}</p>
+                    <span className="text-[11px] font-bold text-accent bg-accent/10 rounded-full px-2 py-0.5">
+                      {item[key].length} jugadores
+                    </span>
+                  </div>
+                  <div className="space-y-2">
                     {item[key].map(jugador => (
-                      <div key={`${key}-${item.temporada}-${jugador.nombre}`} className="bg-primary/40 rounded-lg px-3 py-2 flex items-center justify-between gap-2">
-                        <span className="font-bold text-white text-sm truncate">#{jugador.numero} {jugador.nombre}</span>
+                      <div key={`${key}-${item.temporada}-${jugador.nombre}`} className="bg-primary/40 rounded-lg px-3 py-2 grid grid-cols-[2rem_1fr_auto] items-center gap-3">
+                        <span className="text-white/35 text-xs font-extrabold">{jugador.pos}</span>
+                        <span className="font-bold text-white text-sm truncate">{jugadorConNumero(jugador)}</span>
                         <span className={`text-xs font-bold px-2 py-0.5 rounded text-white ${EQUIPO_COLORS[jugador.equipo] || 'bg-white/20'}`}>
                           {jugador.equipo}
                         </span>
@@ -405,6 +440,10 @@ export default function Estadisticas() {
     fallbackLideresByTemporada(temporada).some(lider => TIPOS[lider.tipo])
     || (temporada === temporadaActiva && lideres.some(lider => TIPOS[lider.tipo]))
   );
+  const temporadasTazones = ordenarTemporadasDesc(temporadasConLideres.filter(t => /^Tazón del Mar/i.test(t)));
+  const temporadasFinales = ordenarTemporadasDesc(temporadasConLideres.filter(t => /^Final/i.test(t)));
+  const temporadasOtras = temporadasConLideres.filter(t => !/^Tazón del Mar/i.test(t) && !/^Final/i.test(t));
+  const temporadasLideresOrdenadas = [...temporadasTazones, ...temporadasFinales, ...temporadasOtras];
 
   useEffect(() => {
     Promise.all([
@@ -436,10 +475,27 @@ export default function Estadisticas() {
   }, [temporadaActiva]);
 
   useEffect(() => {
-    if (seccion === 'lideres' && temporadasConLideres.length > 0 && !temporadasConLideres.includes(temporadaActiva)) {
-      setTemporadaActiva(temporadasConLideres[0]);
+    if (seccion === 'lideres' && temporadasLideresOrdenadas.length > 0 && !temporadasLideresOrdenadas.includes(temporadaActiva)) {
+      setTemporadaActiva(temporadasLideresOrdenadas[0]);
     }
-  }, [seccion, temporadaActiva, temporadasConLideres]);
+  }, [seccion, temporadaActiva, temporadasLideresOrdenadas]);
+
+  const renderTemporadaButtons = (label, items) => items.length > 0 && (
+    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+      <span className="text-xs font-extrabold uppercase tracking-widest text-accent/60 sm:w-20">{label}</span>
+      <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
+        {items.map(t => (
+          <button
+            key={t}
+            onClick={() => setTemporadaActiva(t)}
+            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition ${temporadaActiva === t ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/60 hover:text-white'}`}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className="bg-primary text-white pt-16">
@@ -472,24 +528,18 @@ export default function Estadisticas() {
             {/* LÍDERES */}
             {seccion === 'lideres' && (
               <>
-                {temporadasConLideres.length === 0 && <p className="text-center text-white/40">No hay líderes cargados aún.</p>}
-                {temporadasConLideres.length > 0 && (
+                {temporadasLideresOrdenadas.length === 0 && <p className="text-center text-white/40">No hay líderes cargados aún.</p>}
+                {temporadasLideresOrdenadas.length > 0 && (
                   <>
                     {/* Selector temporada */}
-                    {temporadasConLideres.length > 1 && (
-                      <div className="flex flex-wrap gap-2 mb-6 justify-center">
-                        {temporadasConLideres.map(t => (
-                          <button
-                            key={t}
-                            onClick={() => setTemporadaActiva(t)}
-                            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition ${temporadaActiva === t ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/60 hover:text-white'}`}
-                          >
-                            {t}
-                          </button>
-                        ))}
+                    {temporadasLideresOrdenadas.length > 1 && (
+                      <div className="space-y-3 mb-6 max-w-4xl mx-auto">
+                        {renderTemporadaButtons('Tazones', temporadasTazones)}
+                        {renderTemporadaButtons('Finales', temporadasFinales)}
+                        {renderTemporadaButtons('Otros', temporadasOtras)}
                       </div>
                     )}
-                    {temporadasConLideres.length === 1 && (
+                    {temporadasLideresOrdenadas.length === 1 && (
                       <p className="text-center text-accent font-bold mb-6 text-lg">{temporadaActiva}</p>
                     )}
                     <TablaLideres lideres={lideres} />

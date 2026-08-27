@@ -879,6 +879,39 @@ export const FALLBACK_LIDERES = [
   },
   {
     temporada: 'Tazón del Mar VII',
+    tipo: 'premios',
+    jugadores: [
+      { premio: 'MVP — Jugador Más Valioso', jugador: 'Lucas Gabotto', numero: 16, equipo: 'KRA' },
+      { premio: 'JOF — Jugador Ofensivo', jugador: 'Luciano Escobar', numero: 'S/N', equipo: 'KRA' },
+      { premio: 'JD — Jugador Defensivo', jugador: 'Julián Fernández', numero: 'S/N', equipo: 'KRA' },
+      { premio: 'JEV — Jugador Evolución', jugador: 'Luciano Escobar', numero: 'S/N', equipo: 'KRA' },
+      { premio: 'NOV — Novato del Torneo', jugador: 'Mauro Castillo', numero: 'S/N', equipo: 'KRA' },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar VII',
+    tipo: 'equipo-ofensivo',
+    jugadores: [
+      { pos: 1, nombre: 'Lucas Gabotto', numero: 16, equipo: 'KRA', votos: '-' },
+      { pos: 2, nombre: 'Matías Rojo', numero: 'S/N', equipo: 'ACO', votos: '-' },
+      { pos: 3, nombre: 'Joaquín Gainza', numero: 22, equipo: 'TRI', votos: '-' },
+      { pos: 4, nombre: 'Luciano Escobar', numero: 'S/N', equipo: 'KRA', votos: '-' },
+      { pos: 5, nombre: 'Javier Papagni', numero: 8, equipo: 'TRI', votos: '-' },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar VII',
+    tipo: 'equipo-defensivo',
+    jugadores: [
+      { pos: 1, nombre: 'Lucas Gabotto', numero: 16, equipo: 'KRA', votos: '-' },
+      { pos: 2, nombre: 'Julián Fernández', numero: 'S/N', equipo: 'KRA', votos: '-' },
+      { pos: 3, nombre: 'Matías Rojo', numero: 'S/N', equipo: 'ACO', votos: '-' },
+      { pos: 4, nombre: 'Elvis Rodríguez', numero: 'S/N', equipo: 'TRI', votos: '-' },
+      { pos: 5, nombre: 'Raúl Montenegro', numero: 'S/N', equipo: 'KRA', votos: '-' },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar VII',
     tipo: 'pase',
     jugadores: [
       { pos: 1, nombre: 'Javier Papagni', equipo: 'TRI', pas: 188, com: 108, pct: 57, yds: 1325, td: 24, int: 9 },
