@@ -1034,6 +1034,39 @@ export const FALLBACK_LIDERES = [
   },
   {
     temporada: 'Tazón del Mar VI',
+    tipo: 'premios',
+    jugadores: [
+      { premio: 'MVP — Jugador Más Valioso', jugador: 'Pablo Corva', numero: 'S/N', equipo: 'TRI' },
+      { premio: 'JOF — Jugador Ofensivo', jugador: 'Gerónimo Ferreyra', numero: 'S/N', equipo: 'TRI' },
+      { premio: 'JD — Jugador Defensivo', jugador: 'Julián Fernández', numero: 'S/N', equipo: 'KRA' },
+      { premio: 'NOV — Novato del Torneo', jugador: 'Joel Gamarra', numero: 'S/N', equipo: 'LIE' },
+      { premio: 'JEV — Jugador Evolución', jugador: 'Gerónimo Ferreyra', numero: 'S/N', equipo: 'TRI' },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar VI',
+    tipo: 'equipo-ofensivo',
+    jugadores: [
+      { pos: 1, nombre: 'Matías Rojo', numero: 'S/N', equipo: 'ACO', votos: '-' },
+      { pos: 2, nombre: 'Gerónimo Ferreyra', numero: 'S/N', equipo: 'TRI', votos: '-' },
+      { pos: 3, nombre: 'Pablo Corva', numero: 'S/N', equipo: 'TRI', votos: '-' },
+      { pos: 4, nombre: 'Lucas Gabotto', numero: 16, equipo: 'KRA', votos: '-' },
+      { pos: 5, nombre: 'Julián Fernández', numero: 'S/N', equipo: 'KRA', votos: '-' },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar VI',
+    tipo: 'equipo-defensivo',
+    jugadores: [
+      { pos: 1, nombre: 'Raúl Montenegro', numero: 'S/N', equipo: 'KRA', votos: '-' },
+      { pos: 2, nombre: 'Lucas Gabotto', numero: 16, equipo: 'KRA', votos: '-' },
+      { pos: 3, nombre: 'Julián Fernández', numero: 'S/N', equipo: 'KRA', votos: '-' },
+      { pos: 4, nombre: 'Elvis Rodríguez', numero: 'S/N', equipo: 'ACO', votos: '-' },
+      { pos: 5, nombre: 'Gerónimo Ferreyra', numero: 'S/N', equipo: 'TRI', votos: '-' },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar VI',
     tipo: 'pase',
     jugadores: [
       { pos: 1, nombre: 'Javier Papagni', equipo: 'TRI', pas: 185, com: 114, pct: 61.6, yds: 1334, td: 20, int: 8 },
