@@ -1,7 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../api';
-import { FALLBACK_HISTORICOS, FALLBACK_LIDERES, FALLBACK_STATS, FALLBACK_TEMPORADAS, fallbackLideresByTemporada } from '../data/stats.js';
+import {
+  FALLBACK_HISTORICOS,
+  FALLBACK_LIDERES,
+  FALLBACK_STATS,
+  FALLBACK_TEMPORADAS,
+  fallbackLideresByTemporada,
+  mergeFallbackLideres,
+  mergeFallbackTemporadas,
+} from '../data/stats.js';
 
 const COLS_STATS = ['Equipo', 'PJ', 'PG', 'PP', 'PF', 'PC', 'Pts'];
 
@@ -71,8 +79,9 @@ function TablaLideres({ lideres }) {
   const [tipoActivo, setTipoActivo] = useState('pase');
 
   const tiposDisponibles = Object.keys(TIPOS).filter(t => lideres.some(l => l.tipo === t));
-  const lider = lideres.find(l => l.tipo === tipoActivo);
-  const config = TIPOS[tipoActivo];
+  const tipoVisible = tiposDisponibles.includes(tipoActivo) ? tipoActivo : tiposDisponibles[0];
+  const lider = lideres.find(l => l.tipo === tipoVisible);
+  const config = TIPOS[tipoVisible];
 
   return (
     <div>
@@ -83,7 +92,7 @@ function TablaLideres({ lideres }) {
             key={t}
             onClick={() => setTipoActivo(t)}
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${
-              tipoActivo === t ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/60 hover:text-white hover:border-accent/50'
+              tipoVisible === t ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/60 hover:text-white hover:border-accent/50'
             }`}
           >
             {TIPOS[t].label}
@@ -336,7 +345,7 @@ function PremiosSection() {
   useEffect(() => {
     api.get('/lideres/temporadas').then(r => {
       // Solo temporadas que tienen premios (no las de partidos individuales)
-      const temporadas = r.data?.length ? r.data : FALLBACK_TEMPORADAS;
+      const temporadas = r.data?.length ? mergeFallbackTemporadas(r.data) : FALLBACK_TEMPORADAS;
       const principales = temporadas.filter(t => !t.includes('Final') && !t.includes('Semi'));
       setTemporadas(principales);
       if (principales.length > 0) setTemporadaActiva(principales[0]);
@@ -350,7 +359,7 @@ function PremiosSection() {
   useEffect(() => {
     if (temporadaActiva) {
       api.get(`/lideres?temporada=${encodeURIComponent(temporadaActiva)}`)
-        .then(r => setLideresPremios(r.data?.length ? r.data : fallbackLideresByTemporada(temporadaActiva)))
+        .then(r => setLideresPremios(r.data?.length ? mergeFallbackLideres(r.data, temporadaActiva) : fallbackLideresByTemporada(temporadaActiva)))
         .catch(() => setLideresPremios(fallbackLideresByTemporada(temporadaActiva)));
     }
   }, [temporadaActiva]);
@@ -391,7 +400,7 @@ export default function Estadisticas() {
       api.get('/lideres/temporadas'),
     ]).then(([s, t]) => {
       const statsData = s.data?.length ? s.data : FALLBACK_STATS;
-      const temporadasData = t.data?.length ? t.data : FALLBACK_TEMPORADAS;
+      const temporadasData = t.data?.length ? mergeFallbackTemporadas(t.data) : FALLBACK_TEMPORADAS;
       setStats(statsData);
       setTemporadas(temporadasData);
       const paramTemporada = searchParams.get('temporada');
@@ -409,7 +418,7 @@ export default function Estadisticas() {
   useEffect(() => {
     if (temporadaActiva) {
       api.get(`/lideres?temporada=${encodeURIComponent(temporadaActiva)}`)
-        .then(r => setLideres(r.data?.length ? r.data : fallbackLideresByTemporada(temporadaActiva)))
+        .then(r => setLideres(r.data?.length ? mergeFallbackLideres(r.data, temporadaActiva) : fallbackLideresByTemporada(temporadaActiva)))
         .catch(() => setLideres(fallbackLideresByTemporada(temporadaActiva)));
     }
   }, [temporadaActiva]);

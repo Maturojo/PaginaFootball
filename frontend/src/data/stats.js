@@ -1031,3 +1031,24 @@ export const FALLBACK_TEMPORADAS = [...new Set(FALLBACK_LIDERES.map(l => l.tempo
 export function fallbackLideresByTemporada(temporada) {
   return FALLBACK_LIDERES.filter(l => l.temporada === temporada);
 }
+
+function temporadaSortScore(temporada) {
+  const rank = seasonRank(temporada);
+  const isMainTournament = /^Tazón del Mar/i.test(String(temporada ?? ''));
+  const isFinal = /^Final/i.test(String(temporada ?? ''));
+
+  return rank * 10 + (isMainTournament ? 3 : isFinal ? 2 : 1);
+}
+
+export function mergeFallbackTemporadas(temporadas = []) {
+  return [...new Set([...temporadas, ...FALLBACK_TEMPORADAS])]
+    .sort((a, b) => temporadaSortScore(b) - temporadaSortScore(a) || String(a).localeCompare(String(b)));
+}
+
+export function mergeFallbackLideres(lideres = [], temporada) {
+  const fallback = fallbackLideresByTemporada(temporada);
+  const existingKeys = new Set(lideres.map(lider => `${lider.temporada}-${lider.tipo}`));
+  const missing = fallback.filter(lider => !existingKeys.has(`${lider.temporada}-${lider.tipo}`));
+
+  return [...lideres, ...missing];
+}
