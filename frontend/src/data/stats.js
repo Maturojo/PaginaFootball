@@ -1270,6 +1270,17 @@ export const FALLBACK_LIDERES = [
   },
   {
     temporada: 'Tazón del Mar IV',
+    tipo: 'premios',
+    jugadores: [
+      { premio: 'MVP — Jugador Más Valioso', jugador: 'Luca Ringa', numero: 'S/N', equipo: 'KRA' },
+      { premio: 'JOF — Jugador Ofensivo', jugador: 'Lucas Gabotto', numero: 'S/N', equipo: 'KRA' },
+      { premio: 'JD — Jugador Defensivo', jugador: 'Luca Ringa', numero: 'S/N', equipo: 'KRA' },
+      { premio: 'JEV — Jugador Evolución', jugador: 'Ezequiel Ringa', numero: 'S/N', equipo: 'KRA' },
+      { premio: 'NOV — Novato del Torneo', jugador: 'Daniel Montes', numero: 'S/N', equipo: 'ACO' },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar IV',
     tipo: 'touchdowns',
     jugadores: [
       { pos: 1, nombre: 'Joaquín Gainza', equipo: 'TRI', td: 9 },
