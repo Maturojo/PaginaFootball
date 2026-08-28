@@ -41,7 +41,56 @@ const STATS = [
 
 function imageSrc(src) {
   if (!src) return FALLBACK_BACKGROUND;
+  if (src.startsWith('/historia')) return src;
   return src.startsWith('/') ? `${API_URL}${src}` : src;
+}
+
+const SECTION_STARTS = [
+  ['A partir de esta base inicial', 'Primeros equipos y competencia'],
+  ['En paralelo, el crecimiento', 'Flag Football 5vs5'],
+  ['A nivel nacional', 'Argentina en el mapa internacional'],
+  ['Es importante destacar', 'Un referente marplatense'],
+  ['Luego de la pandemia', 'Consolidación local'],
+  ['La modalidad Flag Football 5vs5 masculina', 'Nuevas modalidades'],
+  ['En cuanto a la modalidad equipado', 'Football equipado'],
+  ['En 2023 FAMDQ', 'Asociación Civil y presente'],
+];
+
+function normalizeHistoriaText(text) {
+  return String(text || FALLBACK_TEXT)
+    .replace(/^\s*HISTORIA\s*/i, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function splitBySectionStarts(text) {
+  const normalized = normalizeHistoriaText(text);
+  const markers = SECTION_STARTS
+    .map(([marker, title]) => ({ marker, title, index: normalized.indexOf(marker) }))
+    .filter(item => item.index > 0)
+    .sort((a, b) => a.index - b.index);
+
+  if (markers.length === 0) {
+    return normalized.split(/\n{2,}/).map((body, index) => ({
+      title: index === 0 ? 'Historia' : '',
+      body: body.trim(),
+    })).filter(section => section.body);
+  }
+
+  const sections = [{
+    title: 'Orígenes en Parque Camet',
+    body: normalized.slice(0, markers[0].index).trim(),
+  }];
+
+  markers.forEach((marker, index) => {
+    const next = markers[index + 1]?.index ?? normalized.length;
+    sections.push({
+      title: marker.title,
+      body: normalized.slice(marker.index, next).trim(),
+    });
+  });
+
+  return sections.filter(section => section.body);
 }
 
 export default function Historia() {
@@ -61,8 +110,8 @@ export default function Historia() {
       .catch(() => {});
   }, []);
 
-  const paragraphs = useMemo(
-    () => (data.texto || FALLBACK_TEXT).split(/\n{2,}/).map(p => p.trim()).filter(Boolean),
+  const sections = useMemo(
+    () => splitBySectionStarts(data.texto || FALLBACK_TEXT),
     [data.texto],
   );
 
@@ -115,14 +164,15 @@ export default function Historia() {
           </div>
         </aside>
 
-        <article className="space-y-6">
-          {paragraphs.map((paragraph, index) => (
-            <p
+        <article className="space-y-8">
+          {sections.map((section, index) => (
+            <section
               key={index}
-              className="text-white/76 text-base md:text-lg leading-8 border-b border-white/8 pb-6 last:border-b-0"
+              className="border-b border-white/8 pb-8 last:border-b-0"
             >
-              {paragraph}
-            </p>
+              {section.title && <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-4">{section.title}</h2>}
+              <p className="text-white/76 text-base md:text-lg leading-8">{section.body}</p>
+            </section>
           ))}
         </article>
       </section>
