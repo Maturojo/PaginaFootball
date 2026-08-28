@@ -1281,6 +1281,28 @@ export const FALLBACK_LIDERES = [
   },
   {
     temporada: 'Tazón del Mar IV',
+    tipo: 'equipo-ofensivo',
+    jugadores: [
+      { pos: 1, nombre: 'Agustín Luporini', numero: 'S/N', equipo: 'TRI', posicion: 'QB' },
+      { pos: 2, nombre: 'Renzo Amado', numero: 'S/N', equipo: 'TRI', posicion: 'C' },
+      { pos: 3, nombre: 'Lucas Gabotto', numero: 'S/N', equipo: 'KRA', posicion: 'WR' },
+      { pos: 4, nombre: 'Matías Rojo', numero: 'S/N', equipo: 'ACO', posicion: 'WR' },
+      { pos: 5, nombre: 'Luca Ringa', numero: 'S/N', equipo: 'KRA', posicion: 'WR' },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar IV',
+    tipo: 'equipo-defensivo',
+    jugadores: [
+      { pos: 1, nombre: 'Lucas Gabotto', numero: 'S/N', equipo: 'KRA', posicion: 'DB' },
+      { pos: 2, nombre: 'Luca Ringa', numero: 'S/N', equipo: 'KRA', posicion: 'DB' },
+      { pos: 3, nombre: 'Ignacio Cuesta', numero: 'S/N', equipo: 'TRI', posicion: 'DB' },
+      { pos: 4, nombre: 'Braian Pourrain', numero: 'S/N', equipo: 'KRA', posicion: 'DB' },
+      { pos: 5, nombre: 'Lucio Leguizamón', numero: 'S/N', equipo: 'KRA', posicion: 'R' },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar IV',
     tipo: 'touchdowns',
     jugadores: [
       { pos: 1, nombre: 'Joaquín Gainza', equipo: 'TRI', td: 9 },
