@@ -69,6 +69,46 @@ function jugadorConNumero(jugador) {
     : (jugador.nombre || jugador.jugador);
 }
 
+function normalizeName(value) {
+  return String(value ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function buildEquipoIdealRanking(tipo) {
+  const players = new Map();
+
+  FALLBACK_LIDERES
+    .filter(lider => lider.tipo === tipo && !lider.temporada.includes('Final') && !lider.temporada.includes('Semi'))
+    .forEach(lider => {
+      lider.jugadores.forEach(jugador => {
+        const name = jugador.nombre || jugador.jugador;
+        const key = normalizeName(name);
+        if (!key) return;
+
+        const current = players.get(key) || {
+          nombre: name,
+          equipo: jugador.equipo,
+          count: 0,
+          temporadas: [],
+        };
+
+        current.count += 1;
+        current.equipo = jugador.equipo || current.equipo;
+        current.temporadas.push(lider.temporada);
+        players.set(key, current);
+      });
+    });
+
+  return [...players.values()]
+    .sort((a, b) => b.count - a.count || a.nombre.localeCompare(b.nombre))
+    .slice(0, 10)
+    .map((player, index) => ({ ...player, pos: index + 1 }));
+}
+
 function TablaStandings({ stat }) {
   return (
     <div className="bg-secondary border border-accent/20 rounded-xl overflow-hidden">
@@ -275,6 +315,10 @@ function TablaHistoricos() {
     { codigo: 'JEV', titulo: 'Jugador Evolución', subtitulo: 'Mayor crecimiento' },
     { codigo: 'NOV', titulo: 'Rookie', subtitulo: 'Novato del torneo' },
   ];
+  const equiposIdealesRanking = [
+    { key: 'equipo-ofensivo', titulo: 'Equipo Ofensivo', icon: '⚔️', jugadores: buildEquipoIdealRanking('equipo-ofensivo') },
+    { key: 'equipo-defensivo', titulo: 'Equipo Defensivo', icon: '🛡️', jugadores: buildEquipoIdealRanking('equipo-defensivo') },
+  ];
 
   return (
     <div className="space-y-8">
@@ -346,31 +390,35 @@ function TablaHistoricos() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {[{ key: 'ofensivo', label: 'Equipo Ofensivo' }, { key: 'defensivo', label: 'Equipo Defensivo' }].map(({ key, label }) => (
+        {equiposIdealesRanking.map(({ key, titulo, icon, jugadores }) => (
           <div key={key} className="bg-secondary border border-accent/20 rounded-xl overflow-hidden">
             <div className="px-5 py-4 border-b border-accent/10">
               <p className="text-xs text-accent/60 uppercase tracking-widest font-bold">Equipos ideales históricos</p>
-              <h2 className="text-xl font-extrabold text-white mt-1">{label}</h2>
+              <h2 className="text-xl font-extrabold text-white mt-1">{icon} {titulo}</h2>
+              <p className="text-white/40 text-xs mt-1">Jugadores con más apariciones acumuladas</p>
             </div>
             <div className="divide-y divide-white/5">
-              {premiosPorTemporada.filter(t => t[key].length).map(item => (
-                <div key={`${key}-${item.temporada}`} className="px-5 py-4">
-                  <div className="flex items-center justify-between gap-3 mb-3">
-                    <p className="text-white/40 text-xs font-bold uppercase tracking-wide">{item.temporada}</p>
-                    <span className="text-[11px] font-bold text-accent bg-accent/10 rounded-full px-2 py-0.5">
-                      {item[key].length} jugadores
-                    </span>
+              {jugadores.map(jugador => (
+                <div key={`${key}-${jugador.pos}-${jugador.nombre}`} className="px-5 py-4 flex items-center gap-4">
+                  <span className={`w-9 h-9 rounded-lg flex items-center justify-center font-extrabold ${
+                    jugador.pos === 1 ? 'bg-yellow-400 text-primary' : jugador.pos === 2 ? 'bg-white/20 text-white' : jugador.pos === 3 ? 'bg-orange-500/80 text-white' : 'bg-white/10 text-white/60'
+                  }`}>
+                    {jugador.pos}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-white truncate">{jugador.nombre}</p>
+                    <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded text-white ${EQUIPO_COLORS[jugador.equipo] || 'bg-white/20'}`}>
+                        {jugador.equipo}
+                      </span>
+                      <span className="text-xs font-bold px-2 py-0.5 rounded bg-white/10 text-white/60">
+                        {jugador.temporadas.length} torneos
+                      </span>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    {item[key].map(jugador => (
-                      <div key={`${key}-${item.temporada}-${jugador.nombre}`} className="bg-primary/40 rounded-lg px-3 py-2 grid grid-cols-[2rem_1fr_auto] items-center gap-3">
-                        <span className="text-white/35 text-xs font-extrabold">{jugador.pos}</span>
-                        <span className="font-bold text-white text-sm truncate">{jugadorConNumero(jugador)}</span>
-                        <span className={`text-xs font-bold px-2 py-0.5 rounded text-white ${EQUIPO_COLORS[jugador.equipo] || 'bg-white/20'}`}>
-                          {jugador.equipo}
-                        </span>
-                      </div>
-                    ))}
+                  <div className="text-right">
+                    <p className="text-2xl font-extrabold text-accent">x{jugador.count}</p>
+                    <p className="text-white/35 text-xs font-bold">EQUIPO</p>
                   </div>
                 </div>
               ))}

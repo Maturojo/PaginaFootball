@@ -10,6 +10,19 @@ function fotoSrc(f) { return f?.startsWith('http') ? f : `${API_URL}${f}`; }
 const EQUIPOS = ['Todos', 'Liebres', 'Krakens', 'Tridentes', 'Nereidas', 'Sirenas', 'Corales', 'Atlantes', 'Bárbaros', 'Templarios'];
 const EQUIPOS_INACTIVOS = ['Acorazados'];
 
+const HONOR_BADGES = {
+  MVP: { icon: '🏆', label: 'MVP' },
+  JOF: { icon: '⚔️', label: 'Ofensivo' },
+  JD: { icon: '🛡️', label: 'Defensivo' },
+  JEV: { icon: '📈', label: 'Evolución' },
+  NOV: { icon: '🌟', label: 'Rookie' },
+};
+
+const TEAM_BADGES = {
+  ofensivo: { icon: '⚔️', label: 'Equipo ofensivo' },
+  defensivo: { icon: '🛡️', label: 'Equipo defensivo' },
+};
+
 function isActivePlayer(player) {
   return !EQUIPOS_INACTIVOS.includes(player.equipo);
 }
@@ -27,16 +40,25 @@ function samePlayer(entryName, playerName) {
   return normalizeName(entryName) === normalizeName(playerName);
 }
 
+function premioCode(label = '') {
+  return String(label).split('—')[0].trim();
+}
+
 function playerHonors(player) {
   const premios = [];
   const ofensivo = [];
   const defensivo = [];
+  const resumenPremios = {};
 
   FALLBACK_LIDERES.forEach(lider => {
     if (lider.tipo === 'premios') {
       lider.jugadores
         .filter(j => samePlayer(j.jugador, player.nombre))
-        .forEach(j => premios.push({ temporada: lider.temporada, label: j.premio.split('—')[0].trim(), equipo: j.equipo }));
+        .forEach(j => {
+          const code = premioCode(j.premio);
+          premios.push({ temporada: lider.temporada, label: code, equipo: j.equipo });
+          resumenPremios[code] = (resumenPremios[code] || 0) + 1;
+        });
     }
 
     if (lider.tipo === 'equipo-ofensivo') {
@@ -56,6 +78,7 @@ function playerHonors(player) {
     premios,
     ofensivo,
     defensivo,
+    resumenPremios,
     total: premios.length + ofensivo.length + defensivo.length,
   };
 }
@@ -69,6 +92,18 @@ function playerAggregateStats(player) {
     intercepciones: stats.intercepciones || player.stats?.intercepciones || 0,
     yardas: stats.yardas || player.stats?.yardas || 0,
   };
+}
+
+function HonorBadge({ icon, label, count }) {
+  return (
+    <div className="bg-primary/40 rounded-lg px-3 py-2 border border-white/5 flex items-center gap-2 min-w-0">
+      <span className="text-xl flex-shrink-0">{icon}</span>
+      <div className="min-w-0">
+        <p className="text-white font-extrabold leading-none">x{count}</p>
+        <p className="text-white/42 text-[11px] mt-1 truncate">{label}</p>
+      </div>
+    </div>
+  );
 }
 
 export default function Jugadores() {
@@ -178,23 +213,32 @@ export default function Jugadores() {
             </div>
             {(() => {
               const honors = playerHonors(selected);
+              const badges = [
+                ...Object.entries(honors.resumenPremios).map(([code, count]) => ({
+                  key: code,
+                  icon: HONOR_BADGES[code]?.icon || '🏅',
+                  label: HONOR_BADGES[code]?.label || code,
+                  count,
+                })),
+                honors.ofensivo.length > 0 && {
+                  key: 'equipo-ofensivo',
+                  icon: TEAM_BADGES.ofensivo.icon,
+                  label: TEAM_BADGES.ofensivo.label,
+                  count: honors.ofensivo.length,
+                },
+                honors.defensivo.length > 0 && {
+                  key: 'equipo-defensivo',
+                  icon: TEAM_BADGES.defensivo.icon,
+                  label: TEAM_BADGES.defensivo.label,
+                  count: honors.defensivo.length,
+                },
+              ].filter(Boolean);
               return (
                 <div className="grid grid-cols-3 gap-2 mt-3">
-                  {[
-                    ['Premios', honors.premios.length],
-                    ['Ofensivo', honors.ofensivo.length],
-                    ['Defensivo', honors.defensivo.length],
-                  ].map(([label, value]) => (
-                    <div key={label} className="bg-primary/40 rounded-lg p-3 text-center border border-white/5">
-                      <p className="text-white font-extrabold text-lg">{value}</p>
-                      <p className="text-white/40 text-xs mt-0.5">{label}</p>
-                    </div>
-                  ))}
+                  {badges.map(badge => <HonorBadge key={badge.key} {...badge} />)}
                   {honors.total > 0 && (
-                    <div className="col-span-3 bg-primary/30 rounded-lg px-3 py-2 text-xs text-white/55 leading-relaxed">
-                      {honors.premios.length > 0 && <p><span className="text-accent font-bold">Premios:</span> {honors.premios.map(p => `${p.label} (${p.temporada}${p.equipo ? ` · ${p.equipo}` : ''})`).join(' · ')}</p>}
-                      {honors.ofensivo.length > 0 && <p><span className="text-accent font-bold">Equipo ofensivo:</span> {honors.ofensivo.map(p => `${p.temporada}${p.equipo ? ` · ${p.equipo}` : ''}`).join(' · ')}</p>}
-                      {honors.defensivo.length > 0 && <p><span className="text-accent font-bold">Equipo defensivo:</span> {honors.defensivo.map(p => `${p.temporada}${p.equipo ? ` · ${p.equipo}` : ''}`).join(' · ')}</p>}
+                    <div className="col-span-3 bg-primary/30 rounded-lg px-3 py-2 text-xs text-white/50 leading-relaxed">
+                      Historial: {honors.total} menciones entre premios y equipos ideales.
                     </div>
                   )}
                 </div>
