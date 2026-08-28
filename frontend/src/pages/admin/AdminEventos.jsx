@@ -84,7 +84,9 @@ export default function AdminEventos() {
   const [editing, setEditing] = useState(null);
   const [expandido, setExpandido] = useState(null);
 
-  const load = () => api.get('/eventos/all').then(r => setEventos(mergeEventos(r.data)));
+  const load = () => api.get('/eventos/all')
+    .then(r => setEventos(mergeEventos(r.data)))
+    .catch(() => setEventos(mergeEventos([])));
   useEffect(() => { load(); }, []);
 
   const handleSave = async (form) => {

@@ -76,9 +76,11 @@ export default function AdminProductos() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
 
-  const load = () => api.get('/products/all').then(r => setProducts(mergeFallbackProducts(r.data).map(p => (
-    isMongoId(p._id) ? p : { ...p, activo: p.activo ?? true, __fallback: true }
-  ))));
+  const load = () => api.get('/products/all')
+    .then(r => setProducts(mergeFallbackProducts(r.data).map(p => (
+      isMongoId(p._id) ? p : { ...p, activo: p.activo ?? true, __fallback: true }
+    ))))
+    .catch(() => setProducts(mergeFallbackProducts([]).map(p => ({ ...p, activo: p.activo ?? true, __fallback: true }))));
   useEffect(() => { load(); }, []);
 
   const handleSave = async (form) => {

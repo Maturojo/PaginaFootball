@@ -106,7 +106,9 @@ export default function AdminEstadisticas() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
 
-  const load = () => api.get('/estadisticas/all').then(r => setStats(mergeStats(r.data)));
+  const load = () => api.get('/estadisticas/all')
+    .then(r => setStats(mergeStats(r.data)))
+    .catch(() => setStats(mergeStats([])));
   useEffect(() => { load(); }, []);
 
   const handleSave = async (data) => {

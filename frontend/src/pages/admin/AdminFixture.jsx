@@ -99,7 +99,9 @@ export default function AdminFixture() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
 
-  const load = () => api.get('/partidos/all').then(r => setPartidos(mergePartidos(r.data)));
+  const load = () => api.get('/partidos/all')
+    .then(r => setPartidos(mergePartidos(r.data)))
+    .catch(() => setPartidos(mergePartidos([])));
   useEffect(() => { load(); }, []);
 
   const handleSave = async (data) => {

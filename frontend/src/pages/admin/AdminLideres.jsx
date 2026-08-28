@@ -125,7 +125,9 @@ export default function AdminLideres() {
   const [editing, setEditing] = useState(null);
   const [filtro, setFiltro] = useState('');
 
-  const load = () => api.get('/lideres').then(r => setLideres(mergeLideres(r.data || [])));
+  const load = () => api.get('/lideres')
+    .then(r => setLideres(mergeLideres(r.data || [])))
+    .catch(() => setLideres(mergeLideres([])));
   useEffect(() => { load(); }, []);
 
   const lideresFiltrados = useMemo(() => {

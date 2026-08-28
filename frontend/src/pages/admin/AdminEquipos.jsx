@@ -81,9 +81,11 @@ export default function AdminEquipos() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
 
-  const load = () => api.get('/teams/all').then(r => setTeams(mergeTeams(r.data).map(t => (
-    isMongoId(t._id) ? t : { ...t, activo: t.activo ?? true, __fallback: true }
-  ))));
+  const load = () => api.get('/teams/all')
+    .then(r => setTeams(mergeTeams(r.data).map(t => (
+      isMongoId(t._id) ? t : { ...t, activo: t.activo ?? true, __fallback: true }
+    ))))
+    .catch(() => setTeams(mergeTeams([]).map(t => ({ ...t, activo: t.activo ?? true, __fallback: true }))));
   useEffect(() => { load(); }, []);
 
   const handleSave = async (form) => {

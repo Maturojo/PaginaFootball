@@ -50,9 +50,11 @@ export default function AdminJugadores() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
 
-  const load = () => api.get('/jugadores/all').then(r => setJugadores(mergePlayers(r.data).map(j => (
-    isMongoId(j._id) ? j : { ...j, __fallback: true }
-  ))));
+  const load = () => api.get('/jugadores/all')
+    .then(r => setJugadores(mergePlayers(r.data).map(j => (
+      isMongoId(j._id) ? j : { ...j, __fallback: true }
+    ))))
+    .catch(() => setJugadores(mergePlayers([]).map(j => ({ ...j, __fallback: true }))));
   useEffect(() => { load(); }, []);
 
   const handleSave = async (form) => {
