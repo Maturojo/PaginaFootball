@@ -3,8 +3,21 @@ import { useForm } from 'react-hook-form';
 import api from '../../api';
 
 import { API_URL } from '../../config.js';
+import { FALLBACK_EVENTS } from '../../data/events.js';
+import { fallbackDeleteMessage, imageSource, isMongoId } from '../../utils/adminFallback.js';
 
-function fotoSrc(f) { return f.startsWith('http') ? f : `${API_URL}${f}`; }
+function fotoSrc(f) { return imageSource(f, API_URL); }
+
+function eventoKey(evento) {
+  return `${String(evento.titulo || '').toLowerCase()}|${String(evento.fecha || '').slice(0, 10)}`;
+}
+
+function mergeEventos(apiEventos = []) {
+  const existing = new Set(apiEventos.map(eventoKey));
+  const missing = FALLBACK_EVENTS.filter(evento => !existing.has(eventoKey(evento)))
+    .map(evento => ({ ...evento, activo: evento.activo ?? true, __fallback: true }));
+  return [...missing, ...apiEventos];
+}
 
 function EventoForm({ initial, onSave, onCancel }) {
   const { register, handleSubmit, reset } = useForm({
@@ -16,8 +29,11 @@ function EventoForm({ initial, onSave, onCancel }) {
       const form = new FormData();
       Object.entries(data).forEach(([k, v]) => {
         if (k === 'fotos') { if (v?.[0]) Array.from(v).forEach(f => form.append('fotos', f)); }
-        else if (v !== undefined && v !== null) form.append(k, v);
+        else if (v !== undefined && v !== null && !['_id', '__fallback', 'createdAt', 'updatedAt', '__v'].includes(k)) form.append(k, v);
       });
+      if (initial?.fotos?.length && !data.fotos?.[0]) {
+        initial.fotos.forEach(foto => form.append('fotos', foto));
+      }
       await onSave(form);
       reset();
     } catch (err) {
@@ -68,12 +84,12 @@ export default function AdminEventos() {
   const [editing, setEditing] = useState(null);
   const [expandido, setExpandido] = useState(null);
 
-  const load = () => api.get('/eventos/all').then(r => setEventos(r.data));
+  const load = () => api.get('/eventos/all').then(r => setEventos(mergeEventos(r.data)));
   useEffect(() => { load(); }, []);
 
   const handleSave = async (form) => {
     try {
-      if (editing) await api.put(`/eventos/${editing._id}`, form);
+      if (editing && isMongoId(editing._id)) await api.put(`/eventos/${editing._id}`, form);
       else await api.post('/eventos', form);
       setShowForm(false); setEditing(null); load();
     } catch (err) {
@@ -82,12 +98,20 @@ export default function AdminEventos() {
   };
 
   const handleDelete = async (id) => {
+    if (!isMongoId(id)) {
+      fallbackDeleteMessage();
+      return;
+    }
     if (!confirm('¿Eliminar este evento?')) return;
     await api.delete(`/eventos/${id}`);
     load();
   };
 
   const handleBorrarFoto = async (eventoId, url) => {
+    if (!isMongoId(eventoId)) {
+      fallbackDeleteMessage();
+      return;
+    }
     if (!confirm('¿Eliminar esta foto?')) return;
     await api.delete(`/eventos/${eventoId}/foto`, { data: { url } });
     load();
@@ -125,6 +149,7 @@ export default function AdminEventos() {
                   {new Date(e.fecha).toLocaleDateString('es-AR')} · {e.lugar} · {e.fotos?.length || 0} fotos
                 </p>
               </div>
+              {e.__fallback && <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700">Fijo</span>}
               <button onClick={() => setExpandido(expandido === e._id ? null : e._id)}
                 className="text-gray-400 hover:text-gray-600 text-sm px-3 py-1">
                 {expandido === e._id ? 'Cerrar ▲' : 'Ver fotos ▼'}

@@ -8,6 +8,7 @@ const sections = [
   { to: '/admin/dashboard/equipos', label: 'Equipos', icon: '🏟️' },
   { to: '/admin/dashboard/jugadores', label: 'Jugadores', icon: '👤' },
   { to: '/admin/dashboard/estadisticas', label: 'Estadísticas', icon: '📊' },
+  { to: '/admin/dashboard/lideres', label: 'Líderes', icon: '🏆' },
   { to: '/admin/dashboard/eventos', label: 'Eventos y Fotos', icon: '📸' },
   { to: '/admin/dashboard/productos', label: 'Productos', icon: '👕' },
   { to: '/admin/dashboard/inscripciones', label: 'Inscripciones', icon: '✍️' },

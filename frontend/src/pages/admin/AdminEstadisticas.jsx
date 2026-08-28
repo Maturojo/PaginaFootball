@@ -1,9 +1,22 @@
 import { useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import api from '../../api';
+import { FALLBACK_STATS } from '../../data/stats.js';
+import { fallbackDeleteMessage, isMongoId } from '../../utils/adminFallback.js';
 
 const CATEGORIAS = ['Liga Football Flag', 'Football Flag Femenino', 'Football Americano 7vs7'];
-const EQUIPOS = ['Acorazados', 'Liebres', 'Krakens', 'Tridentes', 'Nereidas', 'Atlantes', 'Bárbaros', 'Templarios'];
+const EQUIPOS = ['Acorazados', 'Liebres', 'Krakens', 'Tridentes', 'Nereidas', 'Sirenas', 'Corales', 'Atlantes', 'Bárbaros', 'Templarios'];
+
+function statKey(stat) {
+  return `${String(stat.temporada || '').toLowerCase()}|${String(stat.categoria || '').toLowerCase()}|${String(stat.descripcion || '').toLowerCase()}`;
+}
+
+function mergeStats(apiStats = []) {
+  const existing = new Set(apiStats.map(statKey));
+  const missing = FALLBACK_STATS.filter(stat => !existing.has(statKey(stat)))
+    .map(stat => ({ ...stat, activo: stat.activo ?? true, __fallback: true }));
+  return [...missing, ...apiStats];
+}
 
 function StatForm({ initial, onSave, onCancel }) {
   const defaultFila = { equipo: '', PJ: 0, PG: 0, PP: 0, PF: 0, PC: 0, Pts: 0 };
@@ -93,16 +106,20 @@ export default function AdminEstadisticas() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
 
-  const load = () => api.get('/estadisticas/all').then(r => setStats(r.data));
+  const load = () => api.get('/estadisticas/all').then(r => setStats(mergeStats(r.data)));
   useEffect(() => { load(); }, []);
 
   const handleSave = async (data) => {
-    if (editing) await api.put(`/estadisticas/${editing._id}`, data);
+    if (editing && isMongoId(editing._id)) await api.put(`/estadisticas/${editing._id}`, data);
     else await api.post('/estadisticas', data);
     setShowForm(false); setEditing(null); load();
   };
 
   const handleDelete = async (id) => {
+    if (!isMongoId(id)) {
+      fallbackDeleteMessage();
+      return;
+    }
     if (!confirm('¿Eliminar esta tabla?')) return;
     await api.delete(`/estadisticas/${id}`);
     load();
@@ -133,7 +150,7 @@ export default function AdminEstadisticas() {
               <p className="text-sm text-gray-500">{s.tabla?.length || 0} equipos · {s.descripcion}</p>
             </div>
             <span className={`text-xs px-2 py-1 rounded-full ${s.activo ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-              {s.activo ? 'Activo' : 'Inactivo'}
+              {s.__fallback ? 'Fijo' : (s.activo ? 'Activo' : 'Inactivo')}
             </span>
             <button onClick={() => { setEditing(s); setShowForm(false); }} className="text-blue-600 hover:text-blue-800 text-sm font-medium px-3 py-1 rounded hover:bg-blue-50">Editar</button>
             <button onClick={() => handleDelete(s._id)} className="text-red-500 hover:text-red-700 text-sm font-medium px-3 py-1 rounded hover:bg-red-50">Eliminar</button>

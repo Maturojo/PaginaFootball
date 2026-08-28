@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import api from '../../api';
 
 import { API_URL } from '../../config.js';
+import { mergeTeams } from '../../data/teams.js';
+import { fallbackDeleteMessage, imageSource, isMongoId } from '../../utils/adminFallback.js';
 
 function TeamForm({ initial, onSave, onCancel }) {
   const { register, handleSubmit, reset } = useForm({ defaultValues: initial || {} });
@@ -12,10 +14,11 @@ function TeamForm({ initial, onSave, onCancel }) {
     Object.entries(data).forEach(([k, v]) => {
       if (k === 'logo') {
         if (v?.[0]) form.append('logo', v[0]);
-      } else {
+      } else if (!['_id', '__fallback', 'createdAt', 'updatedAt', '__v'].includes(k)) {
         form.append(k, v);
       }
     });
+    if (initial?.logo && typeof data.logo !== 'object') form.append('logo', initial.logo);
     await onSave(form);
     reset();
   };
@@ -78,11 +81,13 @@ export default function AdminEquipos() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
 
-  const load = () => api.get('/teams/all').then(r => setTeams(r.data));
+  const load = () => api.get('/teams/all').then(r => setTeams(mergeTeams(r.data).map(t => (
+    isMongoId(t._id) ? t : { ...t, activo: t.activo ?? true, __fallback: true }
+  ))));
   useEffect(() => { load(); }, []);
 
   const handleSave = async (form) => {
-    if (editing) {
+    if (editing && isMongoId(editing._id)) {
       await api.put(`/teams/${editing._id}`, form);
     } else {
       await api.post('/teams', form);
@@ -93,6 +98,10 @@ export default function AdminEquipos() {
   };
 
   const handleDelete = async (id) => {
+    if (!isMongoId(id)) {
+      fallbackDeleteMessage();
+      return;
+    }
     if (!confirm('¿Eliminar este equipo?')) return;
     await api.delete(`/teams/${id}`);
     load();
@@ -122,7 +131,7 @@ export default function AdminEquipos() {
         {teams.map(t => (
           <div key={t._id} className="bg-white rounded-xl shadow px-6 py-4 flex items-center gap-4">
             {t.logo ? (
-              <img src={`${API_URL}${t.logo}`} alt={t.nombre} className="w-14 h-14 object-contain rounded-lg" />
+              <img src={imageSource(t.logo, API_URL)} alt={t.nombre} className="w-14 h-14 object-contain rounded-lg" />
             ) : (
               <div className="w-14 h-14 bg-gray-100 rounded-lg flex items-center justify-center text-2xl">🏈</div>
             )}
@@ -131,7 +140,7 @@ export default function AdminEquipos() {
               <p className="text-sm text-gray-500">{t.ciudad} · {t.colores}</p>
             </div>
             <span className={`text-xs px-2 py-1 rounded-full ${t.activo ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-              {t.activo ? 'Activo' : 'Inactivo'}
+              {t.__fallback ? 'Fijo' : (t.activo ? 'Activo' : 'Inactivo')}
             </span>
             <button onClick={() => { setEditing(t); setShowForm(false); }} className="text-blue-600 hover:text-blue-800 text-sm font-medium px-3 py-1 rounded hover:bg-blue-50">Editar</button>
             <button onClick={() => handleDelete(t._id)} className="text-red-500 hover:text-red-700 text-sm font-medium px-3 py-1 rounded hover:bg-red-50">Eliminar</button>

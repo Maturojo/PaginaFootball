@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import api from '../../api';
 
 import { API_URL } from '../../config.js';
+import { mergeFallbackProducts } from '../../data/products.js';
+import { fallbackDeleteMessage, imageSource, isMongoId } from '../../utils/adminFallback.js';
 const CATEGORIAS = ['Indumentaria', 'Accesorios', 'Equipamiento', 'Otro'];
 
 function ProductForm({ initial, onSave, onCancel }) {
@@ -13,7 +15,8 @@ function ProductForm({ initial, onSave, onCancel }) {
     Object.entries(data).forEach(([k, v]) => {
       if (k === 'imagen') {
         if (v?.[0]) form.append('imagen', v[0]);
-      } else {
+        else if (initial?.imagen) form.append('imagen', initial.imagen);
+      } else if (!['_id', 'imagenes', '__fallback', 'createdAt', 'updatedAt', '__v'].includes(k)) {
         form.append(k, v);
       }
     });
@@ -73,11 +76,13 @@ export default function AdminProductos() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
 
-  const load = () => api.get('/products/all').then(r => setProducts(r.data));
+  const load = () => api.get('/products/all').then(r => setProducts(mergeFallbackProducts(r.data).map(p => (
+    isMongoId(p._id) ? p : { ...p, activo: p.activo ?? true, __fallback: true }
+  ))));
   useEffect(() => { load(); }, []);
 
   const handleSave = async (form) => {
-    if (editing) {
+    if (editing && isMongoId(editing._id)) {
       await api.put(`/products/${editing._id}`, form);
     } else {
       await api.post('/products', form);
@@ -88,6 +93,10 @@ export default function AdminProductos() {
   };
 
   const handleDelete = async (id) => {
+    if (!isMongoId(id)) {
+      fallbackDeleteMessage();
+      return;
+    }
     if (!confirm('¿Eliminar este producto?')) return;
     await api.delete(`/products/${id}`);
     load();
@@ -118,7 +127,7 @@ export default function AdminProductos() {
           <div key={p._id} className="bg-white rounded-xl shadow px-6 py-4 flex items-center gap-4">
             <div className="w-14 h-14 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
               {p.imagen ? (
-                <img src={p.imagen.startsWith('/') ? `${API_URL}${p.imagen}` : p.imagen} alt={p.nombre} className="w-full h-full object-cover" />
+                <img src={imageSource(p.imagen, API_URL)} alt={p.nombre} className="w-full h-full object-cover" />
               ) : (
                 <span className="text-2xl">👕</span>
               )}
@@ -129,7 +138,7 @@ export default function AdminProductos() {
             </div>
             <p className="font-extrabold text-primary text-lg">${Number(p.precio).toLocaleString('es-AR')}</p>
             <span className={`text-xs px-2 py-1 rounded-full ${p.activo ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-              {p.activo ? 'Activo' : 'Inactivo'}
+              {p.__fallback ? 'Fijo' : (p.activo ? 'Activo' : 'Inactivo')}
             </span>
             <button onClick={() => { setEditing(p); setShowForm(false); }} className="text-blue-600 hover:text-blue-800 text-sm font-medium px-3 py-1 rounded hover:bg-blue-50">Editar</button>
             <button onClick={() => handleDelete(p._id)} className="text-red-500 hover:text-red-700 text-sm font-medium px-3 py-1 rounded hover:bg-red-50">Eliminar</button>

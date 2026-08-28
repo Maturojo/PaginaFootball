@@ -3,7 +3,9 @@ import { useForm } from 'react-hook-form';
 import api from '../../api';
 
 import { API_URL } from '../../config.js';
-const EQUIPOS = ['Acorazados', 'Liebres', 'Krakens', 'Tridentes', 'Nereidas', 'Atlantes'];
+import { mergePlayers } from '../../data/players.js';
+import { fallbackDeleteMessage, imageSource, isMongoId } from '../../utils/adminFallback.js';
+const EQUIPOS = ['Acorazados', 'Liebres', 'Krakens', 'Tridentes', 'Nereidas', 'Sirenas', 'Corales', 'Atlantes'];
 const POSICIONES = ['Quarterback', 'Wide Receiver', 'Running Back', 'Lineman', 'Linebacker', 'Cornerback', 'Safety', 'Otra'];
 
 function JugadorForm({ initial, onSave, onCancel }) {
@@ -13,8 +15,9 @@ function JugadorForm({ initial, onSave, onCancel }) {
     const stats = { touchdowns: data.touchdowns || 0, intercepciones: data.intercepciones || 0, yardas: data.yardas || 0, partidos: data.partidos || 0 };
     Object.entries(data).forEach(([k, v]) => {
       if (k === 'foto') { if (v?.[0]) form.append('foto', v[0]); }
-      else if (!['touchdowns', 'intercepciones', 'yardas', 'partidos'].includes(k)) form.append(k, v);
+      else if (!['touchdowns', 'intercepciones', 'yardas', 'partidos', '_id', '__fallback', 'createdAt', 'updatedAt', '__v'].includes(k)) form.append(k, v);
     });
+    if (initial?.foto && typeof data.foto !== 'object') form.append('foto', initial.foto);
     form.append('stats', JSON.stringify(stats));
     await onSave(form); reset();
   };
@@ -47,16 +50,22 @@ export default function AdminJugadores() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
 
-  const load = () => api.get('/jugadores/all').then(r => setJugadores(r.data));
+  const load = () => api.get('/jugadores/all').then(r => setJugadores(mergePlayers(r.data).map(j => (
+    isMongoId(j._id) ? j : { ...j, __fallback: true }
+  ))));
   useEffect(() => { load(); }, []);
 
   const handleSave = async (form) => {
-    if (editing) await api.put(`/jugadores/${editing._id}`, form);
+    if (editing && isMongoId(editing._id)) await api.put(`/jugadores/${editing._id}`, form);
     else await api.post('/jugadores', form);
     setShowForm(false); setEditing(null); load();
   };
 
   const handleDelete = async (id) => {
+    if (!isMongoId(id)) {
+      fallbackDeleteMessage();
+      return;
+    }
     if (!confirm('¿Eliminar este jugador?')) return;
     await api.delete(`/jugadores/${id}`); load();
   };
@@ -72,12 +81,13 @@ export default function AdminJugadores() {
         {jugadores.length === 0 && <p className="text-gray-400 text-center py-8">No hay jugadores cargados.</p>}
         {jugadores.map(j => (
           <div key={j._id} className="bg-white rounded-xl shadow px-5 py-3 flex items-center gap-3">
-            {j.foto ? <img src={j.foto.startsWith('/') ? `${API_URL}${j.foto}` : j.foto} alt={j.nombre} className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+            {j.foto ? <img src={imageSource(j.foto, API_URL)} alt={j.nombre} className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
               : <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">👤</div>}
             <div className="flex-1 min-w-0">
               <p className="font-bold text-gray-800 text-sm">{j.esMVP && '⭐ '}{j.nombre} {j.numero && <span className="text-gray-400">#{j.numero}</span>}</p>
               <p className="text-xs text-gray-500">{j.equipo} · {j.posicion}</p>
             </div>
+            {j.__fallback && <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700">Fijo</span>}
             <button onClick={() => { setEditing(j); setShowForm(false); }} className="text-blue-600 text-sm px-3 py-1 rounded hover:bg-blue-50">Editar</button>
             <button onClick={() => handleDelete(j._id)} className="text-red-500 text-sm px-3 py-1 rounded hover:bg-red-50">Eliminar</button>
           </div>

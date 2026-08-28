@@ -34,6 +34,7 @@ import AdminPaginas from './pages/admin/AdminPaginas';
 import AdminEstadisticas from './pages/admin/AdminEstadisticas';
 import AdminEventos from './pages/admin/AdminEventos';
 import AdminInscripciones from './pages/admin/AdminInscripciones';
+import AdminLideres from './pages/admin/AdminLideres';
 
 function PublicLayout({ children }) {
   return (
@@ -76,6 +77,7 @@ export default function App() {
             <Route path="jugadores" element={<AdminJugadores />} />
             <Route path="noticias" element={<AdminNoticias />} />
             <Route path="estadisticas" element={<AdminEstadisticas />} />
+            <Route path="lideres" element={<AdminLideres />} />
             <Route path="eventos" element={<AdminEventos />} />
             <Route path="productos" element={<AdminProductos />} />
             <Route path="paginas" element={<AdminPaginas />} />

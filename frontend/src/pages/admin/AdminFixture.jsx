@@ -1,10 +1,28 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import api from '../../api';
+import { FALLBACK_PARTIDOS } from '../../data/stats.js';
+import { fallbackDeleteMessage, isMongoId } from '../../utils/adminFallback.js';
 
 const CATS = ['Liga Football Flag', 'Football Flag Femenino', 'Football Americano 7vs7'];
-const EQUIPOS = ['Acorazados', 'Liebres', 'Krakens', 'Tridentes', 'Nereidas', 'Atlantes', 'Bárbaros', 'Templarios'];
+const EQUIPOS = ['Acorazados', 'Liebres', 'Krakens', 'Tridentes', 'Nereidas', 'Sirenas', 'Corales', 'Atlantes', 'Bárbaros', 'Templarios'];
 const ESTADOS = ['programado', 'en_juego', 'finalizado', 'cancelado'];
+
+function partidoKey(partido) {
+  return [
+    partido.jornada,
+    partido.equipoLocal || partido.titulo,
+    partido.equipoVisitante || '',
+    partido.fecha,
+  ].map(value => String(value || '').toLowerCase()).join('|');
+}
+
+function mergePartidos(apiPartidos = []) {
+  const existing = new Set(apiPartidos.map(partidoKey));
+  const missing = FALLBACK_PARTIDOS.filter(partido => !existing.has(partidoKey(partido)))
+    .map(partido => ({ ...partido, __fallback: true }));
+  return [...missing, ...apiPartidos];
+}
 
 function PartidoForm({ initial, onSave, onCancel }) {
   const { register, handleSubmit, reset } = useForm({
@@ -81,16 +99,20 @@ export default function AdminFixture() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
 
-  const load = () => api.get('/partidos/all').then(r => setPartidos(r.data));
+  const load = () => api.get('/partidos/all').then(r => setPartidos(mergePartidos(r.data)));
   useEffect(() => { load(); }, []);
 
   const handleSave = async (data) => {
-    if (editing) await api.put(`/partidos/${editing._id}`, data);
+    if (editing && isMongoId(editing._id)) await api.put(`/partidos/${editing._id}`, data);
     else await api.post('/partidos', data);
     setShowForm(false); setEditing(null); load();
   };
 
   const handleDelete = async (id) => {
+    if (!isMongoId(id)) {
+      fallbackDeleteMessage();
+      return;
+    }
     if (!confirm('¿Eliminar este partido?')) return;
     await api.delete(`/partidos/${id}`); load();
   };
@@ -111,11 +133,12 @@ export default function AdminFixture() {
         {partidos.map(p => (
           <div key={p._id} className="bg-white rounded-xl shadow px-5 py-3 flex items-center gap-3">
             <div className="flex-1 min-w-0">
-              <p className="font-bold text-gray-800 text-sm">{p.equipoLocal} vs {p.equipoVisitante}</p>
+              <p className="font-bold text-gray-800 text-sm">{p.equipoLocal ? `${p.equipoLocal} vs ${p.equipoVisitante}` : p.titulo}</p>
               <p className="text-xs text-gray-500">{new Date(p.fecha).toLocaleDateString('es-AR')} · {p.categoria} · {p.jornada}</p>
               {p.estado === 'finalizado' && <p className="text-xs font-bold text-gray-700 mt-0.5">{p.golesLocal} - {p.golesVisitante}</p>}
             </div>
             <span className={`text-xs px-2 py-1 rounded-full font-medium ${BADGE[p.estado]}`}>{p.estado}</span>
+            {p.__fallback && <span className="text-xs px-2 py-1 rounded-full font-medium bg-amber-100 text-amber-700">Fijo</span>}
             <button onClick={() => { setEditing(p); setShowForm(false); }} className="text-blue-600 text-sm px-3 py-1 rounded hover:bg-blue-50">Editar</button>
             <button onClick={() => handleDelete(p._id)} className="text-red-500 text-sm px-3 py-1 rounded hover:bg-red-50">Eliminar</button>
           </div>
