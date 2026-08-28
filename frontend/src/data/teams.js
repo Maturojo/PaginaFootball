@@ -18,7 +18,7 @@ export const FALLBACK_TEAMS = [
     anioFundacion: 2016,
     ciudad: 'Mar del Plata',
     categoria: 'Liga Football Flag',
-    campeonatos: ['Tazón del Mar V'],
+    campeonatos: ['Tazón del Mar V', 'Tazón del Mar VI'],
   },
   {
     _id: 'krakens',
@@ -38,7 +38,7 @@ export const FALLBACK_TEAMS = [
     anioFundacion: 2016,
     ciudad: 'Mar del Plata',
     categoria: 'Liga Football Flag',
-    campeonatos: ['Tazón del Mar I', 'Tazón del Mar II', 'Tazón del Mar III'],
+    campeonatos: ['Tazón del Mar I', 'Tazón del Mar II', 'Tazón del Mar III', 'Tazón del Mar VII', 'Tazón del Mar VIII'],
   },
   {
     _id: 'nereidas',
