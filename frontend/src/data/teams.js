@@ -13,22 +13,22 @@ export const FALLBACK_TEAMS = [
   {
     _id: 'liebres',
     nombre: 'Liebres',
-    descripcion: 'Las Liebres, conocidas por su velocidad y agilidad en el campo de juego.',
+    descripcion: 'Las Liebres, conocidas por su velocidad y agilidad en el campo de juego. Campeones del Tazón del Mar V, VI y IX.',
     colores: 'Naranja y negro',
     anioFundacion: 2016,
     ciudad: 'Mar del Plata',
     categoria: 'Liga Football Flag',
-    campeonatos: ['Tazón del Mar V', 'Tazón del Mar VI'],
+    campeonatos: ['Tazón del Mar V', 'Tazón del Mar VI', 'Tazón del Mar IX'],
   },
   {
     _id: 'krakens',
     nombre: 'Krakens',
-    descripcion: 'Los Krakens, implacables y poderosos como la bestia que los representa.',
+    descripcion: 'Los Krakens, implacables y poderosos como la bestia que los representa. Campeones del Tazón del Mar IV y X.',
     colores: 'Violeta y negro',
     anioFundacion: 2016,
     ciudad: 'Mar del Plata',
     categoria: 'Liga Football Flag',
-    campeonatos: ['Tazón del Mar IV'],
+    campeonatos: ['Tazón del Mar IV', 'Tazón del Mar X'],
   },
   {
     _id: 'tridentes',
@@ -102,8 +102,30 @@ function teamKey(team) {
     .trim();
 }
 
+function championshipDescription(team) {
+  if (!team.campeonatos?.length) return team.descripcion;
+  if (/campe[oó]n/i.test(team.descripcion || '')) return team.descripcion;
+
+  const titles = team.campeonatos.join(', ');
+  return `${team.descripcion || ''} Campeones de ${titles}.`.trim();
+}
+
+function withChampionshipBio(team) {
+  return {
+    ...team,
+    descripcion: championshipDescription(team),
+  };
+}
+
 export function mergeTeams(apiTeams = []) {
-  const existing = new Set(apiTeams.map(teamKey));
+  const fallbackByKey = new Map(FALLBACK_TEAMS.map(team => [teamKey(team), team]));
+  const mergedApiTeams = apiTeams.map(team => {
+    const fallback = fallbackByKey.get(teamKey(team));
+    return fallback
+      ? withChampionshipBio({ ...fallback, ...team, campeonatos: team.campeonatos?.length ? team.campeonatos : fallback.campeonatos })
+      : withChampionshipBio(team);
+  });
+  const existing = new Set(mergedApiTeams.map(teamKey));
   const missingFallbacks = FALLBACK_TEAMS.filter(team => !existing.has(teamKey(team)));
-  return [...apiTeams, ...missingFallbacks];
+  return [...mergedApiTeams, ...missingFallbacks.map(withChampionshipBio)];
 }

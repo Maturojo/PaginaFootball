@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../api';
 import {
+  FALLBACK_EQUIPADOS,
   FALLBACK_HISTORICOS,
   FALLBACK_LIDERES,
   FALLBACK_STATS,
@@ -16,7 +17,7 @@ const COLS_STATS = ['Equipo', 'PJ', 'PG', 'PP', 'PF', 'PC', 'Pts'];
 const TIPOS = {
   touchdowns:    { label: 'Touchdowns',    cols: ['TD'],                              keys: ['td'] },
   pase:          { label: 'Pase',          cols: ['PAS','COM','%','YDS','TD','INT'],  keys: ['pas','com','pct','yds','td','int'] },
-  corrida:       { label: 'Corrida',        cols: ['INT','YDS','PROM','TD'],           keys: ['int','yds','prom','td'] },
+  corrida:       { label: 'Corrida',        cols: ['AC','YDS','PROM','TD'],            keys: ['int','yds','prom','td'] },
   recepcion:     { label: 'Recepción',      cols: ['REC','YDS','PROM','TD'],           keys: ['rec','yds','prom','td'] },
   flags:         { label: 'Flageos',        cols: ['FLAGS'],                           keys: ['flags'] },
   intercepciones:{ label: 'Intercepciones', cols: ['INTS'],                            keys: ['ints'] },
@@ -38,6 +39,27 @@ const EQUIPO_COLORS = {
   TRI: 'bg-red-500',
   LIE: 'bg-orange-400',
   ACO: 'bg-gray-500',
+  BAR: 'bg-indigo-700',
+  TEM: 'bg-red-600',
+};
+
+const CAMPEONES_TAZON = {
+  I: 'Tridentes',
+  II: 'Tridentes',
+  III: 'Tridentes',
+  IV: 'Krakens',
+  V: 'Liebres',
+  VI: 'Liebres',
+  VII: 'Tridentes',
+  VIII: 'Tridentes',
+  IX: 'Liebres',
+  X: 'Krakens',
+};
+
+const CAMPEON_COLORS = {
+  Krakens: 'bg-purple-600',
+  Liebres: 'bg-orange-400',
+  Tridentes: 'bg-red-500',
 };
 
 const ROMAN_ORDER = {
@@ -57,6 +79,14 @@ const ROMAN_ORDER = {
 function temporadaNumero(temporada) {
   const match = String(temporada ?? '').match(/Tazón del Mar\s+([IVX]+)/i);
   return ROMAN_ORDER[match?.[1]?.toUpperCase()] || 0;
+}
+
+function tazonRoman(temporada) {
+  return String(temporada ?? '').match(/Tazón del Mar\s+([IVX]+)/i)?.[1]?.toUpperCase();
+}
+
+function campeonDeTemporada(temporada) {
+  return CAMPEONES_TAZON[tazonRoman(temporada)] || null;
 }
 
 function ordenarTemporadasDesc(temporadas) {
@@ -107,6 +137,23 @@ function buildEquipoIdealRanking(tipo) {
     .sort((a, b) => b.count - a.count || a.nombre.localeCompare(b.nombre))
     .slice(0, 10)
     .map((player, index) => ({ ...player, pos: index + 1 }));
+}
+
+function CampeonTemporada({ temporada }) {
+  const campeon = campeonDeTemporada(temporada);
+  if (!campeon) return null;
+
+  return (
+    <div className="mb-6 rounded-xl border border-yellow-400/30 bg-yellow-400/10 px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div>
+        <p className="text-xs text-yellow-200/70 uppercase tracking-widest font-extrabold">Campeón</p>
+        <h2 className="text-2xl font-extrabold text-white mt-1">{campeon}</h2>
+      </div>
+      <span className={`self-start sm:self-center text-xs font-extrabold px-3 py-1 rounded-full text-white ${CAMPEON_COLORS[campeon] || 'bg-white/20'}`}>
+        {temporada}
+      </span>
+    </div>
+  );
 }
 
 function TablaStandings({ stat }) {
@@ -221,6 +268,49 @@ function TablaLideres({ lideres }) {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function EquipadosSection() {
+  const partido = FALLBACK_EQUIPADOS[0];
+
+  if (!partido) {
+    return (
+      <p className="text-center text-white/40 bg-secondary border border-accent/20 rounded-xl px-6 py-10">
+        No hay partidos de equipados cargados todavía.
+      </p>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-secondary border border-accent/20 rounded-xl overflow-hidden">
+        <div className="px-6 py-4 border-b border-accent/10">
+          <p className="text-xs text-accent/60 uppercase tracking-widest font-bold">{partido.categoria}</p>
+          <h2 className="text-2xl font-extrabold text-white mt-1">{partido.titulo}</h2>
+        </div>
+        <div className="p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+          <div className="flex items-center justify-center gap-4 text-center">
+            <div>
+              <p className="text-sm text-white/50">{partido.resultado.local}</p>
+              <p className="text-5xl font-extrabold text-white">{partido.resultado.puntosLocal}</p>
+            </div>
+            <span className="text-white/20 text-3xl font-extrabold">-</span>
+            <div>
+              <p className="text-sm text-white/50">{partido.resultado.visitante}</p>
+              <p className="text-5xl font-extrabold text-white">{partido.resultado.puntosVisitante}</p>
+            </div>
+          </div>
+          <div className="bg-primary/45 border border-white/10 rounded-xl px-5 py-4">
+            <p className="text-xs text-accent/70 uppercase tracking-widest font-bold">Jugador destacado</p>
+            <p className="text-xl font-extrabold text-white mt-1">#38 {partido.resultado.destacado}</p>
+            <p className="text-white/50 text-sm mt-1">{partido.resultado.resumenDestacado}</p>
+          </div>
+        </div>
+      </div>
+
+      <TablaLideres lideres={partido.lideres} />
     </div>
   );
 }
@@ -472,6 +562,7 @@ function PremiosSection() {
         </div>
       )}
       {temporadas.length === 1 && <p className="text-center text-accent font-bold mb-6 text-lg">{temporadaActiva}</p>}
+      <CampeonTemporada temporada={temporadaActiva} />
       <TablaPremios lideres={lideresPremios} />
     </>
   );
@@ -562,7 +653,7 @@ export default function Estadisticas() {
           <>
             {/* Selector sección */}
             <div className="flex flex-wrap gap-3 mb-8 justify-center">
-              {[['premios','🏅 Premios'], ['lideres','📈 Líderes'], ['historicos','🏛️ Históricos'], ['posiciones','📊 Posiciones']].map(([v, l]) => (
+              {[['premios','🏅 Premios'], ['lideres','📈 Líderes'], ['equipados','🏟️ Equipados'], ['historicos','🏛️ Históricos'], ['posiciones','📊 Posiciones']].map(([v, l]) => (
                 <button key={v} onClick={() => setSeccion(v)}
                   className={`px-6 py-2 rounded-lg font-bold transition ${seccion === v ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/60 hover:text-white'}`}>
                   {l}
@@ -592,10 +683,16 @@ export default function Estadisticas() {
                     {temporadasLideresOrdenadas.length === 1 && (
                       <p className="text-center text-accent font-bold mb-6 text-lg">{temporadaActiva}</p>
                     )}
+                    <CampeonTemporada temporada={temporadaActiva} />
                     <TablaLideres lideres={lideres} />
                   </>
                 )}
               </>
+            )}
+
+            {/* EQUIPADOS */}
+            {seccion === 'equipados' && (
+              <EquipadosSection />
             )}
 
             {/* HISTÓRICOS */}
@@ -620,7 +717,12 @@ export default function Estadisticas() {
                         </button>
                       ))}
                     </div>
-                    {stats[activaStat] && <TablaStandings stat={stats[activaStat]} />}
+                    {stats[activaStat] && (
+                      <>
+                        <CampeonTemporada temporada={stats[activaStat].temporada} />
+                        <TablaStandings stat={stats[activaStat]} />
+                      </>
+                    )}
                   </>
                 )}
               </>

@@ -12,7 +12,7 @@ export function fallbackDeleteMessage() {
 
 export function imageSource(src, apiUrl) {
   if (!src) return '';
-  if (src.startsWith('http') || src.startsWith('/tienda') || src.startsWith('/eventos') || src.startsWith('/logos')) {
+  if (src.startsWith('http') || src.startsWith('/tienda') || src.startsWith('/eventos') || src.startsWith('/logos') || src.startsWith('/jugadores')) {
     return src;
   }
   return src.startsWith('/') ? `${apiUrl}${src}` : src;

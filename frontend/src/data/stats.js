@@ -1227,7 +1227,7 @@ export const FALLBACK_LIDERES = [
     temporada: 'Tazón del Mar V',
     tipo: 'recepcion',
     jugadores: [
-      { pos: 1, nombre: 'Matías Rojo', equipo: 'ACO', yds: 802 },
+      { pos: 1, nombre: 'Matías Rojo', equipo: 'ACO', yds: 302 },
       { pos: 2, nombre: 'Luca Ringa', equipo: 'KRA', yds: 295 },
       { pos: 3, nombre: 'Emiliano Sánchez', equipo: 'LIE', yds: 275 },
     ],
@@ -1334,7 +1334,7 @@ export const FALLBACK_LIDERES = [
     jugadores: [
       { pos: 1, nombre: 'Joaquín Gainza', equipo: 'TRI', yds: 459 },
       { pos: 2, nombre: 'Lucas Gabotto', equipo: 'KRA', yds: 436 },
-      { pos: 3, nombre: 'Matías Rojo', equipo: 'ACO', yds: 821 },
+      { pos: 3, nombre: 'Matías Rojo', equipo: 'ACO', yds: 321 },
     ],
   },
   {
@@ -1618,6 +1618,132 @@ export const FALLBACK_LIDERES = [
     ],
   },
   {
+    temporada: 'Tazón del Mar II',
+    tipo: 'premios',
+    jugadores: [
+      { premio: 'MVP — Jugador Más Valioso', jugador: 'Lucas Gabotto', numero: 'S/N', equipo: 'ACO' },
+      { premio: 'JOF — Jugador Ofensivo', jugador: 'Joaquín Gainza', numero: 'S/N', equipo: 'TRI' },
+      { premio: 'JD — Jugador Defensivo', jugador: 'Elvis Rodríguez', numero: 'S/N', equipo: 'KRA' },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar II',
+    tipo: 'equipo-ofensivo',
+    jugadores: [
+      { pos: 1, nombre: 'Joaquín Gainza', numero: 'S/N', equipo: 'TRI', posicion: 'WR' },
+      { pos: 2, nombre: 'Julián Fernández', numero: 'S/N', equipo: 'TRI', posicion: 'C' },
+      { pos: 3, nombre: 'Juan Cruz Castillo', numero: 'S/N', equipo: 'ACO', posicion: 'WR' },
+      { pos: 4, nombre: 'Javier Papagni', numero: 'S/N', equipo: 'TRI', posicion: 'QB' },
+      { pos: 5, nombre: 'Lucas Gabotto', numero: 'S/N', equipo: 'ACO', posicion: 'RB/WR' },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar II',
+    tipo: 'equipo-defensivo',
+    jugadores: [
+      { pos: 1, nombre: 'Elvis Rodríguez', numero: 'S/N', equipo: 'KRA', posicion: 'CB' },
+      { pos: 2, nombre: 'Julián Fernández', numero: 'S/N', equipo: 'TRI', posicion: 'LB' },
+      { pos: 3, nombre: 'Juan Cruz Castillo', numero: 'S/N', equipo: 'ACO', posicion: 'CB' },
+      { pos: 4, nombre: 'Lucas Gabotto', numero: 'S/N', equipo: 'ACO', posicion: 'S' },
+      { pos: 5, nombre: 'Lauro Ibarra', numero: 'S/N', equipo: 'TRI', posicion: 'RUSH' },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar II',
+    tipo: 'pase',
+    jugadores: [
+      { pos: 1, nombre: 'Javier Papagni', equipo: 'TRI', pas: 281, com: 192, pct: 68.3, yds: 2017, prom: 10.5, td: 38, int: 10 },
+      { pos: 2, nombre: 'Agustín Luporini', equipo: 'KRA', pas: 241, com: 124, pct: 51.4, yds: 1173, prom: 9.4, td: 16, int: 13 },
+      { pos: 3, nombre: 'Juan Pablo Luporini', equipo: 'ACO', pas: 204, com: 116, pct: 56.8, yds: 1032, prom: 8.9, td: 18, int: 17 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar II',
+    tipo: 'corrida',
+    jugadores: [
+      { pos: 1, nombre: 'Lucas Gabotto', equipo: 'ACO', int: 36, yds: 317, prom: 8.8, td: 2 },
+      { pos: 2, nombre: 'Juan Cruz Castillo', equipo: 'ACO', int: 26, yds: 193, prom: 7.4, td: 0 },
+      { pos: 3, nombre: 'Francisco Berón', equipo: 'KRA', int: 13, yds: 113, prom: 8.6, td: 2 },
+      { pos: 4, nombre: 'Joaquín Gainza', equipo: 'TRI', int: 9, yds: 109, prom: 12.1, td: 3 },
+      { pos: 5, nombre: 'Pablo Corva', equipo: 'TRI', int: 8, yds: 105, prom: 13.1, td: 2 },
+      { pos: 6, nombre: 'Pedro Kuznetzov', equipo: 'TRI', int: 10, yds: 99, prom: 9.9, td: 1 },
+      { pos: 7, nombre: 'Javier Papagni', equipo: 'TRI', int: 8, yds: 74, prom: 9.2, td: 1 },
+      { pos: 8, nombre: 'Nicolás Luporini', equipo: 'ACO', int: 7, yds: 66, prom: 9.4, td: 1 },
+      { pos: 9, nombre: 'Elvis Rodríguez', equipo: 'KRA', int: 8, yds: 64, prom: 8.0, td: 0 },
+      { pos: 10, nombre: 'Jonathan Baldovino', equipo: 'ACO', int: 6, yds: 61, prom: 10.2, td: 0 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar II',
+    tipo: 'recepcion',
+    jugadores: [
+      { pos: 1, nombre: 'Julián Fernández', equipo: 'TRI', rec: 59, yds: 520, prom: 8.8, td: 7 },
+      { pos: 2, nombre: 'Joaquín Gainza', equipo: 'TRI', rec: 33, yds: 478, prom: 14.9, td: 16 },
+      { pos: 3, nombre: 'Lucas Gabotto', equipo: 'ACO', rec: 47, yds: 435, prom: 9.2, td: 9 },
+      { pos: 4, nombre: 'Elvis Rodríguez', equipo: 'KRA', rec: 48, yds: 433, prom: 9.0, td: 6 },
+      { pos: 5, nombre: 'Pablo Corva', equipo: 'TRI', rec: 31, yds: 379, prom: 12.2, td: 4 },
+      { pos: 6, nombre: 'Renzo Amado', equipo: 'TRI', rec: 32, yds: 303, prom: 9.5, td: 2 },
+      { pos: 7, nombre: 'Juan Cruz Castillo', equipo: 'ACO', rec: 23, yds: 237, prom: 10.3, td: 5 },
+      { pos: 8, nombre: 'Germán Romero', equipo: 'KRA', rec: 24, yds: 168, prom: 7.0, td: 3 },
+      { pos: 9, nombre: 'Richard Moreno H.', equipo: 'KRA', rec: 21, yds: 160, prom: 7.6, td: 1 },
+      { pos: 10, nombre: 'Emiliano Sánchez', equipo: 'KRA', rec: 12, yds: 141, prom: 11.7, td: 2 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar II',
+    tipo: 'flags',
+    jugadores: [
+      { pos: 1, nombre: 'Elvis Rodríguez', equipo: 'KRA', flags: 37 },
+      { pos: 2, nombre: 'Julián Fernández', equipo: 'TRI', flags: 31 },
+      { pos: 3, nombre: 'Joaquín Gainza', equipo: 'TRI', flags: 29 },
+      { pos: 4, nombre: 'Lucas Gabotto', equipo: 'ACO', flags: 27 },
+      { pos: 5, nombre: 'Agustín Luporini', equipo: 'KRA', flags: 25 },
+      { pos: 6, nombre: 'Pablo Corva', equipo: 'TRI', flags: 21 },
+      { pos: 7, nombre: 'Jonathan Baldovino', equipo: 'ACO', flags: 20 },
+      { pos: 8, nombre: 'Richard Moreno H.', equipo: 'KRA', flags: 15 },
+      { pos: 9, nombre: 'Francisco Berón', equipo: 'KRA', flags: 14 },
+      { pos: 10, nombre: 'Juan Cruz Castillo', equipo: 'ACO', flags: 12 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar II',
+    tipo: 'deflecciones',
+    jugadores: [
+      { pos: 1, nombre: 'Julián Fernández', equipo: 'TRI', deflec: 10 },
+      { pos: 2, nombre: 'Lucas Gabotto', equipo: 'ACO', deflec: 7 },
+      { pos: 3, nombre: 'Juan Cruz Castillo', equipo: 'ACO', deflec: 5 },
+      { pos: 4, nombre: 'Pablo Corva', equipo: 'TRI', deflec: 4 },
+      { pos: 5, nombre: 'Agustín Luporini', equipo: 'KRA', deflec: 3 },
+      { pos: 6, nombre: 'Jonathan Baldovino', equipo: 'ACO', deflec: 3 },
+      { pos: 7, nombre: 'Damián Brito', equipo: 'KRA', deflec: 2 },
+      { pos: 8, nombre: 'José Berón', equipo: 'ACO', deflec: 2 },
+      { pos: 9, nombre: 'Raúl Montenegro', equipo: 'ACO', deflec: 2 },
+      { pos: 10, nombre: 'Francisco Berón', equipo: 'KRA', deflec: 2 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar II',
+    tipo: 'intercepciones',
+    jugadores: [
+      { pos: 1, nombre: 'Elvis Rodríguez', equipo: 'KRA', ints: 7 },
+      { pos: 2, nombre: 'Joaquín Gainza', equipo: 'TRI', ints: 6 },
+      { pos: 3, nombre: 'Julián Fernández', equipo: 'TRI', ints: 5 },
+      { pos: 4, nombre: 'Juan Cruz Castillo', equipo: 'ACO', ints: 4 },
+      { pos: 5, nombre: 'Pablo Corva', equipo: 'TRI', ints: 4 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar II',
+    tipo: 'sacks',
+    jugadores: [
+      { pos: 1, nombre: 'Lauro Ibarra', equipo: 'TRI', sacks: 9, safety: 0 },
+      { pos: 2, nombre: 'Nicolás Luporini', equipo: 'ACO', sacks: 4, safety: 0 },
+      { pos: 3, nombre: 'Lautaro Muñera', equipo: 'KRA', sacks: 2, safety: 0 },
+      { pos: 4, nombre: 'José Berón', equipo: 'ACO', sacks: 1, safety: 0 },
+      { pos: 5, nombre: 'Pedro Kuznetzov', equipo: 'TRI', sacks: 1, safety: 0 },
+    ],
+  },
+  {
     temporada: 'Final - Tazón del Mar VIII',
     tipo: 'pase',
     jugadores: [
@@ -1704,8 +1830,14 @@ const HISTORICAL_DISPLAY_NAMES = {
   'hector gonzalez': 'Héctor González',
   'ignacio rios': 'Ignacio Ríos',
   'julian fernandez': 'Julián Fernández',
+  'german romero': 'Germán Romero',
   'matias rojo': 'Matías Rojo',
+  'nicolas luporini': 'Nicolás Luporini',
   'ruben gabotto': 'Rubén Gabotto',
+  'damian brito': 'Damián Brito',
+  'jose beron': 'José Berón',
+  'francisco beron': 'Francisco Berón',
+  'lautaro munera': 'Lautaro Muñera',
 };
 
 const HISTORICAL_EXTRA_STATS = [
@@ -1768,6 +1900,42 @@ function sortedTop10(playersMap, statKey) {
     });
 }
 
+function buildEmptyHistoricalPlayer({ key, nombre, equipo }) {
+  return {
+    key,
+    nombre: HISTORICAL_DISPLAY_NAMES[key] || nombre,
+    equipo,
+    touchdowns: 0,
+    tdPasados: 0,
+    tdCorridos: 0,
+    tdRecibidos: 0,
+    yardas: 0,
+    yardasPasando: 0,
+    yardasCorriendo: 0,
+    yardasRecibiendo: 0,
+    intercepciones: 0,
+    intercepcionesLanzadas: 0,
+    pickSix: 0,
+    sacks: 0,
+    safeties: 0,
+    deflecciones: 0,
+    flags: 0,
+    tackles: 0,
+    temporadas: new Set(),
+    latestSeasonRank: 0,
+  };
+}
+
+function expandHistoricalJugador(jugador) {
+  const nombre = String(jugador.nombre ?? '');
+  if (!/\s+y\s+/i.test(nombre)) return [jugador];
+
+  return nombre
+    .split(/\s+y\s+/i)
+    .map(nombreParte => ({ ...jugador, nombre: nombreParte.trim() }))
+    .filter(jugadorParte => jugadorParte.nombre);
+}
+
 function buildHistoricalPlayers(lideres) {
   const playersMap = new Map();
 
@@ -1776,16 +1944,7 @@ function buildHistoricalPlayers(lideres) {
     if (!key) return null;
 
     if (!playersMap.has(key)) {
-      playersMap.set(key, {
-        key,
-        nombre: HISTORICAL_DISPLAY_NAMES[key] || nombre,
-        equipo,
-        touchdowns: 0,
-        yardas: 0,
-        intercepciones: 0,
-        temporadas: new Set(),
-        latestSeasonRank: 0,
-      });
+      playersMap.set(key, buildEmptyHistoricalPlayer({ key, nombre, equipo }));
     }
 
     const player = playersMap.get(key);
@@ -1801,9 +1960,21 @@ function buildHistoricalPlayers(lideres) {
   };
 
   lideres.forEach(lider => {
-    if (!['touchdowns', 'pase', 'corrida', 'recepcion', 'intercepciones'].includes(lider.tipo)) return;
+    const historicalTypes = [
+      'touchdowns',
+      'pase',
+      'corrida',
+      'recepcion',
+      'intercepciones',
+      'sacks',
+      'deflecciones',
+      'flags',
+      'tackles',
+    ];
 
-    lider.jugadores.forEach(jugador => {
+    if (!historicalTypes.includes(lider.tipo)) return;
+
+    lider.jugadores.flatMap(expandHistoricalJugador).forEach(jugador => {
       const player = getPlayer({ nombre: jugador.nombre, equipo: jugador.equipo, temporada: lider.temporada });
       if (!player) return;
 
@@ -1811,24 +1982,76 @@ function buildHistoricalPlayers(lideres) {
         player.touchdowns += Number(jugador.td) || 0;
       }
 
-      if (['pase', 'corrida', 'recepcion'].includes(lider.tipo)) {
-        player.touchdowns += Number(jugador.td) || 0;
-        player.yardas += Number(jugador.yds) || 0;
+      if (lider.tipo === 'pase') {
+        const touchdowns = Number(jugador.td) || 0;
+        const yardas = Number(jugador.yds) || 0;
+        player.tdPasados += touchdowns;
+        player.touchdowns += touchdowns;
+        player.yardasPasando += yardas;
+        player.yardas += yardas;
+        player.intercepcionesLanzadas += Number(jugador.int) || 0;
+      }
+
+      if (lider.tipo === 'corrida') {
+        const touchdowns = Number(jugador.td) || 0;
+        const yardas = Number(jugador.yds) || 0;
+        player.tdCorridos += touchdowns;
+        player.touchdowns += touchdowns;
+        player.yardasCorriendo += yardas;
+        player.yardas += yardas;
+      }
+
+      if (lider.tipo === 'recepcion') {
+        const touchdowns = Number(jugador.td) || 0;
+        const yardas = Number(jugador.yds) || 0;
+        player.tdRecibidos += touchdowns;
+        player.touchdowns += touchdowns;
+        player.yardasRecibiendo += yardas;
+        player.yardas += yardas;
       }
 
       if (lider.tipo === 'intercepciones') {
         player.intercepciones += Number(jugador.ints) || 0;
+        player.pickSix += Number(jugador.pickSix) || 0;
+      }
+
+      if (lider.tipo === 'sacks') {
+        player.sacks += Number(jugador.sacks) || 0;
+        player.safeties += Number(jugador.safety) || 0;
+      }
+
+      if (lider.tipo === 'deflecciones') {
+        player.deflecciones += Number(jugador.deflec) || 0;
+      }
+
+      if (lider.tipo === 'flags') {
+        player.flags += Number(jugador.flags) || 0;
+      }
+
+      if (lider.tipo === 'tackles') {
+        player.tackles += Number(jugador.tackles) || 0;
       }
     });
   });
 
   HISTORICAL_EXTRA_STATS.forEach(extra => {
-    const player = getPlayer({ nombre: extra.nombre, temporada: 'Datos históricos' });
+    const player = getPlayer({ nombre: extra.nombre, equipo: extra.equipo, temporada: 'Datos históricos' });
     if (!player) return;
 
     player.touchdowns += Number(extra.touchdowns) || 0;
     player.yardas += Number(extra.yardas) || 0;
     player.intercepciones += Number(extra.intercepciones) || 0;
+    player.tdPasados += Number(extra.tdPasados) || 0;
+    player.tdCorridos += Number(extra.tdCorridos) || 0;
+    player.tdRecibidos += Number(extra.tdRecibidos) || 0;
+    player.yardasPasando += Number(extra.yardasPasando) || 0;
+    player.yardasCorriendo += Number(extra.yardasCorriendo) || 0;
+    player.yardasRecibiendo += Number(extra.yardasRecibiendo) || 0;
+    player.sacks += Number(extra.sacks) || 0;
+    player.safeties += Number(extra.safeties) || 0;
+    player.deflecciones += Number(extra.deflecciones) || 0;
+    player.flags += Number(extra.flags) || 0;
+    player.tackles += Number(extra.tackles) || 0;
   });
 
   return playersMap;
@@ -1839,22 +2062,70 @@ const HISTORICAL_PLAYERS = buildHistoricalPlayers(FALLBACK_LIDERES);
 function buildHistoricos(playersMap) {
   return [
     {
-      key: 'touchdowns',
-      titulo: 'Touchdowns',
+      key: 'tdPasados',
+      titulo: 'TD Pasados',
       abreviatura: 'TD',
-      jugadores: sortedTop10(playersMap, 'touchdowns'),
+      jugadores: sortedTop10(playersMap, 'tdPasados'),
     },
     {
-      key: 'yardas',
-      titulo: 'Yardas',
+      key: 'tdRecibidos',
+      titulo: 'TD Recibidos',
+      abreviatura: 'TD',
+      jugadores: sortedTop10(playersMap, 'tdRecibidos'),
+    },
+    {
+      key: 'tdCorridos',
+      titulo: 'TD Corridos',
+      abreviatura: 'TD',
+      jugadores: sortedTop10(playersMap, 'tdCorridos'),
+    },
+    {
+      key: 'yardasPasando',
+      titulo: 'Yardas Pasando',
       abreviatura: 'YDS',
-      jugadores: sortedTop10(playersMap, 'yardas'),
+      jugadores: sortedTop10(playersMap, 'yardasPasando'),
+    },
+    {
+      key: 'yardasRecibiendo',
+      titulo: 'Yardas Recibiendo',
+      abreviatura: 'YDS',
+      jugadores: sortedTop10(playersMap, 'yardasRecibiendo'),
+    },
+    {
+      key: 'yardasCorriendo',
+      titulo: 'Yardas Corriendo',
+      abreviatura: 'YDS',
+      jugadores: sortedTop10(playersMap, 'yardasCorriendo'),
     },
     {
       key: 'intercepciones',
-      titulo: 'Intercepciones',
+      titulo: 'Intercepciones Defensivas',
       abreviatura: 'INT',
       jugadores: sortedTop10(playersMap, 'intercepciones'),
+    },
+    {
+      key: 'sacks',
+      titulo: 'Sacks',
+      abreviatura: 'SACK',
+      jugadores: sortedTop10(playersMap, 'sacks'),
+    },
+    {
+      key: 'deflecciones',
+      titulo: 'Deflecciones',
+      abreviatura: 'DEF',
+      jugadores: sortedTop10(playersMap, 'deflecciones'),
+    },
+    {
+      key: 'tackles',
+      titulo: 'Tackles',
+      abreviatura: 'TCK',
+      jugadores: sortedTop10(playersMap, 'tackles'),
+    },
+    {
+      key: 'flags',
+      titulo: 'Flags',
+      abreviatura: 'FLG',
+      jugadores: sortedTop10(playersMap, 'flags'),
     },
   ];
 }
@@ -1867,12 +2138,100 @@ export function fallbackHistoricosByJugador(nombre) {
 
   return {
     touchdowns: stats?.touchdowns || 0,
+    tdPasados: stats?.tdPasados || 0,
+    tdCorridos: stats?.tdCorridos || 0,
+    tdRecibidos: stats?.tdRecibidos || 0,
     yardas: stats?.yardas || 0,
+    yardasPasando: stats?.yardasPasando || 0,
+    yardasCorriendo: stats?.yardasCorriendo || 0,
+    yardasRecibiendo: stats?.yardasRecibiendo || 0,
     intercepciones: stats?.intercepciones || 0,
+    intercepcionesLanzadas: stats?.intercepcionesLanzadas || 0,
+    pickSix: stats?.pickSix || 0,
+    sacks: stats?.sacks || 0,
+    safeties: stats?.safeties || 0,
+    deflecciones: stats?.deflecciones || 0,
+    flags: stats?.flags || 0,
+    tackles: stats?.tackles || 0,
   };
 }
 
 export const FALLBACK_TEMPORADAS = [...new Set(FALLBACK_LIDERES.map(l => l.temporada))];
+
+export const FALLBACK_EQUIPADOS = [
+  {
+    id: 'barbaros-templarios-2026',
+    titulo: 'Bárbaros vs Templarios',
+    categoria: 'Football Americano 7vs7',
+    resultado: {
+      local: 'Bárbaros',
+      visitante: 'Templarios',
+      puntosLocal: 46,
+      puntosVisitante: 19,
+      ganador: 'Bárbaros',
+      destacado: 'Leandro Cattaneo',
+      resumenDestacado: '6 acarreos, 145 yardas y 2 TD',
+    },
+    lideres: [
+      {
+        temporada: 'Equipados - Bárbaros vs Templarios',
+        tipo: 'pase',
+        jugadores: [
+          { pos: 1, nombre: 'Ángel Ávila', equipo: 'BAR', com: 10, pas: 13, pct: 71, yds: 44, td: 1, int: 0 },
+          { pos: 2, nombre: 'Agustín Luporini', equipo: 'TEM', com: 12, pas: 28, pct: 42, yds: 167, td: 2, int: 3 },
+        ],
+      },
+      {
+        temporada: 'Equipados - Bárbaros vs Templarios',
+        tipo: 'corrida',
+        jugadores: [
+          { pos: 1, nombre: 'Leandro Cattaneo', equipo: 'BAR', int: 6, yds: 145, prom: 24.1, td: 2 },
+          { pos: 2, nombre: 'Ángel Ávila', equipo: 'BAR', int: 4, yds: 83, prom: 20.7, td: 1 },
+          { pos: 3, nombre: 'Nicolás Iglesia', equipo: 'TEM', int: 7, yds: 29, prom: 4.1, td: 0 },
+          { pos: 4, nombre: 'Rubén Gabotto', equipo: 'TEM', int: 2, yds: 19, prom: 9.5, td: 1 },
+        ],
+      },
+      {
+        temporada: 'Equipados - Bárbaros vs Templarios',
+        tipo: 'recepcion',
+        jugadores: [
+          { pos: 1, nombre: 'Ignacio Ríos', equipo: 'TEM', rec: 4, yds: 75, prom: 18.7, td: 1 },
+          { pos: 2, nombre: 'Ricardo De Fiore', equipo: 'TEM', rec: 2, yds: 28, prom: 14, td: 0 },
+          { pos: 3, nombre: 'Nicolás Iglesia', equipo: 'TEM', rec: 2, yds: 23, prom: 11.5, td: 1 },
+          { pos: 4, nombre: 'Matías Rojo', equipo: 'BAR', rec: 2, yds: 20, prom: 10, td: 0 },
+          { pos: 5, nombre: 'Julián Fernández', equipo: 'BAR', rec: 2, yds: 19, prom: 9.5, td: 1 },
+          { pos: 6, nombre: 'Rubén Gabotto', equipo: 'TEM', rec: 2, yds: 19, prom: 9.5, td: 0 },
+          { pos: 7, nombre: 'Gerónimo Ferreyra', equipo: 'TEM', rec: 1, yds: 18, prom: 18, td: 0 },
+          { pos: 8, nombre: 'Íñaki Irurzun', equipo: 'BAR', rec: 1, yds: 5, prom: 5, td: 0 },
+          { pos: 9, nombre: 'Renzo Amado', equipo: 'TEM', rec: 1, yds: 4, prom: 4, td: 0 },
+        ],
+      },
+      {
+        temporada: 'Equipados - Bárbaros vs Templarios',
+        tipo: 'intercepciones',
+        jugadores: [
+          { pos: 1, nombre: 'Matías Rojo', equipo: 'BAR', ints: 3 },
+        ],
+      },
+      {
+        temporada: 'Equipados - Bárbaros vs Templarios',
+        tipo: 'tackles',
+        jugadores: [
+          { pos: 1, nombre: 'Íñaki Irurzun', equipo: 'BAR', tackles: 5 },
+          { pos: 2, nombre: 'Julián Fernández', equipo: 'BAR', tackles: 4 },
+          { pos: 3, nombre: 'Ignacio Ríos', equipo: 'TEM', tackles: 3 },
+          { pos: 4, nombre: 'Gabriel Rodríguez', equipo: 'BAR', tackles: 2.5 },
+          { pos: 5, nombre: 'Leandro Cattaneo', equipo: 'BAR', tackles: 2.5 },
+          { pos: 6, nombre: 'Rubén Gabotto', equipo: 'TEM', tackles: 2 },
+          { pos: 7, nombre: 'Matías Rojo', equipo: 'BAR', tackles: 2 },
+          { pos: 8, nombre: 'Ian Correa', equipo: 'BAR', tackles: 2 },
+          { pos: 9, nombre: 'Ángel Ávila', equipo: 'BAR', tackles: 1 },
+          { pos: 10, nombre: 'Ricardo De Fiore', equipo: 'TEM', tackles: 1 },
+        ],
+      },
+    ],
+  },
+];
 
 export function fallbackLideresByTemporada(temporada) {
   return FALLBACK_LIDERES.filter(l => l.temporada === temporada);
