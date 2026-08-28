@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
+import TeamStars from '../components/TeamStars';
 import { FALLBACK_PLAYERS, mergePlayers, playersForTeam } from '../data/players.js';
 import { FALLBACK_TEAMS, mergeTeams } from '../data/teams.js';
 import { teamLogoSrc, teamSlug } from '../utils/teamLogo.js';
@@ -40,6 +41,9 @@ function TeamCard({ team, players = [] }) {
           </div>
         )}
         <h3 className="text-xl font-extrabold text-white mt-4">{team.nombre}</h3>
+        <div className="mt-2 min-h-10">
+          <TeamStars campeonatos={team.campeonatos || []} compact />
+        </div>
         {players.length > 0 && (
           <div className="w-full mt-5 border-t border-accent/10 pt-4">
             <div className="flex items-center justify-between text-xs uppercase tracking-wide">

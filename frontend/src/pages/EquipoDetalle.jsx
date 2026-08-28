@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import api from '../api';
+import TeamStars from '../components/TeamStars';
 import { FALLBACK_PLAYERS, mergePlayers, playersForTeam } from '../data/players.js';
 import { FALLBACK_TEAMS } from '../data/teams.js';
 import { teamLogoSrc, teamSlug } from '../utils/teamLogo.js';
@@ -98,6 +99,9 @@ export default function EquipoDetalle() {
                 </span>
               )}
             </div>
+            <div className="mt-5 flex md:justify-start justify-center">
+              <TeamStars campeonatos={team.campeonatos || []} />
+            </div>
           </div>
         </div>
       </section>
@@ -169,6 +173,12 @@ export default function EquipoDetalle() {
                 <div>
                   <dt className="text-white/30 text-xs uppercase">Jugadores</dt>
                   <dd className="text-white font-medium mt-0.5">{roster.length}</dd>
+                </div>
+              )}
+              {team.campeonatos?.length > 0 && (
+                <div>
+                  <dt className="text-white/30 text-xs uppercase">Campeonatos</dt>
+                  <dd className="text-white font-medium mt-0.5">{team.campeonatos.join(', ')}</dd>
                 </div>
               )}
             </dl>
