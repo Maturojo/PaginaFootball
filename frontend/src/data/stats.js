@@ -438,6 +438,17 @@ export const FALLBACK_STATS = [
       { equipo: 'Acorazados', PJ: 6, PG: 1, PP: 5, PF: 91, PC: 140, Pts: 3 },
     ],
   },
+  {
+    _id: 'posiciones-tazon-del-mar-iv',
+    temporada: 'Tazón del Mar IV',
+    categoria: 'Liga Football Flag',
+    descripcion: 'Posiciones finales - FAMDQ',
+    tabla: [
+      { equipo: 'Tridentes', PJ: 8, PG: 6, PP: 2, PF: 189, PC: 145, Pts: 18 },
+      { equipo: 'Krakens', PJ: 8, PG: 5, PP: 3, PF: 207, PC: 105, Pts: 15 },
+      { equipo: 'Acorazados', PJ: 8, PG: 1, PP: 7, PF: 106, PC: 241, Pts: 3 },
+    ],
+  },
 ];
 
 export const FALLBACK_LIDERES = [
@@ -1255,6 +1266,69 @@ export const FALLBACK_LIDERES = [
       { pos: 1, nombre: 'Ignacio Cuesta', equipo: 'LIE', tackles: 11 },
       { pos: 2, nombre: 'Raúl Montenegro', equipo: 'LIE', tackles: 8 },
       { pos: 3, nombre: 'Elvis Rodríguez', equipo: 'ACO', tackles: 7 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar IV',
+    tipo: 'touchdowns',
+    jugadores: [
+      { pos: 1, nombre: 'Joaquín Gainza', equipo: 'TRI', td: 9 },
+      { pos: 2, nombre: 'Lucas Gabotto', equipo: 'KRA', td: 8 },
+      { pos: 3, nombre: 'Matías Rojo', equipo: 'ACO', td: 7 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar IV',
+    tipo: 'pase',
+    jugadores: [
+      { pos: 1, nombre: 'Agustín Luporini', equipo: 'TRI', yds: 1857 },
+      { pos: 2, nombre: 'Jano Bisonni', equipo: 'KRA', yds: 1180 },
+      { pos: 3, nombre: 'Elvis Rodríguez', equipo: 'ACO', yds: 1104 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar IV',
+    tipo: 'corrida',
+    jugadores: [
+      { pos: 1, nombre: 'Joaquín Gainza', equipo: 'TRI', yds: 156 },
+      { pos: 2, nombre: 'Jano Bisonni', equipo: 'KRA', yds: 125 },
+      { pos: 3, nombre: 'Elvis Rodríguez', equipo: 'ACO', yds: 119 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar IV',
+    tipo: 'recepcion',
+    jugadores: [
+      { pos: 1, nombre: 'Joaquín Gainza', equipo: 'TRI', yds: 459 },
+      { pos: 2, nombre: 'Lucas Gabotto', equipo: 'KRA', yds: 436 },
+      { pos: 3, nombre: 'Matías Rojo', equipo: 'ACO', yds: 821 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar IV',
+    tipo: 'intercepciones',
+    jugadores: [
+      { pos: 1, nombre: 'Lucas Ringa', equipo: 'KRA', ints: 12 },
+      { pos: 2, nombre: 'Ignacio Cuesta', equipo: 'TRI', ints: 7 },
+      { pos: 3, nombre: 'Elvis Rodríguez', equipo: 'ACO', ints: 1 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar IV',
+    tipo: 'tackles',
+    jugadores: [
+      { pos: 1, nombre: 'Ignacio Cuesta', equipo: 'TRI', tackles: 29 },
+      { pos: 2, nombre: 'Lautaro Muñera', equipo: 'KRA', tackles: 28 },
+      { pos: 3, nombre: 'Elvis Rodríguez', equipo: 'ACO', tackles: 19 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar IV',
+    tipo: 'sacks',
+    jugadores: [
+      { pos: 1, nombre: 'Lucio Leguizamón y Lautaro Muñera', equipo: 'KRA', sacks: 7, safety: 0 },
+      { pos: 2, nombre: 'Daniel Montes', equipo: 'ACO', sacks: 5, safety: 0 },
+      { pos: 3, nombre: 'Lucas Yuntunen', equipo: 'TRI', sacks: 4, safety: 0 },
     ],
   },
   {
