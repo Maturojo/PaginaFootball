@@ -1365,6 +1365,38 @@ export const FALLBACK_LIDERES = [
     ],
   },
   {
+    temporada: 'Tazón del Mar III',
+    tipo: 'premios',
+    jugadores: [
+      { premio: 'MVP — Jugador Más Valioso', jugador: 'Lucas Gabotto', numero: 16, equipo: 'ACO' },
+      { premio: 'JOF — Jugador Ofensivo', jugador: 'Lucas Gabotto', numero: 16, equipo: 'ACO' },
+      { premio: 'JD — Jugador Defensivo', jugador: 'Julián Fernández', numero: 53, equipo: 'KRA' },
+      { premio: 'JEV — Jugador Evolución', jugador: 'Matías Rojo', numero: 1, equipo: 'TRI' },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar III',
+    tipo: 'equipo-ofensivo',
+    jugadores: [
+      { pos: 1, nombre: 'Lucas Gabotto', numero: 16, equipo: 'ACO', votos: 15 },
+      { pos: 2, nombre: 'Joaquín Gainza', numero: 22, equipo: 'TRI', votos: 14 },
+      { pos: 3, nombre: 'Luca Ringa', numero: 41, equipo: 'KRA', votos: 12 },
+      { pos: 4, nombre: 'Javier Papagni', numero: 8, equipo: 'TRI', votos: 8 },
+      { pos: 5, nombre: 'Julián Fernández', numero: 53, equipo: 'KRA', votos: 7 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar III',
+    tipo: 'equipo-defensivo',
+    jugadores: [
+      { pos: 1, nombre: 'Lucas Gabotto', numero: 16, equipo: 'ACO', votos: 13 },
+      { pos: 2, nombre: 'Iván Leguizamón', numero: 3, equipo: 'ACO', votos: 12 },
+      { pos: 3, nombre: 'Jano Bisonni', numero: 23, equipo: 'ACO', votos: 11 },
+      { pos: 4, nombre: 'Luca Ringa', numero: 41, equipo: 'KRA', votos: 10 },
+      { pos: 5, nombre: 'Julián Fernández', numero: 53, equipo: 'KRA', votos: 9 },
+    ],
+  },
+  {
     temporada: 'Tazón del Mar VIII',
     tipo: 'equipo-ofensivo',
     jugadores: [
