@@ -20,10 +20,11 @@ const TIPOS = {
   corrida:       { label: 'Corrida',        cols: ['AC','YDS','PROM','TD'],            keys: ['int','yds','prom','td'] },
   recepcion:     { label: 'Recepción',      cols: ['REC','YDS','PROM','TD'],           keys: ['rec','yds','prom','td'] },
   flags:         { label: 'Flageos',        cols: ['FLAGS'],                           keys: ['flags'] },
-  intercepciones:{ label: 'Intercepciones', cols: ['INTS'],                            keys: ['ints'] },
+  intercepciones:{ label: 'Intercepciones', cols: ['INTS','PICK SIX'],                 keys: ['ints','pickSix'] },
   sacks:         { label: 'Sacks',          cols: ['SACKS','SAFETY'],                  keys: ['sacks','safety'] },
   deflecciones:  { label: 'Deflecciones',   cols: ['DEFLEC'],                          keys: ['deflec'] },
   tackles:       { label: 'Tackles',        cols: ['TACKLES'],                         keys: ['tackles'] },
+  fumbles:       { label: 'Fumbles',        cols: ['FF','FR'],                         keys: ['forzado','recuperado'] },
 };
 
 const PREMIOS_ICONS = {
@@ -137,6 +138,59 @@ function buildEquipoIdealRanking(tipo) {
     .sort((a, b) => b.count - a.count || a.nombre.localeCompare(b.nombre))
     .slice(0, 10)
     .map((player, index) => ({ ...player, pos: index + 1 }));
+}
+
+function buildEquipadosHistoricos() {
+  const categorias = [
+    { key: 'tdPasados', titulo: 'TD pasados', abreviatura: 'TD', tipo: 'pase', stat: 'td' },
+    { key: 'tdCorridos', titulo: 'TD corridos', abreviatura: 'TD', tipo: 'corrida', stat: 'td' },
+    { key: 'tdRecibidos', titulo: 'TD recibidos', abreviatura: 'TD', tipo: 'recepcion', stat: 'td' },
+    { key: 'yardasPasando', titulo: 'Yardas pasando', abreviatura: 'YDS', tipo: 'pase', stat: 'yds' },
+    { key: 'yardasCorriendo', titulo: 'Yardas corriendo', abreviatura: 'YDS', tipo: 'corrida', stat: 'yds' },
+    { key: 'yardasRecibiendo', titulo: 'Yardas recibiendo', abreviatura: 'YDS', tipo: 'recepcion', stat: 'yds' },
+    { key: 'intercepciones', titulo: 'Intercepciones', abreviatura: 'INT', tipo: 'intercepciones', stat: 'ints' },
+    { key: 'tackles', titulo: 'Tackles', abreviatura: 'TCK', tipo: 'tackles', stat: 'tackles' },
+    { key: 'fumblesForzados', titulo: 'Fumbles forzados', abreviatura: 'FF', tipo: 'fumbles', stat: 'forzado' },
+    { key: 'fumblesRecuperados', titulo: 'Fumbles recuperados', abreviatura: 'FR', tipo: 'fumbles', stat: 'recuperado' },
+  ];
+
+  const lideres = FALLBACK_EQUIPADOS.flatMap(partido => partido.lideres || []);
+
+  return categorias
+    .map(categoria => {
+      const jugadores = new Map();
+
+      lideres
+        .filter(lider => lider.tipo === categoria.tipo)
+        .forEach(lider => {
+          lider.jugadores.forEach(jugador => {
+            const valor = Number(jugador[categoria.stat]) || 0;
+            const key = normalizeName(jugador.nombre);
+            if (!key || valor <= 0) return;
+
+            const current = jugadores.get(key) || {
+              nombre: jugador.nombre,
+              equipo: jugador.equipo,
+              partidos: 0,
+              valor: 0,
+            };
+
+            current.valor += valor;
+            current.partidos += 1;
+            current.equipo = jugador.equipo || current.equipo;
+            jugadores.set(key, current);
+          });
+        });
+
+      return {
+        ...categoria,
+        jugadores: [...jugadores.values()]
+          .sort((a, b) => b.valor - a.valor || a.nombre.localeCompare(b.nombre))
+          .slice(0, 10)
+          .map((jugador, index) => ({ ...jugador, pos: index + 1 })),
+      };
+    })
+    .filter(categoria => categoria.jugadores.length > 0);
 }
 
 function CampeonTemporada({ temporada }) {
@@ -273,7 +327,8 @@ function TablaLideres({ lideres }) {
 }
 
 function EquipadosSection() {
-  const partido = FALLBACK_EQUIPADOS[0];
+  const [partidoActivo, setPartidoActivo] = useState(FALLBACK_EQUIPADOS[0]?.id || '');
+  const partido = FALLBACK_EQUIPADOS.find(item => item.id === partidoActivo) || FALLBACK_EQUIPADOS[0];
 
   if (!partido) {
     return (
@@ -285,10 +340,29 @@ function EquipadosSection() {
 
   return (
     <div className="space-y-6">
+      {FALLBACK_EQUIPADOS.length > 1 && (
+        <div className="flex flex-wrap gap-2 justify-center">
+          {FALLBACK_EQUIPADOS.map(item => (
+            <button
+              key={item.id}
+              onClick={() => setPartidoActivo(item.id)}
+              className={`px-4 py-1.5 rounded-lg text-sm font-bold transition ${
+                partido.id === item.id
+                  ? 'bg-accent text-white'
+                  : 'bg-secondary border border-accent/20 text-white/60 hover:text-white'
+              }`}
+            >
+              {item.resultado.fecha} · {item.resultado.local} {item.resultado.puntosLocal}-{item.resultado.puntosVisitante} {item.resultado.visitante}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="bg-secondary border border-accent/20 rounded-xl overflow-hidden">
         <div className="px-6 py-4 border-b border-accent/10">
           <p className="text-xs text-accent/60 uppercase tracking-widest font-bold">{partido.categoria}</p>
           <h2 className="text-2xl font-extrabold text-white mt-1">{partido.titulo}</h2>
+          {partido.resultado.fecha && <p className="text-white/40 text-sm mt-1">{partido.resultado.fecha}</p>}
         </div>
         <div className="p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
           <div className="flex items-center justify-center gap-4 text-center">
@@ -386,8 +460,10 @@ function TablaPremios({ lideres }) {
   );
 }
 
-function TablaHistoricos() {
-  const temporadasHistoricas = ordenarTemporadasDesc([...new Set(
+function TablaHistoricos({ deporte = 'flag' }) {
+  const esEquipados = deporte === 'equipados';
+  const historicos = esEquipados ? buildEquipadosHistoricos() : FALLBACK_HISTORICOS;
+  const temporadasHistoricas = esEquipados ? [] : ordenarTemporadasDesc([...new Set(
     FALLBACK_LIDERES
       .filter(l => !l.temporada.includes('Final') && !l.temporada.includes('Semi'))
       .map(l => l.temporada)
@@ -413,10 +489,12 @@ function TablaHistoricos() {
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {FALLBACK_HISTORICOS.map(categoria => (
+        {historicos.map(categoria => (
           <div key={categoria.key} className="bg-secondary border border-accent/20 rounded-xl overflow-hidden">
             <div className="px-5 py-4 border-b border-accent/10">
-              <p className="text-xs text-accent/60 uppercase tracking-widest font-bold">Líderes históricos</p>
+              <p className="text-xs text-accent/60 uppercase tracking-widest font-bold">
+                Líderes históricos {esEquipados ? 'equipados' : 'flag'}
+              </p>
               <h2 className="text-xl font-extrabold text-white mt-1">{categoria.titulo}</h2>
             </div>
             <div className="divide-y divide-white/5">
@@ -449,7 +527,7 @@ function TablaHistoricos() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {!esEquipados && <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {premiosHistoricos.map(premio => (
           <div key={premio.codigo} className="bg-secondary border border-accent/20 rounded-xl overflow-hidden">
             <div className="px-5 py-4 border-b border-accent/10">
@@ -477,9 +555,9 @@ function TablaHistoricos() {
             </div>
           </div>
         ))}
-      </div>
+      </div>}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {!esEquipados && <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {equiposIdealesRanking.map(({ key, titulo, icon, jugadores }) => (
           <div key={key} className="bg-secondary border border-accent/20 rounded-xl overflow-hidden">
             <div className="px-5 py-4 border-b border-accent/10">
@@ -515,17 +593,24 @@ function TablaHistoricos() {
             </div>
           </div>
         ))}
-      </div>
+      </div>}
     </div>
   );
 }
 
-function PremiosSection() {
+function PremiosSection({ deporte = 'flag' }) {
   const [lideresPremios, setLideresPremios] = useState([]);
   const [temporadas, setTemporadas] = useState([]);
   const [temporadaActiva, setTemporadaActiva] = useState('');
 
   useEffect(() => {
+    if (deporte === 'equipados') {
+      setTemporadas([]);
+      setTemporadaActiva('');
+      setLideresPremios([]);
+      return;
+    }
+
     api.get('/lideres/temporadas').then(r => {
       // Solo temporadas que tienen premios (no las de partidos individuales)
       const temporadas = r.data?.length ? mergeFallbackTemporadas(r.data) : FALLBACK_TEMPORADAS;
@@ -537,15 +622,23 @@ function PremiosSection() {
       setTemporadas(principales);
       if (principales.length > 0) setTemporadaActiva(principales[0]);
     });
-  }, []);
+  }, [deporte]);
 
   useEffect(() => {
-    if (temporadaActiva) {
+    if (deporte === 'flag' && temporadaActiva) {
       api.get(`/lideres?temporada=${encodeURIComponent(temporadaActiva)}`)
         .then(r => setLideresPremios(r.data?.length ? mergeFallbackLideres(r.data, temporadaActiva) : fallbackLideresByTemporada(temporadaActiva)))
         .catch(() => setLideresPremios(fallbackLideresByTemporada(temporadaActiva)));
     }
-  }, [temporadaActiva]);
+  }, [deporte, temporadaActiva]);
+
+  if (deporte === 'equipados') {
+    return (
+      <p className="text-center text-white/40 bg-secondary border border-accent/20 rounded-xl px-6 py-10">
+        Todavía no hay premios cargados para equipados.
+      </p>
+    );
+  }
 
   if (temporadas.length === 0) return <p className="text-center text-white/40">No hay premios cargados aún.</p>;
 
@@ -574,7 +667,10 @@ export default function Estadisticas() {
   const [lideres, setLideres] = useState([]);
   const [temporadas, setTemporadas] = useState([]);
   const [temporadaActiva, setTemporadaActiva] = useState('');
-  const [seccion, setSeccion] = useState(searchParams.get('seccion') || 'premios');
+  const initialSeccion = searchParams.get('seccion') === 'equipados' ? 'lideres' : (searchParams.get('seccion') || 'premios');
+  const initialDeporte = searchParams.get('deporte') || (searchParams.get('seccion') === 'equipados' ? 'equipados' : 'flag');
+  const [seccion, setSeccion] = useState(initialSeccion);
+  const [deporte, setDeporte] = useState(initialDeporte === 'equipados' ? 'equipados' : 'flag');
   const [loading, setLoading] = useState(true);
   const [activaStat, setActivaStat] = useState(0);
   const temporadasConLideres = temporadas.filter(temporada =>
@@ -616,10 +712,10 @@ export default function Estadisticas() {
   }, [temporadaActiva]);
 
   useEffect(() => {
-    if (seccion === 'lideres' && temporadasLideresOrdenadas.length > 0 && !temporadasLideresOrdenadas.includes(temporadaActiva)) {
+    if (deporte === 'flag' && seccion === 'lideres' && temporadasLideresOrdenadas.length > 0 && !temporadasLideresOrdenadas.includes(temporadaActiva)) {
       setTemporadaActiva(temporadasLideresOrdenadas[0]);
     }
-  }, [seccion, temporadaActiva, temporadasLideresOrdenadas]);
+  }, [deporte, seccion, temporadaActiva, temporadasLideresOrdenadas]);
 
   const renderTemporadaButtons = (label, items) => items.length > 0 && (
     <div className="flex flex-col sm:flex-row sm:items-center gap-2">
@@ -653,7 +749,7 @@ export default function Estadisticas() {
           <>
             {/* Selector sección */}
             <div className="flex flex-wrap gap-3 mb-8 justify-center">
-              {[['premios','🏅 Premios'], ['lideres','📈 Líderes'], ['equipados','🏟️ Equipados'], ['historicos','🏛️ Históricos'], ['posiciones','📊 Posiciones']].map(([v, l]) => (
+              {[['premios','🏅 Premios'], ['lideres','📈 Líderes'], ['historicos','🏛️ Históricos'], ['posiciones','📊 Estadísticas']].map(([v, l]) => (
                 <button key={v} onClick={() => setSeccion(v)}
                   className={`px-6 py-2 rounded-lg font-bold transition ${seccion === v ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/60 hover:text-white'}`}>
                   {l}
@@ -661,13 +757,31 @@ export default function Estadisticas() {
               ))}
             </div>
 
+            <div className="flex bg-secondary border border-accent/20 rounded-xl p-1 mb-8 w-fit mx-auto">
+              {[['flag', 'Flag'], ['equipados', 'Equipados']].map(([value, label]) => (
+                <button
+                  key={value}
+                  onClick={() => setDeporte(value)}
+                  className={`px-6 py-2 rounded-lg text-sm font-extrabold transition ${
+                    deporte === value ? 'bg-accent text-white' : 'text-white/50 hover:text-white'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
             {/* PREMIOS */}
             {seccion === 'premios' && (
-              <PremiosSection />
+              <PremiosSection deporte={deporte} />
             )}
 
             {/* LÍDERES */}
-            {seccion === 'lideres' && (
+            {seccion === 'lideres' && deporte === 'equipados' && (
+              <EquipadosSection />
+            )}
+
+            {seccion === 'lideres' && deporte === 'flag' && (
               <>
                 {temporadasLideresOrdenadas.length === 0 && <p className="text-center text-white/40">No hay líderes cargados aún.</p>}
                 {temporadasLideresOrdenadas.length > 0 && (
@@ -690,18 +804,17 @@ export default function Estadisticas() {
               </>
             )}
 
-            {/* EQUIPADOS */}
-            {seccion === 'equipados' && (
-              <EquipadosSection />
-            )}
-
             {/* HISTÓRICOS */}
             {seccion === 'historicos' && (
-              <TablaHistoricos />
+              <TablaHistoricos deporte={deporte} />
             )}
 
             {/* POSICIONES */}
-            {seccion === 'posiciones' && (
+            {seccion === 'posiciones' && deporte === 'equipados' && (
+              <EquipadosSection />
+            )}
+
+            {seccion === 'posiciones' && deporte === 'flag' && (
               <>
                 {stats.length === 0 && <p className="text-center text-white/40">No hay tablas de posiciones cargadas aún.</p>}
                 {stats.length > 0 && (

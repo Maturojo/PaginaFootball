@@ -17,9 +17,23 @@ function dateLabel(partido) {
   return partido.fechaTexto || new Date(partido.fecha).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' });
 }
 
+function isOldEquipadosMatch(partido) {
+  const fecha = String(partido.fecha || '').slice(0, 10);
+  const equipos = [partido.equipoLocal, partido.equipoVisitante].map(e => String(e || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, ''));
+
+  return partido.categoria === 'Football Americano 7vs7'
+    && fecha === '2026-06-06'
+    && equipos.includes('templarios')
+    && equipos.includes('barbaros');
+}
+
 function mergePartidos(apiPartidos = []) {
-  const ids = new Set(apiPartidos.map(partido => partido._id));
-  return [...apiPartidos, ...FALLBACK_PARTIDOS.filter(partido => !ids.has(partido._id))];
+  const visibles = apiPartidos.filter(partido => !isOldEquipadosMatch(partido));
+  const ids = new Set(visibles.map(partido => partido._id));
+  return [...visibles, ...FALLBACK_PARTIDOS.filter(partido => !ids.has(partido._id))];
 }
 
 function SectionTitle({ children, count }) {
@@ -113,6 +127,16 @@ function PartidoCard({ p, logoMap }) {
               ))}
             </div>
           )}
+        </div>
+      )}
+      {finalizado && p.categoria === 'Football Americano 7vs7' && (
+        <div className="mt-3 pt-3 border-t border-white/5 text-center">
+          <Link
+            to="/estadisticas?seccion=lideres&deporte=equipados"
+            className="inline-flex items-center gap-2 text-xs font-bold text-accent hover:text-accent-light transition border border-accent/30 hover:border-accent px-4 py-1.5 rounded-full"
+          >
+            📊 Ver estadísticas de equipados
+          </Link>
         </div>
       )}
       {p.jornada?.includes('Final') && !p.jornada?.includes('Semi') && (

@@ -54,11 +54,29 @@ export const FALLBACK_PARTIDOS = [
     _id: 'atlantes-2026-barbaros-templarios-1',
     jornada: 'Football Equipado - Competencia local',
     categoria: 'Football Americano 7vs7',
+    equipoLocal: 'Templarios',
+    equipoVisitante: 'Bárbaros',
+    fecha: '2026-04-25',
+    estado: 'finalizado',
+    golesLocal: 20,
+    golesVisitante: 19,
+    mvp: 'Matías Rojo',
+    lugar: 'Mar del Plata',
+    notas: 'Resultado final equipado\nTemplarios 20 - 19 Bárbaros',
+  },
+  {
+    _id: 'atlantes-2026-barbaros-templarios-resultado-2',
+    jornada: 'Football Equipado - Competencia local',
+    categoria: 'Football Americano 7vs7',
     equipoLocal: 'Bárbaros',
     equipoVisitante: 'Templarios',
-    fecha: '2026-09-26',
-    estado: 'programado',
-    lugar: 'Mar del Plata',
+    fecha: '2026-06-06',
+    estado: 'finalizado',
+    golesLocal: 46,
+    golesVisitante: 19,
+    mvp: 'Leandro Cattaneo',
+    lugar: 'Base Naval',
+    notas: 'Resultado final equipado\nLeandro Cattaneo: 6 acarreos, 145 yardas y 2 TD',
   },
   {
     _id: 'flag-masculino-2026-fecha-4',
@@ -2160,10 +2178,97 @@ export const FALLBACK_TEMPORADAS = [...new Set(FALLBACK_LIDERES.map(l => l.tempo
 
 export const FALLBACK_EQUIPADOS = [
   {
-    id: 'barbaros-templarios-2026',
+    id: 'templarios-barbaros-2026-04-25',
     titulo: 'Bárbaros vs Templarios',
     categoria: 'Football Americano 7vs7',
     resultado: {
+      fecha: '25/04',
+      local: 'Templarios',
+      visitante: 'Bárbaros',
+      puntosLocal: 20,
+      puntosVisitante: 19,
+      ganador: 'Templarios',
+      destacado: 'Matías Rojo',
+      resumenDestacado: '8 recepciones, 95 yardas, 1 TD por tierra y 1 INT',
+    },
+    lideres: [
+      {
+        temporada: 'Equipados - 25/04 - Bárbaros vs Templarios',
+        tipo: 'pase',
+        jugadores: [
+          { pos: 1, nombre: 'Ángel Ávila', equipo: 'BAR', com: 10, pas: 13, pct: 77, yds: 127, td: 1, int: 1 },
+          { pos: 2, nombre: 'Lucas Gabotto', equipo: 'TEM', com: 11, pas: 17, pct: 65, yds: 110, td: 2, int: 2 },
+        ],
+      },
+      {
+        temporada: 'Equipados - 25/04 - Bárbaros vs Templarios',
+        tipo: 'corrida',
+        jugadores: [
+          { pos: 1, nombre: 'Lucas Gabotto', equipo: 'TEM', int: 6, yds: 95, prom: 15.8, td: 1 },
+          { pos: 2, nombre: 'Ángel Ávila', equipo: 'BAR', int: 3, yds: 44, prom: 14.6, td: 0 },
+          { pos: 3, nombre: 'Matías Rojo', equipo: 'BAR', int: 4, yds: 40, prom: 10, td: 1 },
+          { pos: 4, nombre: 'Elvis Rodríguez', equipo: 'TEM', int: 3, yds: 30, prom: 10, td: 0 },
+          { pos: 5, nombre: 'Raúl Montenegro', equipo: 'TEM', int: 2, yds: 29, prom: 14.5, td: 0 },
+          { pos: 6, nombre: 'Daniel Montes', equipo: 'BAR', int: 3, yds: 20, prom: 6.6, td: 0 },
+          { pos: 7, nombre: 'Leandro Cattaneo', equipo: 'BAR', int: 1, yds: 15, prom: 15, td: 0 },
+          { pos: 8, nombre: 'Nicolás Iglesia', equipo: 'TEM', int: 2, yds: 10, prom: 5, td: 0 },
+        ],
+      },
+      {
+        temporada: 'Equipados - 25/04 - Bárbaros vs Templarios',
+        tipo: 'recepcion',
+        jugadores: [
+          { pos: 1, nombre: 'Matías Rojo', equipo: 'BAR', rec: 8, yds: 95, prom: 10.9, td: 0 },
+          { pos: 2, nombre: 'Leandro Cattaneo', equipo: 'BAR', rec: 2, yds: 40, prom: 20, td: 1 },
+          { pos: 3, nombre: 'Elvis Rodríguez', equipo: 'TEM', rec: 3, yds: 33, prom: 11, td: 1 },
+          { pos: 4, nombre: 'Julián Fernández', equipo: 'TEM', rec: 3, yds: 31, prom: 10.3, td: 0 },
+          { pos: 5, nombre: 'Ricardo De Fiore', equipo: 'TEM', rec: 2, yds: 19, prom: 9.5, td: 0 },
+          { pos: 6, nombre: 'Rubén Gabotto', equipo: 'TEM', rec: 2, yds: 15, prom: 7.5, td: 0 },
+          { pos: 7, nombre: 'Renzo Amado', equipo: 'TEM', rec: 1, yds: 12, prom: 12, td: 0 },
+        ],
+      },
+      {
+        temporada: 'Equipados - 25/04 - Bárbaros vs Templarios',
+        tipo: 'intercepciones',
+        jugadores: [
+          { pos: 1, nombre: 'Íñaki Irurzun', equipo: 'BAR', ints: 1, pickSix: 1 },
+          { pos: 2, nombre: 'Matías Rojo', equipo: 'BAR', ints: 1, pickSix: 0 },
+          { pos: 3, nombre: 'Lucas Gabotto', equipo: 'TEM', ints: 1, pickSix: 0 },
+        ],
+      },
+      {
+        temporada: 'Equipados - 25/04 - Bárbaros vs Templarios',
+        tipo: 'fumbles',
+        jugadores: [
+          { pos: 1, nombre: 'Raúl Montenegro', equipo: 'TEM', forzado: 1, recuperado: 0 },
+          { pos: 2, nombre: 'Lucas Gabotto', equipo: 'TEM', forzado: 0, recuperado: 1 },
+        ],
+      },
+      {
+        temporada: 'Equipados - 25/04 - Bárbaros vs Templarios',
+        tipo: 'tackles',
+        jugadores: [
+          { pos: 1, nombre: 'Íñaki Irurzun', equipo: 'BAR', tackles: 4 },
+          { pos: 2, nombre: 'Rubén Gabotto', equipo: 'TEM', tackles: 4 },
+          { pos: 3, nombre: 'Elvis Rodríguez', equipo: 'TEM', tackles: 4 },
+          { pos: 4, nombre: 'Daniel Montes', equipo: 'BAR', tackles: 3 },
+          { pos: 5, nombre: 'Leandro Cattaneo', equipo: 'BAR', tackles: 3 },
+          { pos: 6, nombre: 'Julián Fernández', equipo: 'TEM', tackles: 2.5 },
+          { pos: 7, nombre: 'Raúl Montenegro', equipo: 'TEM', tackles: 2.5 },
+          { pos: 8, nombre: 'Nicolás Iglesia', equipo: 'TEM', tackles: 1 },
+          { pos: 9, nombre: 'Ángel Ávila', equipo: 'BAR', tackles: 1 },
+          { pos: 10, nombre: 'Ian Correa', equipo: 'BAR', tackles: 1 },
+          { pos: 11, nombre: 'Santiago Antuña', equipo: 'BAR', tackles: 1 },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'barbaros-templarios-2026-06-06',
+    titulo: 'Bárbaros vs Templarios',
+    categoria: 'Football Americano 7vs7',
+    resultado: {
+      fecha: '06/06',
       local: 'Bárbaros',
       visitante: 'Templarios',
       puntosLocal: 46,
@@ -2174,7 +2279,7 @@ export const FALLBACK_EQUIPADOS = [
     },
     lideres: [
       {
-        temporada: 'Equipados - Bárbaros vs Templarios',
+        temporada: 'Equipados - 06/06 - Bárbaros vs Templarios',
         tipo: 'pase',
         jugadores: [
           { pos: 1, nombre: 'Ángel Ávila', equipo: 'BAR', com: 10, pas: 13, pct: 71, yds: 44, td: 1, int: 0 },
@@ -2182,7 +2287,7 @@ export const FALLBACK_EQUIPADOS = [
         ],
       },
       {
-        temporada: 'Equipados - Bárbaros vs Templarios',
+        temporada: 'Equipados - 06/06 - Bárbaros vs Templarios',
         tipo: 'corrida',
         jugadores: [
           { pos: 1, nombre: 'Leandro Cattaneo', equipo: 'BAR', int: 6, yds: 145, prom: 24.1, td: 2 },
@@ -2192,7 +2297,7 @@ export const FALLBACK_EQUIPADOS = [
         ],
       },
       {
-        temporada: 'Equipados - Bárbaros vs Templarios',
+        temporada: 'Equipados - 06/06 - Bárbaros vs Templarios',
         tipo: 'recepcion',
         jugadores: [
           { pos: 1, nombre: 'Ignacio Ríos', equipo: 'TEM', rec: 4, yds: 75, prom: 18.7, td: 1 },
@@ -2207,14 +2312,14 @@ export const FALLBACK_EQUIPADOS = [
         ],
       },
       {
-        temporada: 'Equipados - Bárbaros vs Templarios',
+        temporada: 'Equipados - 06/06 - Bárbaros vs Templarios',
         tipo: 'intercepciones',
         jugadores: [
-          { pos: 1, nombre: 'Matías Rojo', equipo: 'BAR', ints: 3 },
+          { pos: 1, nombre: 'Matías Rojo', equipo: 'BAR', ints: 3, pickSix: 0 },
         ],
       },
       {
-        temporada: 'Equipados - Bárbaros vs Templarios',
+        temporada: 'Equipados - 06/06 - Bárbaros vs Templarios',
         tipo: 'tackles',
         jugadores: [
           { pos: 1, nombre: 'Íñaki Irurzun', equipo: 'BAR', tackles: 5 },

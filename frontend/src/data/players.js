@@ -190,6 +190,27 @@ export const FALLBACK_PLAYERS = [
   }),
   player({ equipo: 'Liebres', numero: 21, nombre: 'Lauro Ibarra', posicion: 'C', stats: { partidos: 4, touchdowns: 0, intercepciones: 0, yardas: 65 } }),
   player({ equipo: 'Liebres', numero: 37, nombre: 'Héctor González', posicion: 'WR', stats: { partidos: 4, touchdowns: 10, intercepciones: 0, yardas: 407 } }),
+
+  player({ equipo: 'Bárbaros', numero: 3, nombre: 'Ángel Ávila', posicion: 'QB', foto: '/jugadores/angel-avila.png' }),
+  player({ equipo: 'Bárbaros', numero: 38, nombre: 'Leandro Cattaneo', posicion: 'RB' }),
+  player({ equipo: 'Bárbaros', numero: 11, nombre: 'Matías Rojo', posicion: 'Jugador', foto: '/jugadores/matias-rojo.png' }),
+  player({ equipo: 'Bárbaros', numero: 85, nombre: 'Julián Fernández', posicion: 'WR', foto: '/jugadores/julian-fernandez.png' }),
+  player({ equipo: 'Bárbaros', numero: 9, nombre: 'Elvis Rodríguez', posicion: 'WR' }),
+  player({ equipo: 'Bárbaros', numero: '00', nombre: 'Germán Romero', posicion: 'C' }),
+  player({ equipo: 'Bárbaros', numero: 79, nombre: 'Ian Correa', posicion: 'RT' }),
+  player({ equipo: 'Bárbaros', numero: 65, nombre: 'Iñaki Irurzun', posicion: 'OC' }),
+  player({ equipo: 'Bárbaros', numero: 91, nombre: 'Gabriel Rodríguez', posicion: 'DE' }),
+
+  player({ equipo: 'Templarios', numero: 19, nombre: 'Agustín Luporini', posicion: 'QB', foto: '/jugadores/agustin-luporini.png' }),
+  player({ equipo: 'Templarios', numero: 27, nombre: 'Nicolás Iglesia', posicion: 'RB' }),
+  player({ equipo: 'Templarios', numero: 16, nombre: 'Lucas Gabotto', posicion: 'WR', foto: '/jugadores/lucas-gabotto.png' }),
+  player({ equipo: 'Templarios', numero: 13, nombre: 'Emma Rodríguez', posicion: 'WR' }),
+  player({ equipo: 'Templarios', numero: 8, nombre: 'Gerónimo Ferreyra', posicion: 'WR', foto: '/jugadores/geronimo-ferreyra.png' }),
+  player({ equipo: 'Templarios', numero: 90, nombre: 'Ricardo De Fiore', posicion: 'LT' }),
+  player({ equipo: 'Templarios', numero: 77, nombre: 'Renzo Amado', posicion: 'C', foto: '/jugadores/renzo-amado.png' }),
+  player({ equipo: 'Templarios', numero: 69, nombre: 'Gabriel Sosa', posicion: 'C', foto: '/jugadores/gabriel-sosa.png' }),
+  player({ equipo: 'Templarios', numero: 94, nombre: 'Ignacio Ríos', posicion: 'RT' }),
+  player({ equipo: 'Templarios', numero: 34, nombre: 'Rubén Gabotto', posicion: 'LB' }),
 ];
 
 function normalizeKey(value) {

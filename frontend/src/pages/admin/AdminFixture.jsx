@@ -17,11 +17,25 @@ function partidoKey(partido) {
   ].map(value => String(value || '').toLowerCase()).join('|');
 }
 
+function isOldEquipadosMatch(partido) {
+  const fecha = String(partido.fecha || '').slice(0, 10);
+  const equipos = [partido.equipoLocal, partido.equipoVisitante].map(e => String(e || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, ''));
+
+  return partido.categoria === 'Football Americano 7vs7'
+    && fecha === '2026-06-06'
+    && equipos.includes('templarios')
+    && equipos.includes('barbaros');
+}
+
 function mergePartidos(apiPartidos = []) {
-  const existing = new Set(apiPartidos.map(partidoKey));
+  const visibles = apiPartidos.filter(partido => !isOldEquipadosMatch(partido));
+  const existing = new Set(visibles.map(partidoKey));
   const missing = FALLBACK_PARTIDOS.filter(partido => !existing.has(partidoKey(partido)))
     .map(partido => ({ ...partido, __fallback: true }));
-  return [...missing, ...apiPartidos];
+  return [...missing, ...visibles];
 }
 
 function PartidoForm({ initial, onSave, onCancel }) {
