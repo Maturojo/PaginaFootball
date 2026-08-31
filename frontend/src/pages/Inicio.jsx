@@ -16,7 +16,7 @@ const MODALIDADES = [
   {
     title: 'Football Equipado',
     desc: 'Entrenamientos con casco y hombreras para quienes quieren vivir la modalidad con contacto.',
-    image: '/hero/portada-atlantes.jpg',
+    image: '/hero/portada-equipados-accion.jpg',
     to: '/equipos',
     cta: 'Ver equipos',
   },
