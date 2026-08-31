@@ -57,17 +57,17 @@ export default function Inicio() {
   return (
     <div className="bg-primary text-white">
       {/* Hero */}
-      <section className="relative h-[68vh] min-h-[520px] max-h-[680px] px-4 overflow-hidden flex items-center">
+      <section className="relative h-[68vh] min-h-[560px] max-h-[700px] px-4 pt-24 md:pt-28 pb-10 overflow-hidden flex items-center">
         <img
           src={HERO_IMAGE}
           alt=""
           aria-hidden="true"
           className="absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: 'center 56%' }}
+          style={{ objectPosition: 'center 52%' }}
         />
-        <div className="absolute inset-0 bg-primary/45" />
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/50 via-primary/25 to-primary/80" />
-        <div className="relative max-w-4xl mx-auto text-center">
+        <div className="absolute inset-0 bg-primary/25" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/45 via-primary/15 to-primary/70" />
+        <div className="relative max-w-4xl mx-auto text-center mt-8 md:mt-12">
           <img src="/logo.png" alt="Logo Liga" className="h-36 w-36 object-contain mx-auto mb-8 drop-shadow-2xl" />
           <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-4">Est. 2016 · Mar del Plata · Argentina</p>
           <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 text-white">{data.titulo}</h1> 
