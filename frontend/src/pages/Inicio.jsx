@@ -74,24 +74,14 @@ export default function Inicio() {
       {/* Hero */}
       <section className="relative h-[72vh] min-h-[640px] max-h-[760px] px-4 pt-24 md:pt-28 pb-24 md:pb-28 overflow-hidden flex items-center">
         {HERO_SLIDES.map((slide, index) => (
-          <div
+          <img
             key={slide}
-            className={`absolute inset-0 transition-opacity duration-1000 ${heroSlide === index ? 'opacity-100' : 'opacity-0'}`}
+            src={slide}
+            alt=""
             aria-hidden="true"
-          >
-            <img
-              src={slide}
-              alt=""
-              className="absolute inset-0 h-full w-full scale-105 object-cover blur-xl"
-              style={{ objectPosition: 'center 52%' }}
-            />
-            <img
-              src={slide}
-              alt=""
-              className="absolute inset-0 h-full w-full scale-[0.92] object-cover"
-              style={{ objectPosition: 'center 52%' }}
-            />
-          </div>
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${heroSlide === index ? 'opacity-100' : 'opacity-0'}`}
+            style={{ objectPosition: 'center 52%' }}
+          />
         ))}
         <div className="absolute inset-0 bg-primary/25" />
         <div className="absolute inset-0 bg-gradient-to-b from-primary/45 via-primary/15 to-primary/70" />
