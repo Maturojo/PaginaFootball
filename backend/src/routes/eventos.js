@@ -5,6 +5,7 @@ const upload = require('../middleware/upload');
 const fileUrl = require('../middleware/fileUrl');
 
 const MAX_FOTOS_POR_PEDIDO = 50;
+const EVENTOS_SORT = { fijado: -1, orden: 1, createdAt: -1, fecha: -1 };
 
 function uploadFotos(req, res, next) {
   upload.array('fotos', MAX_FOTOS_POR_PEDIDO)(req, res, (err) => {
@@ -19,16 +20,31 @@ function uploadFotos(req, res, next) {
   });
 }
 
+function normalizeEventoData(body) {
+  const data = { ...body };
+
+  if (data.fijado !== undefined) {
+    data.fijado = data.fijado === true || data.fijado === 'true' || data.fijado === 'on';
+  }
+
+  if (data.orden !== undefined) {
+    const orden = Number(data.orden);
+    data.orden = Number.isFinite(orden) ? orden : 0;
+  }
+
+  return data;
+}
+
 router.get('/', async (req, res) => {
   try {
-    const eventos = await Evento.find({ activo: true }).sort({ fecha: -1 });
+    const eventos = await Evento.find({ activo: true }).sort(EVENTOS_SORT);
     res.json(eventos);
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
 router.get('/all', auth, async (req, res) => {
   try {
-    const eventos = await Evento.find().sort({ fecha: -1 });
+    const eventos = await Evento.find().sort(EVENTOS_SORT);
     res.json(eventos);
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
@@ -43,7 +59,7 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', auth, uploadFotos, async (req, res) => {
   try {
-    const data = { ...req.body };
+    const data = normalizeEventoData(req.body);
     if (req.files?.length) data.fotos = req.files.map(f => fileUrl(f));
     const evento = await Evento.create(data);
     res.status(201).json(evento);
@@ -55,7 +71,7 @@ router.put('/:id', auth, uploadFotos, async (req, res) => {
     const existing = await Evento.findById(req.params.id);
     if (!existing) return res.status(404).json({ message: 'No encontrado' });
 
-    const data = { ...req.body };
+    const data = normalizeEventoData(req.body);
     const nuevasFotos = req.files?.map(f => fileUrl(f)) || [];
     data.fotos = [...(existing.fotos || []), ...nuevasFotos];
     const evento = await Evento.findByIdAndUpdate(req.params.id, data, { new: true });

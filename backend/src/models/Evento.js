@@ -6,6 +6,8 @@ const eventoSchema = new mongoose.Schema({
   fecha: { type: Date, required: true },
   lugar: { type: String, default: '' },
   fotos: [{ type: String }],
+  fijado: { type: Boolean, default: false },
+  orden: { type: Number, default: 0 },
   activo: { type: Boolean, default: true },
 }, { timestamps: true });
 

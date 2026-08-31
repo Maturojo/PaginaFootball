@@ -17,11 +17,21 @@ function eventoKey(evento) {
   return `${String(evento.titulo || '').toLowerCase()}|${String(evento.fecha || '').slice(0, 10)}`;
 }
 
+function sortEventos(eventos = []) {
+  return [...eventos].sort((a, b) => {
+    if (Boolean(a.fijado) !== Boolean(b.fijado)) return Boolean(b.fijado) - Boolean(a.fijado);
+    const ordenA = Number.isFinite(Number(a.orden)) ? Number(a.orden) : 0;
+    const ordenB = Number.isFinite(Number(b.orden)) ? Number(b.orden) : 0;
+    if (ordenA !== ordenB) return ordenA - ordenB;
+    return new Date(b.createdAt || b.fecha) - new Date(a.createdAt || a.fecha);
+  });
+}
+
 function mergeEventos(apiEventos = []) {
   const existing = new Set(apiEventos.map(eventoKey));
   const missing = FALLBACK_EVENTS.filter(evento => !existing.has(eventoKey(evento)))
     .map(evento => ({ ...evento, activo: evento.activo ?? true, __fallback: true }));
-  return [...missing, ...apiEventos];
+  return sortEventos([...apiEventos, ...missing]);
 }
 
 function buildEventoForm(fields, fotos = []) {
@@ -122,10 +132,18 @@ function EventoForm({ initial, onSave, onCancel }) {
           <input {...register('lugar')} className="input" placeholder="Cancha Municipal, MDP" />
         </div>
         <div>
+          <label className="block text-sm font-medium mb-1">Orden</label>
+          <input {...register('orden')} type="number" className="input" placeholder="0" />
+        </div>
+        <div>
           <label className="block text-sm font-medium mb-1">Fotos (podés seleccionar varias)</label>
           <input {...register('fotos')} type="file" accept="image/*" multiple
             className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary file:text-white" />
         </div>
+        <label className="flex items-center gap-2 text-sm font-medium">
+          <input {...register('fijado')} type="checkbox" className="h-4 w-4 accent-primary" />
+          Fijar este evento arriba
+        </label>
         <div className="md:col-span-2">
           <label className="block text-sm font-medium mb-1">Descripción</label>
           <textarea {...register('descripcion')} className="input resize-none" rows={3} placeholder="Descripción del evento..." />
@@ -152,6 +170,36 @@ export default function AdminEventos() {
     .then(r => setEventos(mergeEventos(r.data)))
     .catch(() => setEventos(mergeEventos([])));
   useEffect(() => { load(); }, []);
+
+  const updateEvento = async (evento, changes) => {
+    if (!isMongoId(evento._id)) {
+      fallbackDeleteMessage();
+      return;
+    }
+    await api.put(`/eventos/${evento._id}`, buildEventoForm({ ...evento, ...changes }));
+    load();
+  };
+
+  const moveEvento = async (evento, direction) => {
+    if (!isMongoId(evento._id)) {
+      fallbackDeleteMessage();
+      return;
+    }
+
+    const reales = eventos.filter(e => isMongoId(e._id));
+    const currentIndex = reales.findIndex(e => e._id === evento._id);
+    const nextIndex = currentIndex + direction;
+    if (currentIndex < 0 || nextIndex < 0 || nextIndex >= reales.length) return;
+
+    const reordered = [...reales];
+    const [selected] = reordered.splice(currentIndex, 1);
+    reordered.splice(nextIndex, 0, selected);
+
+    await Promise.all(reordered.map((e, index) =>
+      api.put(`/eventos/${e._id}`, buildEventoForm({ ...e, orden: index }))
+    ));
+    load();
+  };
 
   const handleSave = async ({ fields, fotos, setStatus }) => {
     let eventoId = editing?._id;
@@ -227,7 +275,16 @@ export default function AdminEventos() {
                   {new Date(e.fecha).toLocaleDateString('es-AR')} · {e.lugar} · {e.fotos?.length || 0} fotos
                 </p>
               </div>
-              {e.__fallback && <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700">Fijo</span>}
+              {e.fijado && <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">Fijado</span>}
+              {e.__fallback && <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700">Precargado</span>}
+              <button onClick={() => updateEvento(e, { fijado: !e.fijado })}
+                className="text-gray-600 hover:text-primary text-sm px-3 py-1 rounded hover:bg-gray-50">
+                {e.fijado ? 'Desfijar' : 'Fijar'}
+              </button>
+              <button onClick={() => moveEvento(e, -1)}
+                className="text-gray-600 hover:text-primary text-sm px-2 py-1 rounded hover:bg-gray-50">↑</button>
+              <button onClick={() => moveEvento(e, 1)}
+                className="text-gray-600 hover:text-primary text-sm px-2 py-1 rounded hover:bg-gray-50">↓</button>
               <button onClick={() => setExpandido(expandido === e._id ? null : e._id)}
                 className="text-gray-400 hover:text-gray-600 text-sm px-3 py-1">
                 {expandido === e._id ? 'Cerrar ▲' : 'Ver fotos ▼'}

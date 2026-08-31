@@ -10,10 +10,19 @@ function fotoSrc(f) {
   return f.startsWith('http') ? f : `${API_URL}${f}`;
 }
 
+function sortEvents(events = []) {
+  return [...events].sort((a, b) => {
+    if (Boolean(a.fijado) !== Boolean(b.fijado)) return Boolean(b.fijado) - Boolean(a.fijado);
+    const ordenA = Number.isFinite(Number(a.orden)) ? Number(a.orden) : 0;
+    const ordenB = Number.isFinite(Number(b.orden)) ? Number(b.orden) : 0;
+    if (ordenA !== ordenB) return ordenA - ordenB;
+    return new Date(b.createdAt || b.fecha) - new Date(a.createdAt || a.fecha);
+  });
+}
+
 function mergeEvents(apiEvents = []) {
   const ids = new Set(apiEvents.map(evento => evento._id));
-  return [...apiEvents, ...FALLBACK_EVENTS.filter(evento => !ids.has(evento._id))]
-    .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+  return sortEvents([...apiEvents, ...FALLBACK_EVENTS.filter(evento => !ids.has(evento._id))]);
 }
 
 export default function Eventos() {
@@ -74,6 +83,7 @@ export default function Eventos() {
                 <p className="text-accent text-xs font-semibold uppercase tracking-wide mb-1">
                   {new Date(evento.fecha).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' })}
                 </p>
+                {evento.fijado && <span className="inline-block bg-accent/15 text-accent text-xs font-semibold px-2 py-1 rounded-full mb-2">Fijado</span>}
                 <h3 className="font-bold text-lg text-white group-hover:text-accent transition">{evento.titulo}</h3>
                 {evento.lugar && <p className="text-white/40 text-sm mt-1">📍 {evento.lugar}</p>}
                 {evento.descripcion && (

@@ -3,7 +3,26 @@ import { Link } from 'react-router-dom';
 import api from '../api';
 
 import { API_URL } from '../config.js';
-function fotoSrc(f) { return f?.startsWith('http') ? f : `${API_URL}${f}`; }
+import { FALLBACK_EVENTS } from '../data/events.js';
+
+function fotoSrc(f) {
+  if (f?.startsWith('/eventos/')) return f;
+  return f?.startsWith('http') ? f : `${API_URL}${f}`;
+}
+
+function sortByCreated(events = []) {
+  return [...events].sort((a, b) => new Date(b.createdAt || b.fecha) - new Date(a.createdAt || a.fecha));
+}
+
+function sortVisibleEvents(events = []) {
+  return [...events].sort((a, b) => {
+    if (Boolean(a.fijado) !== Boolean(b.fijado)) return Boolean(b.fijado) - Boolean(a.fijado);
+    const ordenA = Number.isFinite(Number(a.orden)) ? Number(a.orden) : 0;
+    const ordenB = Number.isFinite(Number(b.orden)) ? Number(b.orden) : 0;
+    if (ordenA !== ordenB) return ordenA - ordenB;
+    return new Date(b.createdAt || b.fecha) - new Date(a.createdAt || a.fecha);
+  });
+}
 
 export default function Inicio() {
   const [data, setData] = useState({
@@ -13,12 +32,21 @@ export default function Inicio() {
     descripcion: 'Somos la liga oficial de Football Americano de Mar del Plata.',
   });
   const [fotos, setFotos] = useState([]);
+  const [ultimoEvento, setUltimoEvento] = useState(null);
   const [noticias, setNoticias] = useState([]);
 
   useEffect(() => {
     api.get('/pages/inicio').then(r => { if (r.data?.contenido) setData(r.data.contenido); });
     api.get('/eventos').then(r => {
-      const todas = r.data.flatMap(e => (e.fotos || []).map(f => ({ src: f, titulo: e.titulo, id: e._id })));
+      const eventos = r.data || [];
+      const ordenados = sortVisibleEvents(eventos);
+      const todas = ordenados.flatMap(e => (e.fotos || []).map(f => ({ src: f, titulo: e.titulo, id: e._id })));
+      setUltimoEvento(sortByCreated(eventos)[0] || null);
+      setFotos(todas.slice(0, 9));
+    }).catch(() => {
+      const ordenados = sortVisibleEvents(FALLBACK_EVENTS);
+      const todas = ordenados.flatMap(e => (e.fotos || []).map(f => ({ src: f, titulo: e.titulo, id: e._id })));
+      setUltimoEvento(sortByCreated(FALLBACK_EVENTS)[0] || null);
       setFotos(todas.slice(0, 9));
     });
     api.get('/noticias').then(r => setNoticias(r.data.slice(0, 3)));
@@ -110,6 +138,50 @@ export default function Inicio() {
                 </Link>
               ))}
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Último evento */}
+      {ultimoEvento && (
+        <section className="py-16 px-4 bg-primary">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-3xl font-bold text-white">Último Evento</h2>
+                <div className="w-12 h-1 bg-accent mt-2 rounded" />
+              </div>
+              <Link to="/eventos" className="text-accent hover:text-accent-light text-sm font-semibold transition">
+                Ver todos →
+              </Link>
+            </div>
+            <Link
+              to={`/eventos/${ultimoEvento._id}`}
+              className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr] bg-secondary border border-accent/20 rounded-xl overflow-hidden hover:border-accent/60 transition-all group"
+            >
+              <div className="h-72 md:h-80 bg-primary/50 overflow-hidden">
+                {ultimoEvento.fotos?.[0] ? (
+                  <img
+                    src={fotoSrc(ultimoEvento.fotos[0])}
+                    alt={ultimoEvento.titulo}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-5xl opacity-30">📸</div>
+                )}
+              </div>
+              <div className="p-6 md:p-8 flex flex-col justify-center">
+                <p className="text-accent text-xs font-semibold uppercase tracking-wide mb-2">
+                  {new Date(ultimoEvento.fecha).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </p>
+                <h3 className="font-bold text-2xl md:text-3xl text-white group-hover:text-accent transition">{ultimoEvento.titulo}</h3>
+                {ultimoEvento.lugar && <p className="text-white/45 text-sm mt-3">📍 {ultimoEvento.lugar}</p>}
+                {ultimoEvento.descripcion && (
+                  <p className="text-white/55 mt-4 leading-relaxed line-clamp-3">{ultimoEvento.descripcion}</p>
+                )}
+                <span className="text-accent font-semibold text-sm mt-6">Ver fotos →</span>
+              </div>
+            </Link>
           </div>
         </section>
       )}
