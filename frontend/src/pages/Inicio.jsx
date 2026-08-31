@@ -6,6 +6,9 @@ import { API_URL } from '../config.js';
 import { FALLBACK_EVENTS } from '../data/events.js';
 
 const HERO_IMAGE = '/hero/portada.jpg';
+const HERO_TITLE = 'Fútbol Americano';
+const HERO_TITLE_2 = 'Mar del Plata';
+const HERO_SUBTITLE = 'Football Equipado – Flag Football 5vs5 Femenino y Masculino';
 
 function fotoSrc(f) {
   if (f?.startsWith('/eventos/')) return f;
@@ -70,9 +73,9 @@ export default function Inicio() {
         <div className="relative max-w-4xl mx-auto text-center mt-8 md:mt-12">
           <img src="/logo.png" alt="Logo Liga" className="h-36 w-36 object-contain mx-auto mb-8 drop-shadow-2xl" />
           <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-4">Est. 2016 · Mar del Plata · Argentina</p>
-          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 text-white">{data.titulo}</h1> 
-          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 text-white">{data.titulo2}</h1>                                
-          <p className="text-xl text-white/70 mb-10">{data.subtitulo}</p>
+          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4 text-white">{HERO_TITLE}</h1>
+          <h2 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 text-white">{HERO_TITLE_2}</h2>
+          <p className="text-xl text-white/75 mb-10">{HERO_SUBTITLE}</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link to="/inscripcion" className="bg-accent text-white font-bold px-8 py-3 rounded-full hover:bg-accent-light transition shadow-lg shadow-accent/30">
               SUMATE
