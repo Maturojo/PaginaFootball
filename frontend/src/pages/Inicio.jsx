@@ -8,6 +8,7 @@ import { FALLBACK_EVENTS } from '../data/events.js';
 const HERO_SLIDES = [
   '/hero/portada.jpg',
   '/hero/portada-nereidas.png',
+  '/hero/portada-atlantes.jpg',
 ];
 const HERO_TITLE = 'Fútbol Americano';
 const HERO_TITLE_2 = 'Mar del Plata';
