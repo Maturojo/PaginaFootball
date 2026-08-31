@@ -120,7 +120,7 @@ export default function Historia() {
   return (
     <div className="bg-primary text-white pt-16 overflow-hidden">
       <section
-        className="relative min-h-[76vh] flex items-end border-b border-accent/20 bg-secondary"
+        className="relative min-h-[76vh] flex items-end bg-secondary"
         style={{
           backgroundImage: `linear-gradient(90deg, rgba(5, 10, 18, 0.95) 0%, rgba(9, 18, 31, 0.86) 48%, rgba(9, 18, 31, 0.52) 100%), url(${backgroundImage})`,
           backgroundPosition: 'center',
