@@ -63,7 +63,7 @@ export default function Inicio() {
           alt=""
           aria-hidden="true"
           className="absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: 'center 42%' }}
+          style={{ objectPosition: 'center 56%' }}
         />
         <div className="absolute inset-0 bg-primary/45" />
         <div className="absolute inset-0 bg-gradient-to-b from-primary/50 via-primary/25 to-primary/80" />
