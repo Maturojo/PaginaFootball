@@ -5,11 +5,7 @@ import api from '../api';
 import { API_URL } from '../config.js';
 import { FALLBACK_EVENTS } from '../data/events.js';
 
-const HERO_SLIDES = [
-  '/hero/portada-1.png',
-  '/hero/portada-2.jpg',
-  '/hero/portada-3.png',
-];
+const HERO_IMAGE = '/hero/portada.jpg';
 
 function fotoSrc(f) {
   if (f?.startsWith('/eventos/')) return f;
@@ -40,7 +36,6 @@ export default function Inicio() {
   const [fotos, setFotos] = useState([]);
   const [ultimoEvento, setUltimoEvento] = useState(null);
   const [noticias, setNoticias] = useState([]);
-  const [heroSlide, setHeroSlide] = useState(0);
 
   useEffect(() => {
     api.get('/pages/inicio').then(r => { if (r.data?.contenido) setData(r.data.contenido); });
@@ -59,28 +54,17 @@ export default function Inicio() {
     api.get('/noticias').then(r => setNoticias(r.data.slice(0, 3)));
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setHeroSlide(current => (current + 1) % HERO_SLIDES.length);
-    }, 4500);
-
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <div className="bg-primary text-white">
       {/* Hero */}
       <section className="relative h-[68vh] min-h-[520px] max-h-[680px] px-4 overflow-hidden flex items-center">
-        {HERO_SLIDES.map((slide, index) => (
-          <img
-            key={slide}
-            src={slide}
-            alt=""
-            aria-hidden="true"
-            className={`absolute inset-0 transition-opacity duration-1000 ${heroSlide === index ? 'opacity-100' : 'opacity-0'}`}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 42%' }}
-          />
-        ))}
+        <img
+          src={HERO_IMAGE}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ objectPosition: 'center 42%' }}
+        />
         <div className="absolute inset-0 bg-primary/45" />
         <div className="absolute inset-0 bg-gradient-to-b from-primary/50 via-primary/25 to-primary/80" />
         <div className="relative max-w-4xl mx-auto text-center">
