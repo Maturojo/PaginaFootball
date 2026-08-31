@@ -28,6 +28,12 @@ const MODALIDADES = [
       ['Entrenamiento', 'Ideal para quienes quieren vivir la intensidad del football con equipamiento completo.'],
     ],
     image: '/hero/portada-equipados-accion.jpg',
+    slides: [
+      '/hero/portada-equipados-accion.jpg',
+      '/hero/modalidad-equipado-1.jpg',
+      '/hero/modalidad-equipado-2.jpg',
+      '/hero/modalidad-equipado-3.jpg',
+    ],
     to: '/equipos',
     cta: 'Ver equipos',
   },
@@ -42,6 +48,7 @@ const MODALIDADES = [
       ['Competencia local', 'La liga masculina combina entrenamientos, partidos y torneos durante la temporada.'],
     ],
     image: '/hero/portada-flag-accion.jpg',
+    slides: ['/hero/portada-flag-accion.jpg'],
     to: '/equipos',
     cta: 'Ver equipos',
   },
@@ -56,6 +63,7 @@ const MODALIDADES = [
       ['Equipo y comunidad', 'Es una puerta de entrada ideal para sumarse a Nereidas y a la liga femenina local.'],
     ],
     image: '/hero/portada-femenino-accion.jpg',
+    slides: ['/hero/portada-femenino-accion.jpg'],
     to: '/inscripcion',
     cta: 'Sumarme',
   },
@@ -105,7 +113,9 @@ export default function Inicio() {
   const [noticias, setNoticias] = useState([]);
   const [heroSlide, setHeroSlide] = useState(0);
   const [selectedModalidad, setSelectedModalidad] = useState(MODALIDADES[0].id);
+  const [modalidadSlide, setModalidadSlide] = useState(0);
   const modalidadActiva = MODALIDADES.find(modalidad => modalidad.id === selectedModalidad) || MODALIDADES[0];
+  const modalidadSlides = modalidadActiva.slides || [modalidadActiva.image];
 
   useEffect(() => {
     api.get('/pages/inicio').then(r => { if (r.data?.contenido) setData(r.data.contenido); });
@@ -133,6 +143,20 @@ export default function Inicio() {
 
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    setModalidadSlide(0);
+  }, [selectedModalidad]);
+
+  useEffect(() => {
+    if (modalidadSlides.length < 2) return undefined;
+
+    const interval = setInterval(() => {
+      setModalidadSlide(current => (current + 1) % modalidadSlides.length);
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [modalidadSlides.length, selectedModalidad]);
 
   return (
     <div className="bg-primary text-white">
@@ -223,12 +247,46 @@ export default function Inicio() {
             ))}
           </div>
           <div className="mt-8 grid lg:grid-cols-[0.9fr_1.1fr] gap-6 items-stretch">
-            <div className="overflow-hidden rounded-xl border border-accent/20 bg-secondary min-h-[280px]">
-              <img
-                src={modalidadActiva.image}
-                alt={modalidadActiva.title}
-                className="h-full min-h-[280px] w-full object-cover"
-              />
+            <div className="relative overflow-hidden rounded-xl border border-accent/20 bg-secondary min-h-[280px]">
+              {modalidadSlides.map((slide, index) => (
+                <img
+                  key={slide}
+                  src={slide}
+                  alt={modalidadActiva.title}
+                  className={`absolute inset-0 h-full min-h-[280px] w-full object-cover transition-opacity duration-700 ${modalidadSlide === index ? 'opacity-100' : 'opacity-0'}`}
+                />
+              ))}
+              {modalidadSlides.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setModalidadSlide(current => (current - 1 + modalidadSlides.length) % modalidadSlides.length)}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-primary/75 text-white text-2xl leading-none hover:bg-accent transition"
+                    aria-label="Foto anterior"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setModalidadSlide(current => (current + 1) % modalidadSlides.length)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-primary/75 text-white text-2xl leading-none hover:bg-accent transition"
+                    aria-label="Foto siguiente"
+                  >
+                    ›
+                  </button>
+                  <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+                    {modalidadSlides.map((slide, index) => (
+                      <button
+                        key={`${slide}-dot`}
+                        type="button"
+                        onClick={() => setModalidadSlide(index)}
+                        className={`h-2.5 rounded-full transition-all ${modalidadSlide === index ? 'w-8 bg-accent' : 'w-2.5 bg-white/45 hover:bg-white/80'}`}
+                        aria-label={`Ver foto ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
             <div className="bg-secondary border border-accent/20 rounded-xl p-6 md:p-8">
               <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-3">Cómo se juega</p>
