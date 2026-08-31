@@ -31,7 +31,7 @@ const MODALIDADES = [
   {
     title: 'Flag Femenino',
     desc: 'Equipos femeninos en crecimiento, entrenamientos abiertos y comunidad para empezar desde cero.',
-    image: '/hero/portada-nereidas.png',
+    image: '/hero/portada-femenino-accion.jpg',
     to: '/inscripcion',
     cta: 'Sumarme',
   },
