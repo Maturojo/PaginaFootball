@@ -5,7 +5,10 @@ import api from '../api';
 import { API_URL } from '../config.js';
 import { FALLBACK_EVENTS } from '../data/events.js';
 
-const HERO_IMAGE = '/hero/portada.jpg';
+const HERO_SLIDES = [
+  '/hero/portada.jpg',
+  '/hero/portada-nereidas.png',
+];
 const HERO_TITLE = 'Fútbol Americano';
 const HERO_TITLE_2 = 'Mar del Plata';
 const HERO_SUBTITLE = 'Football Equipado – Flag Football 5vs5 Femenino y Masculino';
@@ -39,6 +42,7 @@ export default function Inicio() {
   const [fotos, setFotos] = useState([]);
   const [ultimoEvento, setUltimoEvento] = useState(null);
   const [noticias, setNoticias] = useState([]);
+  const [heroSlide, setHeroSlide] = useState(0);
 
   useEffect(() => {
     api.get('/pages/inicio').then(r => { if (r.data?.contenido) setData(r.data.contenido); });
@@ -57,17 +61,28 @@ export default function Inicio() {
     api.get('/noticias').then(r => setNoticias(r.data.slice(0, 3)));
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setHeroSlide(current => (current + 1) % HERO_SLIDES.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="bg-primary text-white">
       {/* Hero */}
       <section className="relative h-[72vh] min-h-[640px] max-h-[760px] px-4 pt-24 md:pt-28 pb-24 md:pb-28 overflow-hidden flex items-center">
-        <img
-          src={HERO_IMAGE}
-          alt=""
-          aria-hidden="true"
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: 'center 52%' }}
-        />
+        {HERO_SLIDES.map((slide, index) => (
+          <img
+            key={slide}
+            src={slide}
+            alt=""
+            aria-hidden="true"
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${heroSlide === index ? 'opacity-100' : 'opacity-0'}`}
+            style={{ objectPosition: 'center 52%' }}
+          />
+        ))}
         <div className="absolute inset-0 bg-primary/25" />
         <div className="absolute inset-0 bg-gradient-to-b from-primary/45 via-primary/15 to-primary/70" />
         <div className="relative max-w-4xl mx-auto text-center mt-8 md:mt-12">
