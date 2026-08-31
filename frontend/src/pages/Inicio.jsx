@@ -6,7 +6,6 @@ import { API_URL } from '../config.js';
 import { FALLBACK_EVENTS } from '../data/events.js';
 
 const HERO_SLIDES = [
-  '/hero/portada-flag-accion.jpg',
   '/hero/portada-equipados-accion.jpg',
 ];
 const HERO_TITLE = 'Fútbol Americano';
@@ -24,7 +23,7 @@ const MODALIDADES = [
   {
     title: 'Flag Masculino',
     desc: 'Competencia 5vs5, ritmo alto y técnica para aprender el deporte desde sus fundamentos.',
-    image: '/hero/portada.jpg',
+    image: '/hero/portada-flag-accion.jpg',
     to: '/inscripcion',
     cta: 'Sumarme',
   },
