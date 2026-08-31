@@ -5,7 +5,7 @@ import { API_URL } from '../config.js';
 import { findFallbackProduct } from '../data/products.js';
 
 function buildWhatsAppLink(product) {
-  const phone = product.whatsapp || '5492235000000';
+  const phone = product.whatsapp || '5492236661385';
   const msg = encodeURIComponent(`Hola! Me interesa el producto: ${product.nombre} ($${product.precio})`);
   return `https://wa.me/${phone}?text=${msg}`;
 }

@@ -23,6 +23,7 @@ export default function Footer() {
         <div>
           <h4 className="font-semibold mb-3 text-accent uppercase tracking-wide text-sm">Contacto</h4>
           <p className="text-sm text-white/60">Mar del Plata, Buenos Aires</p>
+          <p className="text-sm text-white/60">+54 9 223 666-1385</p>
           <p className="text-sm text-white/60">contacto@ligafootballmdp.com</p>
         </div>
       </div>

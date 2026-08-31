@@ -76,7 +76,7 @@ async function seed() {
     descripcion: 'Remera de entrenamiento FAMDQ City Hall, diseño azul con frente y dorso.',
     categoria: 'Indumentaria',
     stock: 20,
-    whatsapp: '5492235000000',
+    whatsapp: '5492236661385',
     imagen: '/tienda/remera-entrenamiento-city-hall-frente.png',
     imagenes: [
       '/tienda/remera-entrenamiento-city-hall-frente.png',
@@ -89,7 +89,7 @@ async function seed() {
     descripcion: 'Remera conmemorativa FAMDQ 10 años, diseño blanco con frente y dorso.',
     categoria: 'Indumentaria',
     stock: 20,
-    whatsapp: '5492235000000',
+    whatsapp: '5492236661385',
     imagen: '/tienda/remera-10-anos-frente.jpg',
     imagenes: [
       '/tienda/remera-10-anos-frente.jpg',
@@ -101,9 +101,9 @@ async function seed() {
   if (productCount === 0) {
     await Product.insertMany([
       ...fixedProducts,
-      { nombre: 'Camiseta Oficial Liga', precio: 3500, descripcion: 'Camiseta oficial de la Liga de Football Americano MDP.', categoria: 'Indumentaria', stock: 20, whatsapp: '5492235000000' },
-      { nombre: 'Gorra Liga MDP', precio: 1800, descripcion: 'Gorra bordada con el logo de la liga.', categoria: 'Accesorios', stock: 15, whatsapp: '5492235000000' },
-      { nombre: 'Pelota Oficial', precio: 4200, descripcion: 'Pelota reglamentaria para entrenamiento.', categoria: 'Equipamiento', stock: 5, whatsapp: '5492235000000' },
+      { nombre: 'Camiseta Oficial Liga', precio: 3500, descripcion: 'Camiseta oficial de la Liga de Football Americano MDP.', categoria: 'Indumentaria', stock: 20, whatsapp: '5492236661385' },
+      { nombre: 'Gorra Liga MDP', precio: 1800, descripcion: 'Gorra bordada con el logo de la liga.', categoria: 'Accesorios', stock: 15, whatsapp: '5492236661385' },
+      { nombre: 'Pelota Oficial', precio: 4200, descripcion: 'Pelota reglamentaria para entrenamiento.', categoria: 'Equipamiento', stock: 5, whatsapp: '5492236661385' },
     ]);
     console.log('Productos creados');
   }
@@ -123,7 +123,7 @@ async function seed() {
         titulo: 'Liga de Football Americano Mar del Plata',
         subtitulo: 'La pasión del gridiron en la ciudad feliz',
         descripcion: 'Somos la liga oficial de Football Americano de Mar del Plata. Unidos por la pasión, el deporte y el compañerismo.',
-        telefono: '+54 9 223 500-0000',
+        telefono: '+54 9 223 666-1385',
         email: 'contacto@ligafootballmdp.com'
       }
     },
@@ -140,7 +140,7 @@ async function seed() {
       contenido: {
         titulo: 'Contactanos',
         direccion: 'Mar del Plata, Buenos Aires, Argentina',
-        telefono: '+54 9 223 500-0000',
+        telefono: '+54 9 223 666-1385',
         email: 'contacto@ligafootballmdp.com',
         instagram: 'ligafootballmdp',
         facebook: 'ligafootballmdp'

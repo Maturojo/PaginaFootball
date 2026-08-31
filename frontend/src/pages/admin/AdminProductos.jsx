@@ -48,7 +48,7 @@ function ProductForm({ initial, onSave, onCancel }) {
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">WhatsApp (número sin +)</label>
-          <input {...register('whatsapp')} className="input" placeholder="5492235000000" />
+          <input {...register('whatsapp')} className="input" placeholder="5492236661385" />
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">Imagen</label>

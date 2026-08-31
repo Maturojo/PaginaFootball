@@ -6,7 +6,7 @@ export const FALLBACK_PRODUCTS = [
     descripcion: 'Remera conmemorativa FAMDQ 10 años, diseño blanco con frente y dorso.',
     categoria: 'Indumentaria',
     stock: 20,
-    whatsapp: '5492235000000',
+    whatsapp: '5492236661385',
     imagen: '/tienda/remera-10-anos-frente.jpg',
     imagenes: [
       '/tienda/remera-10-anos-frente.jpg',
@@ -20,7 +20,7 @@ export const FALLBACK_PRODUCTS = [
     descripcion: 'Remera de entrenamiento FAMDQ City Hall, diseño azul con frente y dorso.',
     categoria: 'Indumentaria',
     stock: 20,
-    whatsapp: '5492235000000',
+    whatsapp: '5492236661385',
     imagen: '/tienda/remera-entrenamiento-city-hall-frente.png',
     imagenes: [
       '/tienda/remera-entrenamiento-city-hall-frente.png',
@@ -34,7 +34,7 @@ export const FALLBACK_PRODUCTS = [
     descripcion: 'Camiseta oficial de la Liga de Football Americano MDP.',
     categoria: 'Indumentaria',
     stock: 20,
-    whatsapp: '5492235000000',
+    whatsapp: '5492236661385',
   },
   {
     _id: 'gorra-liga-mdp',
@@ -43,7 +43,7 @@ export const FALLBACK_PRODUCTS = [
     descripcion: 'Gorra bordada con el logo de la liga.',
     categoria: 'Accesorios',
     stock: 15,
-    whatsapp: '5492235000000',
+    whatsapp: '5492236661385',
   },
   {
     _id: 'pelota-oficial',
@@ -52,7 +52,7 @@ export const FALLBACK_PRODUCTS = [
     descripcion: 'Pelota reglamentaria para entrenamiento.',
     categoria: 'Equipamiento',
     stock: 5,
-    whatsapp: '5492235000000',
+    whatsapp: '5492236661385',
   },
 ];
 

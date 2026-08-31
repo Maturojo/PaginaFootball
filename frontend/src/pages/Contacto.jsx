@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import api from '../api';
 
 export default function Contacto() {
-  const [data, setData] = useState({ titulo: 'Contactanos', direccion: '', telefono: '', email: '', instagram: '', facebook: '' });
+  const [data, setData] = useState({ titulo: 'Contactanos', direccion: '', telefono: '+54 9 223 666-1385', email: '', instagram: '', facebook: '' });
   const { register, handleSubmit, reset, formState: { isSubmitSuccessful } } = useForm();
 
   useEffect(() => {
@@ -11,7 +11,7 @@ export default function Contacto() {
   }, []);
 
   const onSubmit = (values) => {
-    const phone = data.telefono?.replace(/\D/g, '') || '5492235000000';
+    const phone = data.telefono?.replace(/\D/g, '') || '5492236661385';
     const msg = encodeURIComponent(`Nombre: ${values.nombre}\nEmail: ${values.email}\nMensaje: ${values.mensaje}`);
     window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
     reset();

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { FALLBACK_TEAMS } from '../data/teams.js';
 import { teamLogoSrc } from '../utils/teamLogo.js';
 
-const WHATSAPP_PHONE = '5492235000000';
+const WHATSAPP_PHONE = '5492236661385';
 const TALLES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
 const TEAM_STYLES = {
