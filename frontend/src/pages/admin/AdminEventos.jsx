@@ -8,6 +8,11 @@ import { fallbackDeleteMessage, imageSource, isMongoId } from '../../utils/admin
 
 function fotoSrc(f) { return imageSource(f, API_URL); }
 
+const PHOTO_BATCH_SIZE = 1;
+const MAX_PHOTO_WIDTH = 1200;
+const PHOTO_QUALITY = 0.72;
+const MAX_PHOTO_BYTES = 900 * 1024;
+
 function eventoKey(evento) {
   return `${String(evento.titulo || '').toLowerCase()}|${String(evento.fecha || '').slice(0, 10)}`;
 }
@@ -19,26 +24,84 @@ function mergeEventos(apiEventos = []) {
   return [...missing, ...apiEventos];
 }
 
+function buildEventoForm(fields, fotos = []) {
+  const form = new FormData();
+  Object.entries(fields).forEach(([k, v]) => {
+    if (v !== undefined && v !== null && !['_id', '__fallback', 'createdAt', 'updatedAt', '__v', 'fotos'].includes(k)) {
+      form.append(k, v);
+    }
+  });
+  fotos.forEach(foto => form.append('fotos', foto));
+  return form;
+}
+
+async function resizeImage(file) {
+  if (!file.type.startsWith('image/')) return file;
+
+  const imageUrl = URL.createObjectURL(file);
+  try {
+    const image = await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = imageUrl;
+    });
+
+    const canvas = document.createElement('canvas');
+    let scale = Math.min(1, MAX_PHOTO_WIDTH / image.width);
+    let quality = PHOTO_QUALITY;
+    let blob = null;
+
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      canvas.width = Math.max(1, Math.round(image.width * scale));
+      canvas.height = Math.max(1, Math.round(image.height * scale));
+      canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+
+      blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
+      if (!blob || blob.size <= MAX_PHOTO_BYTES) break;
+
+      scale *= 0.8;
+      quality = Math.max(0.55, quality - 0.07);
+    }
+
+    if (!blob) return file;
+    const name = file.name.replace(/\.[^.]+$/, '.jpg');
+    return new File([blob], name, { type: 'image/jpeg', lastModified: Date.now() });
+  } finally {
+    URL.revokeObjectURL(imageUrl);
+  }
+}
+
+async function preparePhotos(files) {
+  const fotos = Array.from(files || []);
+  const processed = [];
+  for (const foto of fotos) {
+    processed.push(await resizeImage(foto));
+  }
+  return processed;
+}
+
 function EventoForm({ initial, onSave, onCancel }) {
   const { register, handleSubmit, reset } = useForm({
     defaultValues: initial ? { ...initial, fecha: initial.fecha?.slice(0, 10) } : {}
   });
+  const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState('');
 
   const onSubmit = async (data) => {
+    if (saving) return;
+    setSaving(true);
+    setStatus('Preparando fotos...');
     try {
-      const form = new FormData();
-      Object.entries(data).forEach(([k, v]) => {
-        if (k === 'fotos') { if (v?.[0]) Array.from(v).forEach(f => form.append('fotos', f)); }
-        else if (v !== undefined && v !== null && !['_id', '__fallback', 'createdAt', 'updatedAt', '__v'].includes(k)) form.append(k, v);
-      });
-      if (initial?.fotos?.length && !data.fotos?.[0]) {
-        initial.fotos.forEach(foto => form.append('fotos', foto));
-      }
-      await onSave(form);
+      const fotos = await preparePhotos(data.fotos);
+      await onSave({ fields: data, fotos, setStatus });
       reset();
     } catch (err) {
       console.error('Error al guardar evento:', err);
       alert('Error al guardar: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setSaving(false);
+      setStatus('');
     }
   };
 
@@ -69,11 +132,12 @@ function EventoForm({ initial, onSave, onCancel }) {
         </div>
       </div>
       <div className="flex gap-3 mt-5">
-        <button type="submit" className="bg-primary text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-900 transition">
-          {initial ? 'Guardar cambios' : 'Crear evento'}
+        <button type="submit" disabled={saving} className="bg-primary text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-900 transition disabled:opacity-60 disabled:cursor-not-allowed">
+          {saving ? 'Subiendo...' : (initial ? 'Guardar cambios' : 'Crear evento')}
         </button>
         <button type="button" onClick={onCancel} className="border border-gray-300 px-6 py-2 rounded-lg hover:bg-gray-50 transition">Cancelar</button>
       </div>
+      {status && <p className="text-sm text-gray-500 mt-3">{status}</p>}
     </form>
   );
 }
@@ -89,14 +153,26 @@ export default function AdminEventos() {
     .catch(() => setEventos(mergeEventos([])));
   useEffect(() => { load(); }, []);
 
-  const handleSave = async (form) => {
-    try {
-      if (editing && isMongoId(editing._id)) await api.put(`/eventos/${editing._id}`, form);
-      else await api.post('/eventos', form);
-      setShowForm(false); setEditing(null); load();
-    } catch (err) {
-      alert('Error: ' + (err.response?.data?.message || err.message));
+  const handleSave = async ({ fields, fotos, setStatus }) => {
+    let eventoId = editing?._id;
+
+    if (editing && isMongoId(editing._id)) {
+      setStatus('Guardando datos...');
+      await api.put(`/eventos/${editing._id}`, buildEventoForm(fields));
+    } else {
+      setStatus('Creando evento...');
+      const response = await api.post('/eventos', buildEventoForm(fields));
+      eventoId = response.data?._id;
     }
+
+    for (let index = 0; index < fotos.length; index += PHOTO_BATCH_SIZE) {
+      const batchNumber = Math.floor(index / PHOTO_BATCH_SIZE) + 1;
+      const totalBatches = Math.ceil(fotos.length / PHOTO_BATCH_SIZE);
+      setStatus(`Subiendo foto ${batchNumber} de ${totalBatches}...`);
+      await api.put(`/eventos/${eventoId}`, buildEventoForm(fields, fotos.slice(index, index + PHOTO_BATCH_SIZE)));
+    }
+
+    setShowForm(false); setEditing(null); load();
   };
 
   const handleDelete = async (id) => {

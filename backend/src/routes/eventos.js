@@ -4,6 +4,21 @@ const auth = require('../middleware/auth');
 const upload = require('../middleware/upload');
 const fileUrl = require('../middleware/fileUrl');
 
+const MAX_FOTOS_POR_PEDIDO = 50;
+
+function uploadFotos(req, res, next) {
+  upload.array('fotos', MAX_FOTOS_POR_PEDIDO)(req, res, (err) => {
+    if (!err) return next();
+
+    const messages = {
+      LIMIT_FILE_COUNT: `Podés subir hasta ${MAX_FOTOS_POR_PEDIDO} fotos por tanda.`,
+      LIMIT_FILE_SIZE: 'Cada foto puede pesar hasta 10 MB.',
+    };
+
+    return res.status(400).json({ message: messages[err.code] || err.message });
+  });
+}
+
 router.get('/', async (req, res) => {
   try {
     const eventos = await Evento.find({ activo: true }).sort({ fecha: -1 });
@@ -26,30 +41,26 @@ router.get('/:id', async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-router.post('/', auth, (req, res) => {
-  upload.array('fotos', 20)(req, res, async (err) => {
-    if (err) return res.status(400).json({ message: err.message });
-    try {
-      const data = { ...req.body };
-      if (req.files?.length) data.fotos = req.files.map(f => fileUrl(f));
-      const evento = await Evento.create(data);
-      res.status(201).json(evento);
-    } catch (e) { res.status(400).json({ message: e.message }); }
-  });
+router.post('/', auth, uploadFotos, async (req, res) => {
+  try {
+    const data = { ...req.body };
+    if (req.files?.length) data.fotos = req.files.map(f => fileUrl(f));
+    const evento = await Evento.create(data);
+    res.status(201).json(evento);
+  } catch (e) { res.status(400).json({ message: e.message }); }
 });
 
-router.put('/:id', auth, (req, res) => {
-  upload.array('fotos', 20)(req, res, async (err) => {
-    if (err) return res.status(400).json({ message: err.message });
-    try {
-      const existing = await Evento.findById(req.params.id);
-      const data = { ...req.body };
-      const nuevasFotos = req.files?.map(f => fileUrl(f)) || [];
-      data.fotos = [...(existing?.fotos || []), ...nuevasFotos];
-      const evento = await Evento.findByIdAndUpdate(req.params.id, data, { new: true });
-      res.json(evento);
-    } catch (e) { res.status(400).json({ message: e.message }); }
-  });
+router.put('/:id', auth, uploadFotos, async (req, res) => {
+  try {
+    const existing = await Evento.findById(req.params.id);
+    if (!existing) return res.status(404).json({ message: 'No encontrado' });
+
+    const data = { ...req.body };
+    const nuevasFotos = req.files?.map(f => fileUrl(f)) || [];
+    data.fotos = [...(existing.fotos || []), ...nuevasFotos];
+    const evento = await Evento.findByIdAndUpdate(req.params.id, data, { new: true });
+    res.json(evento);
+  } catch (e) { res.status(400).json({ message: e.message }); }
 });
 
 router.delete('/:id/foto', auth, async (req, res) => {
