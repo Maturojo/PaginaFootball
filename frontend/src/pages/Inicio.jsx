@@ -39,7 +39,7 @@ const MODALIDADES = [
 ];
 
 const TRAINING_PLACES = [
-  ['Centro Naval', 'Flag Femenino', 'Miércoles 18 a 20 h · Sábados 13 a 14:30 h'],
+  ['Centro Naval', 'Entrenamientos y partidos', 'Miércoles 18 a 20 h · Sábados 13 a 14:30 h'],
 ];
 
 function fotoSrc(f) {
@@ -224,27 +224,6 @@ export default function Inicio() {
               referrerPolicy="no-referrer-when-downgrade"
             />
           </div>
-        </div>
-      </section>
-
-      {/* Cards de secciones */}
-      <section className="py-16 px-4">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            { to: '/historia', icon: '📖', title: 'Nuestra Historia', desc: 'Conocé los orígenes y el recorrido de la liga desde 2016.' },
-            { to: '/equipos', icon: '🏟️', title: 'Los Equipos', desc: 'Conocé los equipos que compiten en la liga temporada a temporada.' },
-            { to: '/remeras', icon: '👕', title: 'Remeras Personalizadas', desc: 'Elegí tu equipo y encargá tu remera con nombre atrás.' },
-          ].map(c => (
-            <Link
-              key={c.to}
-              to={c.to}
-              className="bg-secondary border border-accent/20 rounded-xl p-8 flex flex-col items-center text-center hover:border-accent/60 hover:-translate-y-1 transition-all group"
-            >
-              <span className="text-5xl mb-4">{c.icon}</span>
-              <h3 className="font-bold text-xl text-white mb-2 group-hover:text-accent transition">{c.title}</h3>
-              <p className="text-white/50 text-sm">{c.desc}</p>
-            </Link>
-          ))}
         </div>
       </section>
 
