@@ -70,28 +70,19 @@ export default function Inicio() {
   return (
     <div className="bg-primary text-white">
       {/* Hero */}
-      <section className="relative min-h-[560px] md:min-h-[620px] px-4 overflow-hidden flex items-center">
+      <section className="relative h-[68vh] min-h-[520px] max-h-[680px] px-4 overflow-hidden flex items-center">
         {HERO_SLIDES.map((slide, index) => (
-          <div
+          <img
             key={slide}
-            className={`absolute inset-0 transition-opacity duration-1000 ${heroSlide === index ? 'opacity-100' : 'opacity-0'}`}
+            src={slide}
+            alt=""
             aria-hidden="true"
-          >
-            <img
-              src={slide}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover blur-xl scale-110 opacity-55"
-            />
-            <img
-              src={slide}
-              alt=""
-              className="absolute inset-0 w-full h-full object-contain"
-            />
-          </div>
+            className={`absolute inset-0 transition-opacity duration-1000 ${heroSlide === index ? 'opacity-100' : 'opacity-0'}`}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 42%' }}
+          />
         ))}
-        <div className="absolute inset-0 bg-primary/75" />
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/55 via-primary/50 to-primary/85" />
-        <div className="absolute inset-0 opacity-15" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #4a8cc4 0, #4a8cc4 1px, transparent 0, transparent 50%)', backgroundSize: '20px 20px' }} />
+        <div className="absolute inset-0 bg-primary/45" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/50 via-primary/25 to-primary/80" />
         <div className="relative max-w-4xl mx-auto text-center">
           <img src="/logo.png" alt="Logo Liga" className="h-36 w-36 object-contain mx-auto mb-8 drop-shadow-2xl" />
           <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-4">Est. 2016 · Mar del Plata · Argentina</p>
