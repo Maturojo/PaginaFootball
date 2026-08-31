@@ -245,14 +245,14 @@ export default function Inicio() {
               </article>
             ))}
           </div>
-          <div className="mt-8 grid lg:grid-cols-[0.9fr_1.1fr] gap-6 items-start">
-            <div className="relative overflow-hidden rounded-xl border border-accent/20 bg-secondary aspect-[16/10] min-h-[260px]">
+          <div className="mt-8 grid lg:grid-cols-[0.9fr_1.1fr] gap-6 items-stretch">
+            <div className="relative overflow-hidden rounded-xl border border-accent/20 bg-primary/70 min-h-[280px]">
               {modalidadSlides.map((slide, index) => (
                 <img
                   key={slide}
                   src={slide}
                   alt={modalidadActiva.title}
-                  className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${modalidadSlide === index ? 'opacity-100' : 'opacity-0'}`}
+                  className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-700 ${modalidadSlide === index ? 'opacity-100' : 'opacity-0'}`}
                 />
               ))}
               {modalidadSlides.length > 1 && (
