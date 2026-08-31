@@ -5,6 +5,12 @@ import api from '../api';
 import { API_URL } from '../config.js';
 import { FALLBACK_EVENTS } from '../data/events.js';
 
+const HERO_SLIDES = [
+  '/hero/portada-1.png',
+  '/hero/portada-2.jpg',
+  '/hero/portada-3.png',
+];
+
 function fotoSrc(f) {
   if (f?.startsWith('/eventos/')) return f;
   return f?.startsWith('http') ? f : `${API_URL}${f}`;
@@ -34,6 +40,7 @@ export default function Inicio() {
   const [fotos, setFotos] = useState([]);
   const [ultimoEvento, setUltimoEvento] = useState(null);
   const [noticias, setNoticias] = useState([]);
+  const [heroSlide, setHeroSlide] = useState(0);
 
   useEffect(() => {
     api.get('/pages/inicio').then(r => { if (r.data?.contenido) setData(r.data.contenido); });
@@ -52,12 +59,30 @@ export default function Inicio() {
     api.get('/noticias').then(r => setNoticias(r.data.slice(0, 3)));
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setHeroSlide(current => (current + 1) % HERO_SLIDES.length);
+    }, 4500);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="bg-primary text-white">
       {/* Hero */}
-      <section className="relative py-32 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary via-secondary to-primary opacity-95" />
-        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #4a8cc4 0, #4a8cc4 1px, transparent 0, transparent 50%)', backgroundSize: '20px 20px' }} />
+      <section className="relative min-h-[720px] md:min-h-[760px] px-4 overflow-hidden flex items-center">
+        {HERO_SLIDES.map((slide, index) => (
+          <img
+            key={slide}
+            src={slide}
+            alt=""
+            aria-hidden="true"
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${heroSlide === index ? 'opacity-100' : 'opacity-0'}`}
+          />
+        ))}
+        <div className="absolute inset-0 bg-primary/75" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/55 via-primary/50 to-primary/85" />
+        <div className="absolute inset-0 opacity-15" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #4a8cc4 0, #4a8cc4 1px, transparent 0, transparent 50%)', backgroundSize: '20px 20px' }} />
         <div className="relative max-w-4xl mx-auto text-center">
           <img src="/logo.png" alt="Logo Liga" className="h-36 w-36 object-contain mx-auto mb-8 drop-shadow-2xl" />
           <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-4">Est. 2016 · Mar del Plata · Argentina</p>
