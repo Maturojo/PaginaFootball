@@ -40,8 +40,6 @@ const MODALIDADES = [
 
 const TRAINING_PLACES = [
   ['Centro Naval', 'Flag Femenino', 'Miércoles 18 a 20 h · Sábados 13 a 14:30 h'],
-  ['Parque Camet', 'Flag Masculino', 'Horarios a confirmar por WhatsApp'],
-  ['Club Biguá', 'Football Equipado', 'Horarios a confirmar por WhatsApp'],
 ];
 
 function fotoSrc(f) {
