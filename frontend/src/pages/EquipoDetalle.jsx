@@ -10,6 +10,14 @@ const TEAM_COVERS = {
   nereidas: '/equipos/nereidas-cover.jpg',
 };
 
+const TEAM_COVER_SLIDES = {
+  tridentes: [
+    '/equipos/tridentes-slide-1.jpg',
+    '/equipos/tridentes-slide-2.jpg',
+    '/equipos/tridentes-slide-3.jpg',
+  ],
+};
+
 function slugify(str) {
   return teamSlug(str);
 }
@@ -21,6 +29,7 @@ export default function EquipoDetalle() {
   const [players, setPlayers] = useState(FALLBACK_PLAYERS);
   const [loading, setLoading] = useState(!location.state?.team);
   const [notFound, setNotFound] = useState(false);
+  const [coverSlide, setCoverSlide] = useState(0);
 
   useEffect(() => {
     if (team) return;
@@ -46,6 +55,22 @@ export default function EquipoDetalle() {
       .catch(() => setPlayers(FALLBACK_PLAYERS));
   }, []);
 
+  useEffect(() => {
+    if (!team) return;
+
+    const teamId = slugify(team.nombre);
+    const slides = TEAM_COVER_SLIDES[teamId] || (TEAM_COVERS[teamId] ? [TEAM_COVERS[teamId]] : []);
+    setCoverSlide(0);
+
+    if (slides.length < 2) return;
+
+    const interval = setInterval(() => {
+      setCoverSlide(current => (current + 1) % slides.length);
+    }, 4500);
+
+    return () => clearInterval(interval);
+  }, [team]);
+
   if (loading) return (
     <div className="bg-primary min-h-screen flex items-center justify-center">
       <p className="text-white/40 text-lg">Cargando...</p>
@@ -61,21 +86,26 @@ export default function EquipoDetalle() {
   );
 
   const logo = teamLogoSrc(team);
-  const cover = TEAM_COVERS[slugify(team.nombre)];
+  const teamId = slugify(team.nombre);
+  const coverSlides = TEAM_COVER_SLIDES[teamId] || (TEAM_COVERS[teamId] ? [TEAM_COVERS[teamId]] : []);
+  const hasCover = coverSlides.length > 0;
   const roster = playersForTeam(team.nombre, players);
 
   return (
     <div className="bg-primary text-white min-h-screen pt-16">
       {/* Hero del equipo */}
-      <section className={`relative overflow-hidden border-b border-accent/20 py-16 px-4 ${cover ? 'bg-primary' : 'bg-secondary'}`}>
-        {cover && (
+      <section className={`relative overflow-hidden border-b border-accent/20 py-16 px-4 ${hasCover ? 'bg-primary' : 'bg-secondary'}`}>
+        {hasCover && (
           <>
-            <img
-              src={cover}
-              alt=""
-              aria-hidden="true"
-              className="absolute inset-0 h-full w-full object-cover opacity-55"
-            />
+            {coverSlides.map((slide, index) => (
+              <img
+                key={slide}
+                src={slide}
+                alt=""
+                aria-hidden="true"
+                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${coverSlide === index ? 'opacity-[.55]' : 'opacity-0'}`}
+              />
+            ))}
             <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/80 to-primary/45" />
           </>
         )}
@@ -118,6 +148,16 @@ export default function EquipoDetalle() {
             <div className="mt-5 flex md:justify-start justify-center">
               <TeamStars campeonatos={team.campeonatos || []} />
             </div>
+            {coverSlides.length > 1 && (
+              <div className="mt-6 flex gap-2 md:justify-start justify-center" aria-hidden="true">
+                {coverSlides.map((slide, index) => (
+                  <span
+                    key={`${slide}-dot`}
+                    className={`h-1.5 rounded-full transition-all ${coverSlide === index ? 'w-8 bg-accent' : 'w-3 bg-white/35'}`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
