@@ -103,7 +103,7 @@ export default function EquipoDetalle() {
                 src={slide}
                 alt=""
                 aria-hidden="true"
-                className={`absolute inset-0 h-full w-full object-cover object-[center_38%] transition-opacity duration-1000 ${coverSlide === index ? 'opacity-[.55]' : 'opacity-0'}`}
+                className={`absolute inset-0 h-full w-full object-cover object-[center_20%] transition-opacity duration-1000 ${coverSlide === index ? 'opacity-[.55]' : 'opacity-0'}`}
               />
             ))}
             <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/80 to-primary/45" />

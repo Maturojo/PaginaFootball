@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 
 const links = [
@@ -16,9 +16,16 @@ const links = [
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-transparent bg-transparent text-white transition-all duration-300" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-300 ${scrolled ? 'bg-primary text-white shadow-lg border-accent/20' : 'bg-transparent text-white border-transparent'}`} style={!scrolled ? { textShadow: '0 1px 4px rgba(0,0,0,0.8)' } : {}}>
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-18 py-2">
         <Link to="/" className="flex items-center gap-3 font-bold text-xl tracking-wide">
           <img src="/logo.png" alt="Logo Liga" className="h-12 w-12 object-contain" />
