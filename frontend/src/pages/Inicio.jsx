@@ -42,7 +42,12 @@ const TRAINING_PLACES = [
   [
     'Centro Naval',
     'Entrenamientos y partidos',
-    ['13:00 a 14:00 · Flag Femenino', '14:00 a 16:00 · Liga de Football Flag', '16:00 a 18:00 · Entrenamiento de Equipados'],
+    [
+      ['Miércoles', '18:00 a 20:00 · Entrenamientos de todas las modalidades'],
+      ['Sábados', '13:00 a 14:00 · Flag Femenino'],
+      ['Sábados', '14:00 a 16:00 · Liga de Football Flag'],
+      ['Sábados', '16:00 a 18:00 · Entrenamiento de Equipados'],
+    ],
   ],
 ];
 
@@ -214,9 +219,11 @@ export default function Inicio() {
                 <div key={place} className="border border-accent/20 bg-secondary/80 rounded-xl p-5">
                   <p className="text-white font-extrabold text-xl">{place}</p>
                   <p className="text-accent font-semibold mt-1">{mode}</p>
-                  <div className="text-white/55 mt-3 space-y-1">
-                    {schedule.map(item => (
-                      <p key={item}>{item}</p>
+                  <div className="mt-3 space-y-2">
+                    {schedule.map(([day, item]) => (
+                      <p key={`${day}-${item}`} className="text-white/55">
+                        <span className="text-white/75 font-semibold">{day}:</span> {item}
+                      </p>
                     ))}
                   </div>
                 </div>
