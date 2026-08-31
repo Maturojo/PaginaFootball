@@ -14,6 +14,36 @@ const HERO_TITLE = 'Fútbol Americano';
 const HERO_TITLE_2 = 'Mar del Plata';
 const HERO_SUBTITLE = 'Football Equipado – Flag Football 5vs5 Femenino y Masculino';
 
+const MODALIDADES = [
+  {
+    title: 'Football Equipado',
+    desc: 'Entrenamientos con casco y hombreras para quienes quieren vivir la modalidad con contacto.',
+    image: '/hero/portada-atlantes.jpg',
+    to: '/equipos',
+    cta: 'Ver equipos',
+  },
+  {
+    title: 'Flag Masculino',
+    desc: 'Competencia 5vs5, ritmo alto y técnica para aprender el deporte desde sus fundamentos.',
+    image: '/hero/portada.jpg',
+    to: '/inscripcion',
+    cta: 'Sumarme',
+  },
+  {
+    title: 'Flag Femenino',
+    desc: 'Equipos femeninos en crecimiento, entrenamientos abiertos y comunidad para empezar desde cero.',
+    image: '/hero/portada-nereidas.png',
+    to: '/inscripcion',
+    cta: 'Sumarme',
+  },
+];
+
+const TRAINING_PLACES = [
+  ['Centro Naval', 'Flag Femenino', 'Miércoles 18 a 20 h · Sábados 13 a 14:30 h'],
+  ['Parque Camet', 'Flag Masculino', 'Horarios a confirmar por WhatsApp'],
+  ['Club Biguá', 'Football Equipado', 'Horarios a confirmar por WhatsApp'],
+];
+
 function fotoSrc(f) {
   if (f?.startsWith('/eventos/')) return f;
   return f?.startsWith('http') ? f : `${API_URL}${f}`;
@@ -112,6 +142,90 @@ export default function Inicio() {
           <h2 className="text-3xl font-bold text-white mb-4">Bienvenidos a la Liga</h2>
           <div className="w-16 h-1 bg-accent mx-auto mb-6 rounded" />
           <p className="text-white/60 text-lg leading-relaxed">{data.descripcion}</p>
+        </div>
+      </section>
+
+      {/* Modalidades */}
+      <section className="py-16 px-4 bg-primary">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+            <div>
+              <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-2">Entrená con nosotros</p>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-white">Elegí tu modalidad</h2>
+            </div>
+            <Link to="/equipos" className="text-accent hover:text-accent-light text-sm font-semibold transition">
+              Ver todos los equipos →
+            </Link>
+          </div>
+          <div className="flex gap-5 overflow-x-auto snap-x pb-2 md:grid md:grid-cols-3 md:overflow-visible">
+            {MODALIDADES.map(modalidad => (
+              <article
+                key={modalidad.title}
+                className="min-w-[82%] snap-start bg-secondary border border-accent/20 rounded-xl overflow-hidden md:min-w-0"
+              >
+                <div className="h-56 bg-primary/50 overflow-hidden">
+                  <img src={modalidad.image} alt={modalidad.title} className="w-full h-full object-cover" />
+                </div>
+                <div className="p-6">
+                  <h3 className="text-2xl font-extrabold text-white">{modalidad.title}</h3>
+                  <p className="text-white/58 leading-relaxed mt-3 min-h-[84px]">{modalidad.desc}</p>
+                  <Link
+                    to={modalidad.to}
+                    className="inline-flex items-center justify-center bg-accent text-white font-bold px-5 py-2.5 rounded-full hover:bg-accent-light transition mt-5"
+                  >
+                    {modalidad.cta}
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* No necesitás experiencia */}
+      <section className="bg-secondary border-y border-accent/10 py-16 px-4">
+        <div className="max-w-5xl mx-auto grid md:grid-cols-[1fr_auto] gap-8 items-center">
+          <div>
+            <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-3">Probá una clase</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white">No necesitás experiencia</h2>
+            <p className="text-white/64 text-lg leading-relaxed mt-4">
+              Entrená con nosotros aunque nunca hayas jugado. Te prestamos una bandera, te enseñamos desde cero y podés probar una clase.
+            </p>
+          </div>
+          <Link
+            to="/inscripcion"
+            className="inline-flex items-center justify-center bg-accent text-white font-bold px-8 py-3 rounded-full hover:bg-accent-light transition shadow-lg shadow-accent/25"
+          >
+            Quiero probar
+          </Link>
+        </div>
+      </section>
+
+      {/* Entrenamientos */}
+      <section className="py-16 px-4 bg-primary">
+        <div className="max-w-6xl mx-auto grid lg:grid-cols-[1fr_1.1fr] gap-8 items-stretch">
+          <div>
+            <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-2">Lugares de entrenamiento</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-6">Dónde nos encontrás</h2>
+            <div className="space-y-3">
+              {TRAINING_PLACES.map(([place, mode, schedule]) => (
+                <div key={place} className="border border-accent/20 bg-secondary/80 rounded-xl p-5">
+                  <p className="text-white font-extrabold text-xl">{place}</p>
+                  <p className="text-accent font-semibold mt-1">{mode}</p>
+                  <p className="text-white/55 mt-2">{schedule}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="min-h-[360px] overflow-hidden rounded-xl border border-accent/20 bg-secondary">
+            <iframe
+              title="Mapa de entrenamientos en Mar del Plata"
+              src="https://www.google.com/maps?q=Centro%20Naval%20Mar%20del%20Plata&output=embed"
+              className="h-full min-h-[360px] w-full"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
         </div>
       </section>
 
