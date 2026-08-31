@@ -42,8 +42,8 @@ const MODALIDADES = [
       ['Competencia local', 'La liga masculina combina entrenamientos, partidos y torneos durante la temporada.'],
     ],
     image: '/hero/portada-flag-accion.jpg',
-    to: '/inscripcion',
-    cta: 'Sumarme',
+    to: '/equipos',
+    cta: 'Ver equipos',
   },
   {
     id: 'flag-femenino',
