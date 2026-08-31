@@ -245,16 +245,14 @@ export default function Inicio() {
               </article>
             ))}
           </div>
-          <div className="mt-8 grid lg:grid-cols-[0.9fr_1.1fr] gap-6 items-stretch">
-            <div className="relative overflow-hidden rounded-xl border border-accent/20 bg-primary/70 min-h-[280px]">
-              {modalidadSlides.map((slide, index) => (
-                <img
-                  key={slide}
-                  src={slide}
-                  alt={modalidadActiva.title}
-                  className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-700 ${modalidadSlide === index ? 'opacity-100' : 'opacity-0'}`}
-                />
-              ))}
+          <div className="mt-8 grid lg:grid-cols-[0.9fr_1.1fr] gap-6 items-start">
+            <div className="relative overflow-hidden rounded-xl border border-accent/20 bg-primary/70">
+              <img
+                key={modalidadSlides[modalidadSlide]}
+                src={modalidadSlides[modalidadSlide]}
+                alt={modalidadActiva.title}
+                className="block w-full h-auto"
+              />
               {modalidadSlides.length > 1 && (
                 <>
                   <button
