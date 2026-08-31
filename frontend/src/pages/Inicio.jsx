@@ -39,7 +39,11 @@ const MODALIDADES = [
 ];
 
 const TRAINING_PLACES = [
-  ['Centro Naval', 'Entrenamientos y partidos', 'Miércoles 18 a 20 h · Sábados 13 a 14:30 h'],
+  [
+    'Centro Naval',
+    'Entrenamientos y partidos',
+    ['13:00 a 14:00 · Flag Femenino', '14:00 a 16:00 · Liga de Football Flag', '16:00 a 18:00 · Entrenamiento de Equipados'],
+  ],
 ];
 
 function fotoSrc(f) {
@@ -210,7 +214,11 @@ export default function Inicio() {
                 <div key={place} className="border border-accent/20 bg-secondary/80 rounded-xl p-5">
                   <p className="text-white font-extrabold text-xl">{place}</p>
                   <p className="text-accent font-semibold mt-1">{mode}</p>
-                  <p className="text-white/55 mt-2">{schedule}</p>
+                  <div className="text-white/55 mt-3 space-y-1">
+                    {schedule.map(item => (
+                      <p key={item}>{item}</p>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
