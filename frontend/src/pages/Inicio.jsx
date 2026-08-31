@@ -57,7 +57,7 @@ export default function Inicio() {
   return (
     <div className="bg-primary text-white">
       {/* Hero */}
-      <section className="relative h-[68vh] min-h-[560px] max-h-[700px] px-4 pt-24 md:pt-28 pb-10 overflow-hidden flex items-center">
+      <section className="relative h-[72vh] min-h-[640px] max-h-[760px] px-4 pt-24 md:pt-28 pb-24 md:pb-28 overflow-hidden flex items-center">
         <img
           src={HERO_IMAGE}
           alt=""
