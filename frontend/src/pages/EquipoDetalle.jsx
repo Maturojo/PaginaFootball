@@ -6,6 +6,10 @@ import { FALLBACK_PLAYERS, mergePlayers, playersForTeam } from '../data/players.
 import { FALLBACK_TEAMS } from '../data/teams.js';
 import { teamLogoSrc, teamSlug } from '../utils/teamLogo.js';
 
+const TEAM_COVERS = {
+  nereidas: '/equipos/nereidas-cover.jpg',
+};
+
 function slugify(str) {
   return teamSlug(str);
 }
@@ -57,13 +61,25 @@ export default function EquipoDetalle() {
   );
 
   const logo = teamLogoSrc(team);
+  const cover = TEAM_COVERS[slugify(team.nombre)];
   const roster = playersForTeam(team.nombre, players);
 
   return (
     <div className="bg-primary text-white min-h-screen pt-16">
       {/* Hero del equipo */}
-      <section className="bg-secondary border-b border-accent/20 py-16 px-4">
-        <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-10">
+      <section className={`relative overflow-hidden border-b border-accent/20 py-16 px-4 ${cover ? 'bg-primary' : 'bg-secondary'}`}>
+        {cover && (
+          <>
+            <img
+              src={cover}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 h-full w-full object-cover opacity-55"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/80 to-primary/45" />
+          </>
+        )}
+        <div className="relative max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-10">
           <div className="flex-shrink-0">
             {logo ? (
               <img
