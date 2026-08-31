@@ -18,22 +18,43 @@ const HERO_SUBTITLE = 'Football Equipado – Flag Football 5vs5 Femenino y Mascu
 
 const MODALIDADES = [
   {
+    id: 'equipado',
     title: 'Football Equipado',
     desc: 'Entrenamientos con casco y hombreras para quienes quieren vivir la modalidad con contacto.',
+    detail: 'Es la versión con contacto del fútbol americano. Se juega con casco, hombreras y protecciones, trabajando bloqueo, tackleo, estrategia ofensiva y defensiva en equipo.',
+    points: [
+      ['Contacto', 'Se aprende progresivamente, con técnica y seguridad antes de pasar a situaciones reales de juego.'],
+      ['Roles definidos', 'Hay posiciones ofensivas y defensivas: corredores, receptores, línea, mariscal, defensivos y más.'],
+      ['Entrenamiento', 'Ideal para quienes quieren vivir la intensidad del football con equipamiento completo.'],
+    ],
     image: '/hero/portada-equipados-accion.jpg',
     to: '/equipos',
     cta: 'Ver equipos',
   },
   {
+    id: 'flag-masculino',
     title: 'Flag Masculino',
     desc: 'Competencia 5vs5, ritmo alto y técnica para aprender el deporte desde sus fundamentos.',
+    detail: 'Es una modalidad sin contacto fuerte: para detener la jugada se quita una bandera del cinturón del rival. Prioriza velocidad, lectura de juego, pases, rutas y defensa individual.',
+    points: [
+      ['Sin tackleo', 'La jugada termina cuando se retira una flag, por eso es ágil y accesible para empezar.'],
+      ['Formato 5vs5', 'Se juega con cinco jugadores por equipo, mucho espacio y decisiones rápidas.'],
+      ['Competencia local', 'La liga masculina combina entrenamientos, partidos y torneos durante la temporada.'],
+    ],
     image: '/hero/portada-flag-accion.jpg',
     to: '/inscripcion',
     cta: 'Sumarme',
   },
   {
+    id: 'flag-femenino',
     title: 'Flag Femenino',
     desc: 'Equipos femeninos en crecimiento, entrenamientos abiertos y comunidad para empezar desde cero.',
+    detail: 'Comparte las reglas centrales del flag 5vs5 y suma un espacio femenino en crecimiento, pensado para entrenar, competir y aprender el deporte en grupo desde cualquier nivel.',
+    points: [
+      ['Abierto a principiantes', 'Podés probar aunque nunca hayas jugado: se enseñan técnica, reglas y fundamentos desde cero.'],
+      ['Juego dinámico', 'La modalidad combina velocidad, coordinación, pases, recepción y lectura defensiva.'],
+      ['Equipo y comunidad', 'Es una puerta de entrada ideal para sumarse a Nereidas y a la liga femenina local.'],
+    ],
     image: '/hero/portada-femenino-accion.jpg',
     to: '/inscripcion',
     cta: 'Sumarme',
@@ -83,6 +104,8 @@ export default function Inicio() {
   const [ultimoEvento, setUltimoEvento] = useState(null);
   const [noticias, setNoticias] = useState([]);
   const [heroSlide, setHeroSlide] = useState(0);
+  const [selectedModalidad, setSelectedModalidad] = useState(MODALIDADES[0].id);
+  const modalidadActiva = MODALIDADES.find(modalidad => modalidad.id === selectedModalidad) || MODALIDADES[0];
 
   useEffect(() => {
     api.get('/pages/inicio').then(r => { if (r.data?.contenido) setData(r.data.contenido); });
@@ -171,8 +194,8 @@ export default function Inicio() {
           <div className="flex gap-5 overflow-x-auto snap-x pb-2 md:grid md:grid-cols-3 md:overflow-visible">
             {MODALIDADES.map(modalidad => (
               <article
-                key={modalidad.title}
-                className="min-w-[82%] snap-start bg-secondary border border-accent/20 rounded-xl overflow-hidden md:min-w-0"
+                key={modalidad.id}
+                className={`min-w-[82%] snap-start bg-secondary border rounded-xl overflow-hidden md:min-w-0 transition ${selectedModalidad === modalidad.id ? 'border-accent shadow-lg shadow-accent/15' : 'border-accent/20'}`}
               >
                 <div className="h-56 bg-primary/50 overflow-hidden">
                   <img src={modalidad.image} alt={modalidad.title} className="w-full h-full object-cover" />
@@ -180,15 +203,46 @@ export default function Inicio() {
                 <div className="p-6">
                   <h3 className="text-2xl font-extrabold text-white">{modalidad.title}</h3>
                   <p className="text-white/58 leading-relaxed mt-3 min-h-[84px]">{modalidad.desc}</p>
-                  <Link
-                    to={modalidad.to}
-                    className="inline-flex items-center justify-center bg-accent text-white font-bold px-5 py-2.5 rounded-full hover:bg-accent-light transition mt-5"
-                  >
-                    {modalidad.cta}
-                  </Link>
+                  <div className="mt-5 flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedModalidad(modalidad.id)}
+                      className="inline-flex items-center justify-center bg-accent text-white font-bold px-5 py-2.5 rounded-full hover:bg-accent-light transition"
+                    >
+                      Ver explicación
+                    </button>
+                    <Link
+                      to={modalidad.to}
+                      className="inline-flex items-center justify-center border border-white/20 text-white font-bold px-5 py-2.5 rounded-full hover:bg-white/10 transition"
+                    >
+                      {modalidad.cta}
+                    </Link>
+                  </div>
                 </div>
               </article>
             ))}
+          </div>
+          <div className="mt-8 grid lg:grid-cols-[0.9fr_1.1fr] gap-6 items-stretch">
+            <div className="overflow-hidden rounded-xl border border-accent/20 bg-secondary min-h-[280px]">
+              <img
+                src={modalidadActiva.image}
+                alt={modalidadActiva.title}
+                className="h-full min-h-[280px] w-full object-cover"
+              />
+            </div>
+            <div className="bg-secondary border border-accent/20 rounded-xl p-6 md:p-8">
+              <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-3">Cómo se juega</p>
+              <h3 className="text-3xl font-extrabold text-white">{modalidadActiva.title}</h3>
+              <p className="text-white/65 text-lg leading-relaxed mt-4">{modalidadActiva.detail}</p>
+              <div className="grid sm:grid-cols-3 gap-4 mt-6">
+                {modalidadActiva.points.map(([title, text]) => (
+                  <div key={title} className="border border-accent/15 bg-primary/45 rounded-lg p-4">
+                    <p className="text-white font-bold">{title}</p>
+                    <p className="text-white/50 text-sm leading-relaxed mt-2">{text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
