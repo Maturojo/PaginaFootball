@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import api from '../api';
 import { FALLBACK_PARTIDOS } from '../data/stats.js';
 import { teamLogoSrc } from '../utils/teamLogo.js';
@@ -127,26 +126,6 @@ function PartidoCard({ p, logoMap }) {
               ))}
             </div>
           )}
-        </div>
-      )}
-      {finalizado && p.categoria === 'Football Americano 7vs7' && (
-        <div className="mt-3 pt-3 border-t border-white/5 text-center">
-          <Link
-            to="/estadisticas?seccion=lideres&deporte=equipados"
-            className="inline-flex items-center gap-2 text-xs font-bold text-accent hover:text-accent-light transition border border-accent/30 hover:border-accent px-4 py-1.5 rounded-full"
-          >
-            📊 Ver estadísticas de equipados
-          </Link>
-        </div>
-      )}
-      {p.jornada?.includes('Final') && !p.jornada?.includes('Semi') && (
-        <div className="mt-3 pt-3 border-t border-white/5 text-center">
-          <Link
-            to="/estadisticas?seccion=lideres&temporada=Final - Tazón del Mar IX"
-            className="inline-flex items-center gap-2 text-xs font-bold text-accent hover:text-accent-light transition border border-accent/30 hover:border-accent px-4 py-1.5 rounded-full"
-          >
-            📊 Ver estadísticas de la Final
-          </Link>
         </div>
       )}
     </div>

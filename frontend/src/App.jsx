@@ -9,7 +9,6 @@ import Inicio from './pages/Inicio';
 import Historia from './pages/Historia';
 import Equipos from './pages/Equipos';
 import EquipoDetalle from './pages/EquipoDetalle';
-import Estadisticas from './pages/Estadisticas';
 import Fixture from './pages/Fixture';
 import Jugadores from './pages/Jugadores';
 import Noticias from './pages/Noticias';
@@ -56,7 +55,6 @@ export default function App() {
           <Route path="/historia" element={<PublicLayout><Historia /></PublicLayout>} />
           <Route path="/equipos" element={<PublicLayout><Equipos /></PublicLayout>} />
           <Route path="/equipos/:id" element={<PublicLayout><EquipoDetalle /></PublicLayout>} />
-          <Route path="/estadisticas" element={<PublicLayout><Estadisticas /></PublicLayout>} />
           <Route path="/fixture" element={<PublicLayout><Fixture /></PublicLayout>} />
           <Route path="/jugadores" element={<PublicLayout><Jugadores /></PublicLayout>} />
           <Route path="/noticias" element={<PublicLayout><Noticias /></PublicLayout>} />
