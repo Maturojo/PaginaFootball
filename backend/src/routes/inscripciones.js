@@ -1,9 +1,22 @@
 const router = require('express').Router();
 const Inscripcion = require('../models/Inscripcion');
 const auth = require('../middleware/auth');
+const { sendInscripcionConfirmation } = require('../services/confirmationEmail');
 
 router.post('/', async (req, res) => {
-  try { res.status(201).json(await Inscripcion.create(req.body)); }
+  try {
+    const inscripcion = await Inscripcion.create(req.body);
+    let confirmacion = { sent: false };
+
+    try {
+      confirmacion = await sendInscripcionConfirmation(inscripcion);
+    } catch (emailError) {
+      console.error('Error al enviar confirmacion de inscripcion:', emailError.message);
+      confirmacion = { sent: false, reason: emailError.message };
+    }
+
+    res.status(201).json({ inscripcion, confirmacion });
+  }
   catch (err) { res.status(400).json({ message: err.message }); }
 });
 router.get('/all', auth, async (req, res) => {

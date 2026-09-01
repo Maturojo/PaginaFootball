@@ -26,6 +26,19 @@ npm run dev       # App en http://localhost:5173
 - Email: admin@ligafootballmdp.com
 - Contraseña: Admin1234!
 
+## Email de confirmación de inscripciones
+Para que cada persona reciba el mensaje automático al inscribirse, configurar estas variables de entorno en el backend/Vercel:
+
+```bash
+SMTP_HOST=smtp.tu-proveedor.com
+SMTP_PORT=587
+SMTP_USER=tu-email@dominio.com
+SMTP_PASS=tu-password-o-app-password
+SMTP_FROM="Liga Football MDP <tu-email@dominio.com>"
+```
+
+Si estas variables no están configuradas, la inscripción igual se guarda, pero no se envía email automático.
+
 ## Estructura
 ```
 backend/src/

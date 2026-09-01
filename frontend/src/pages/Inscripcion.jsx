@@ -8,6 +8,7 @@ const POSICIONES = ['No sé aún', 'Quarterback (QB)', 'Wide Receiver (WR)', 'Ru
 export default function Inscripcion() {
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
   const [enviado, setEnviado] = useState(false);
+  const [confirmacionEmail, setConfirmacionEmail] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -15,7 +16,8 @@ export default function Inscripcion() {
     setLoading(true);
     setError('');
     try {
-      await api.post('/inscripciones', data);
+      const response = await api.post('/inscripciones', data);
+      setConfirmacionEmail(Boolean(response.data?.confirmacion?.sent));
       setEnviado(true);
       reset();
     } catch {
@@ -38,7 +40,10 @@ export default function Inscripcion() {
           <div className="bg-green-900/30 border border-green-500/30 rounded-2xl p-10 text-center">
             <p className="text-5xl mb-4">🏈</p>
             <h2 className="text-2xl font-bold text-white mb-3">¡Inscripción recibida!</h2>
-            <p className="text-white/60">Nos ponemos en contacto a la brevedad. ¡Bienvenido a la liga!</p>
+            <p className="text-white/60">Te vamos a escribir o llamar en cualquier momento. ¡Bienvenido a la liga!</p>
+            {confirmacionEmail && (
+              <p className="text-green-300 text-sm mt-3">También te enviamos un email de confirmación.</p>
+            )}
             <button onClick={() => setEnviado(false)} className="mt-6 bg-accent text-white px-6 py-2 rounded-full font-bold hover:bg-accent-light transition">
               Nueva inscripción
             </button>
