@@ -148,13 +148,15 @@ function imageInputId(prefix, index = '') {
 }
 
 function normalizeSlide(slide, defaults = {}) {
-  const fallback = { fit: 'natural', x: 50, y: 50, ...defaults };
+  const fallback = { fit: 'cover', x: 50, y: 50, zoom: 100, ...defaults };
   if (typeof slide === 'string') return { src: slide, ...fallback };
+  const fit = slide?.fit === 'contain' ? 'contain' : fallback.fit;
   return {
     src: slide?.src || '',
-    fit: slide?.fit || fallback.fit,
+    fit,
     x: Number.isFinite(Number(slide?.x)) ? Number(slide.x) : fallback.x,
     y: Number.isFinite(Number(slide?.y)) ? Number(slide.y) : fallback.y,
+    zoom: Number.isFinite(Number(slide?.zoom)) ? Number(slide.zoom) : fallback.zoom,
   };
 }
 
@@ -195,9 +197,19 @@ function ImageValueEditor({ label, value, onChange, id }) {
   );
 }
 
-function SlidesEditor({ title, slides, onChange, id, defaultFit = 'natural', defaultY = 50 }) {
+function slideStyle(slide) {
+  const offsetX = (50 - slide.x) * 0.7;
+  const offsetY = (50 - slide.y) * 0.7;
+  return {
+    objectFit: slide.fit === 'contain' ? 'contain' : 'cover',
+    objectPosition: 'center center',
+    transform: `translate(${offsetX}%, ${offsetY}%) scale(${slide.zoom / 100})`,
+  };
+}
+
+function SlidesEditor({ title, slides, onChange, id, defaultFit = 'cover', defaultY = 50 }) {
   const [newUrl, setNewUrl] = useState('');
-  const defaults = { fit: defaultFit, x: 50, y: defaultY };
+  const defaults = { fit: defaultFit, x: 50, y: defaultY, zoom: 100 };
   const values = (Array.isArray(slides) ? slides : []).map(slide => normalizeSlide(slide, defaults));
 
   const updateAt = (index, changes) => {
@@ -207,7 +219,7 @@ function SlidesEditor({ title, slides, onChange, id, defaultFit = 'natural', def
   const updatePosition = (index, changes) => {
     onChange(values.map((slide, i) => (
       i === index
-        ? { ...slide, fit: slide.fit === 'natural' ? 'cover' : slide.fit, ...changes }
+        ? { ...slide, fit: slide.fit === 'natural' ? 'cover' : slide.fit, zoom: slide.zoom <= 100 ? 115 : slide.zoom, ...changes }
         : slide
     )));
   };
@@ -245,28 +257,35 @@ function SlidesEditor({ title, slides, onChange, id, defaultFit = 'natural', def
           <div key={`${slide.src}-${index}`} className="rounded-lg border border-gray-200 p-3">
             <div className="grid gap-3 md:grid-cols-[160px_1fr_auto] md:items-start">
               <div className="overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
-                <div className={slide.fit === 'natural' ? '' : 'aspect-[16/10]'}>
+                <div className="aspect-[16/10] overflow-hidden">
                   <img
                     src={imageSrc(slide.src)}
                     alt=""
-                    className={slide.fit === 'natural' ? 'block w-full h-auto' : 'h-full w-full'}
-                    style={{
-                      objectFit: slide.fit === 'contain' ? 'contain' : 'cover',
-                      objectPosition: `${slide.x}% ${slide.y}%`,
-                    }}
+                    className="h-full w-full"
+                    style={slideStyle(slide)}
                   />
                 </div>
               </div>
               <div className="space-y-3">
                 <input value={slide.src} onChange={e => updateAt(index, { src: e.target.value })} className="input" />
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
                   <label className="text-sm font-medium text-gray-700">
                     Modo
                     <select value={slide.fit} onChange={e => updateAt(index, { fit: e.target.value })} className="input mt-1">
-                      <option value="natural">Alto natural</option>
                       <option value="cover">Rellenar sin margen</option>
                       <option value="contain">Foto completa</option>
                     </select>
+                  </label>
+                  <label className="text-sm font-medium text-gray-700">
+                    Zoom: {slide.zoom}%
+                    <input
+                      type="range"
+                      min="80"
+                      max="180"
+                      value={slide.zoom}
+                      onChange={e => updateAt(index, { zoom: Number(e.target.value) })}
+                      className="mt-3 w-full accent-primary"
+                    />
                   </label>
                   <label className="text-sm font-medium text-gray-700">
                     Horizontal: {slide.x}%
@@ -292,7 +311,7 @@ function SlidesEditor({ title, slides, onChange, id, defaultFit = 'natural', def
                   </label>
                 </div>
                 <p className="text-xs text-gray-500">
-                  Al mover Horizontal o Vertical, la foto pasa a “Rellenar sin margen” para que el encuadre tenga efecto.
+                  Usá Zoom para acercar o alejar, y Horizontal/Vertical para mover el encuadre dentro del marco.
                 </p>
               </div>
               <div className="flex gap-1">
@@ -364,10 +383,10 @@ function InicioEditor() {
       await api.put('/pages/inicio', {
         contenido: {
           ...contenido,
-          heroSlides: (contenido.heroSlides || []).map(slide => cleanSlide(slide, { fit: 'cover', x: 50, y: 52 })).filter(Boolean),
+          heroSlides: (contenido.heroSlides || []).map(slide => cleanSlide(slide, { fit: 'cover', x: 50, y: 52, zoom: 100 })).filter(Boolean),
           modalidades: (contenido.modalidades || []).map(modalidad => ({
             ...modalidad,
-            slides: (modalidad.slides || []).map(slide => cleanSlide(slide, { fit: 'natural', x: 50, y: 50 })).filter(Boolean),
+            slides: (modalidad.slides || []).map(slide => cleanSlide(slide, { fit: 'cover', x: 50, y: 50, zoom: 100 })).filter(Boolean),
           })),
         },
       });

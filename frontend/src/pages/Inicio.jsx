@@ -115,7 +115,24 @@ function nonEmptyArray(value, fallback) {
 
 function normalizeSlide(slide, defaults = {}) {
   if (typeof slide === 'string') return { src: slide, ...defaults };
-  return { ...defaults, ...(slide || {}) };
+  const normalized = { ...defaults, ...(slide || {}) };
+  return {
+    ...normalized,
+    fit: normalized.fit === 'contain' ? 'contain' : 'cover',
+  };
+}
+
+function slideStyle(slide) {
+  const zoom = Number.isFinite(Number(slide.zoom)) ? Number(slide.zoom) : 100;
+  const x = Number.isFinite(Number(slide.x)) ? Number(slide.x) : 50;
+  const y = Number.isFinite(Number(slide.y)) ? Number(slide.y) : 50;
+  const offsetX = (50 - x) * 0.7;
+  const offsetY = (50 - y) * 0.7;
+  return {
+    objectFit: slide.fit === 'contain' ? 'contain' : 'cover',
+    objectPosition: 'center center',
+    transform: `translate(${offsetX}%, ${offsetY}%) scale(${zoom / 100})`,
+  };
 }
 
 function slideKey(slide, index) {
@@ -215,7 +232,7 @@ export default function Inicio() {
       {/* Hero */}
       <section className="relative h-[72vh] min-h-[640px] max-h-[760px] px-4 pt-24 md:pt-28 pb-24 md:pb-28 overflow-hidden flex items-center">
         {heroSlides.map((slide, index) => {
-          const normalizedSlide = normalizeSlide(slide, { fit: 'cover', x: 50, y: 52 });
+          const normalizedSlide = normalizeSlide(slide, { fit: 'cover', x: 50, y: 52, zoom: 100 });
           return (
             <img
               key={slideKey(slide, index)}
@@ -223,10 +240,7 @@ export default function Inicio() {
               alt=""
               aria-hidden="true"
               className={`absolute inset-0 h-full w-full transition-opacity duration-1000 ${heroSlide === index ? 'opacity-100' : 'opacity-0'}`}
-              style={{
-                objectFit: normalizedSlide.fit === 'contain' ? 'contain' : 'cover',
-                objectPosition: `${normalizedSlide.x}% ${normalizedSlide.y}%`,
-              }}
+              style={slideStyle(normalizedSlide)}
             />
           );
         })}
@@ -307,17 +321,7 @@ export default function Inicio() {
           <div className="mt-8 grid lg:grid-cols-[0.9fr_1.1fr] gap-6 items-start">
             <div className="relative overflow-hidden rounded-xl border border-accent/20 bg-primary/70">
               {(() => {
-                const currentSlide = normalizeSlide(modalidadSlides[modalidadSlide], { fit: 'natural', x: 50, y: 50 });
-                if (currentSlide.fit === 'natural') {
-                  return (
-                    <img
-                      key={slideKey(currentSlide, modalidadSlide)}
-                      src={pageImageSrc(currentSlide.src)}
-                      alt={modalidadActiva.title}
-                      className="block w-full h-auto"
-                    />
-                  );
-                }
+                const currentSlide = normalizeSlide(modalidadSlides[modalidadSlide], { fit: 'cover', x: 50, y: 50, zoom: 100 });
 
                 return (
                   <div className="aspect-[16/10]">
@@ -326,10 +330,7 @@ export default function Inicio() {
                       src={pageImageSrc(currentSlide.src)}
                       alt={modalidadActiva.title}
                       className="h-full w-full"
-                      style={{
-                        objectFit: currentSlide.fit === 'contain' ? 'contain' : 'cover',
-                        objectPosition: `${currentSlide.x}% ${currentSlide.y}%`,
-                      }}
+                      style={slideStyle(currentSlide)}
                     />
                   </div>
                 );
