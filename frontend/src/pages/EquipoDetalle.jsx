@@ -16,6 +16,13 @@ const TEAM_COVER_SLIDES = {
     '/equipos/krakens-slide-2.jpg',
     '/equipos/krakens-slide-3.jpg',
   ],
+  liebres: [
+    '/equipos/liebres-slide-1.jpg',
+    '/equipos/liebres-slide-2.jpg',
+    '/equipos/liebres-slide-3.jpg',
+    '/equipos/liebres-slide-4.jpg',
+    '/equipos/liebres-slide-5.jpg',
+  ],
   tridentes: [
     '/equipos/tridentes-slide-1.jpg',
     '/equipos/tridentes-slide-2.jpg',
