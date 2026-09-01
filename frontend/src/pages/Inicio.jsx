@@ -8,9 +8,6 @@ import { FALLBACK_EVENTS } from '../data/events.js';
 const HERO_SLIDES = [
   '/hero/portada-slide-mariscal.jpg',
   '/hero/portada-slide-chicas.jpg',
-  '/hero/portada-slide-flag-1.jpg',
-  '/hero/portada-slide-flag-2.jpg',
-  '/hero/portada-slide-flag-3.jpg',
 ];
 const HERO_TITLE = 'Fútbol Americano';
 const HERO_TITLE_2 = 'Mar del Plata';
@@ -47,7 +44,12 @@ const MODALIDADES = [
       ['Competencia local', 'La liga masculina combina entrenamientos, partidos y torneos durante la temporada.'],
     ],
     image: '/hero/portada-flag-accion.jpg',
-    slides: ['/hero/portada-flag-accion.jpg'],
+    slides: [
+      '/hero/portada-flag-accion.jpg',
+      '/hero/portada-slide-flag-1.jpg',
+      '/hero/portada-slide-flag-2.jpg',
+      '/hero/portada-slide-flag-3.jpg',
+    ],
     to: '/equipos',
     cta: 'Ver equipos',
   },
