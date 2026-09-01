@@ -113,6 +113,16 @@ function nonEmptyArray(value, fallback) {
   return Array.isArray(value) && value.length > 0 ? value : fallback;
 }
 
+function normalizeSlide(slide, defaults = {}) {
+  if (typeof slide === 'string') return { src: slide, ...defaults };
+  return { ...defaults, ...(slide || {}) };
+}
+
+function slideKey(slide, index) {
+  const normalized = normalizeSlide(slide);
+  return `${normalized.src || 'slide'}-${index}`;
+}
+
 function mergeModalidades(custom = []) {
   if (!Array.isArray(custom)) return DEFAULT_MODALIDADES;
   return DEFAULT_MODALIDADES.map(defaultModalidad => ({
@@ -204,16 +214,22 @@ export default function Inicio() {
     <div className="bg-primary text-white">
       {/* Hero */}
       <section className="relative h-[72vh] min-h-[640px] max-h-[760px] px-4 pt-24 md:pt-28 pb-24 md:pb-28 overflow-hidden flex items-center">
-        {heroSlides.map((slide, index) => (
-          <img
-            key={slide}
-            src={pageImageSrc(slide)}
-            alt=""
-            aria-hidden="true"
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${heroSlide === index ? 'opacity-100' : 'opacity-0'}`}
-            style={{ objectPosition: 'center 52%' }}
-          />
-        ))}
+        {heroSlides.map((slide, index) => {
+          const normalizedSlide = normalizeSlide(slide, { fit: 'cover', x: 50, y: 52 });
+          return (
+            <img
+              key={slideKey(slide, index)}
+              src={pageImageSrc(normalizedSlide.src)}
+              alt=""
+              aria-hidden="true"
+              className={`absolute inset-0 h-full w-full transition-opacity duration-1000 ${heroSlide === index ? 'opacity-100' : 'opacity-0'}`}
+              style={{
+                objectFit: normalizedSlide.fit === 'contain' ? 'contain' : 'cover',
+                objectPosition: `${normalizedSlide.x}% ${normalizedSlide.y}%`,
+              }}
+            />
+          );
+        })}
         <div className="absolute inset-0 bg-primary/25" />
         <div className="absolute inset-0 bg-gradient-to-b from-primary/45 via-primary/15 to-primary/70" />
         <div className="relative max-w-4xl mx-auto text-center mt-8 md:mt-12">
@@ -290,12 +306,34 @@ export default function Inicio() {
           </div>
           <div className="mt-8 grid lg:grid-cols-[0.9fr_1.1fr] gap-6 items-start">
             <div className="relative overflow-hidden rounded-xl border border-accent/20 bg-primary/70">
-              <img
-                key={modalidadSlides[modalidadSlide]}
-                src={pageImageSrc(modalidadSlides[modalidadSlide])}
-                alt={modalidadActiva.title}
-                className="block w-full h-auto"
-              />
+              {(() => {
+                const currentSlide = normalizeSlide(modalidadSlides[modalidadSlide], { fit: 'natural', x: 50, y: 50 });
+                if (currentSlide.fit === 'natural') {
+                  return (
+                    <img
+                      key={slideKey(currentSlide, modalidadSlide)}
+                      src={pageImageSrc(currentSlide.src)}
+                      alt={modalidadActiva.title}
+                      className="block w-full h-auto"
+                    />
+                  );
+                }
+
+                return (
+                  <div className="aspect-[16/10]">
+                    <img
+                      key={slideKey(currentSlide, modalidadSlide)}
+                      src={pageImageSrc(currentSlide.src)}
+                      alt={modalidadActiva.title}
+                      className="h-full w-full"
+                      style={{
+                        objectFit: currentSlide.fit === 'contain' ? 'contain' : 'cover',
+                        objectPosition: `${currentSlide.x}% ${currentSlide.y}%`,
+                      }}
+                    />
+                  </div>
+                );
+              })()}
               {modalidadSlides.length > 1 && (
                 <>
                   <button
@@ -317,7 +355,7 @@ export default function Inicio() {
                   <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
                     {modalidadSlides.map((slide, index) => (
                       <button
-                        key={`${slide}-dot`}
+                        key={`${slideKey(slide, index)}-dot`}
                         type="button"
                         onClick={() => setModalidadSlide(index)}
                         className={`h-2.5 rounded-full transition-all ${modalidadSlide === index ? 'w-8 bg-accent' : 'w-2.5 bg-white/45 hover:bg-white/80'}`}

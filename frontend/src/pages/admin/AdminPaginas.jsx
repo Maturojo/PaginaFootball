@@ -147,6 +147,23 @@ function imageInputId(prefix, index = '') {
   return `${prefix}-${index}`.replace(/[^a-zA-Z0-9_-]/g, '-');
 }
 
+function normalizeSlide(slide, defaults = {}) {
+  const fallback = { fit: 'natural', x: 50, y: 50, ...defaults };
+  if (typeof slide === 'string') return { src: slide, ...fallback };
+  return {
+    src: slide?.src || '',
+    fit: slide?.fit || fallback.fit,
+    x: Number.isFinite(Number(slide?.x)) ? Number(slide.x) : fallback.x,
+    y: Number.isFinite(Number(slide?.y)) ? Number(slide.y) : fallback.y,
+  };
+}
+
+function cleanSlide(slide, defaults) {
+  const normalized = normalizeSlide(slide, defaults);
+  if (!normalized.src) return null;
+  return normalized;
+}
+
 function ImageValueEditor({ label, value, onChange, id }) {
   const inputId = imageInputId(id || label);
   const [uploading, setUploading] = useState(false);
@@ -178,12 +195,13 @@ function ImageValueEditor({ label, value, onChange, id }) {
   );
 }
 
-function SlidesEditor({ title, slides, onChange, id }) {
+function SlidesEditor({ title, slides, onChange, id, defaultFit = 'natural', defaultY = 50 }) {
   const [newUrl, setNewUrl] = useState('');
-  const values = Array.isArray(slides) ? slides : [];
+  const defaults = { fit: defaultFit, x: 50, y: defaultY };
+  const values = (Array.isArray(slides) ? slides : []).map(slide => normalizeSlide(slide, defaults));
 
-  const updateAt = (index, value) => {
-    onChange(values.map((slide, i) => (i === index ? value : slide)));
+  const updateAt = (index, changes) => {
+    onChange(values.map((slide, i) => (i === index ? { ...slide, ...changes } : slide)));
   };
 
   const move = (index, direction) => {
@@ -198,7 +216,7 @@ function SlidesEditor({ title, slides, onChange, id }) {
   const addUrl = () => {
     const clean = newUrl.trim();
     if (!clean) return;
-    onChange([...values, clean]);
+    onChange([...values, { src: clean, ...defaults }]);
     setNewUrl('');
   };
 
@@ -206,7 +224,7 @@ function SlidesEditor({ title, slides, onChange, id }) {
     const files = Array.from(event.target.files || []);
     if (files.length === 0) return;
     const uploaded = [];
-    for (const file of files) uploaded.push(await uploadImage(file));
+    for (const file of files) uploaded.push({ src: await uploadImage(file), ...defaults });
     onChange([...values, ...uploaded]);
     event.target.value = '';
   };
@@ -216,13 +234,64 @@ function SlidesEditor({ title, slides, onChange, id }) {
       <p className="mb-3 font-bold text-gray-800">{title}</p>
       <div className="space-y-3">
         {values.map((slide, index) => (
-          <div key={`${slide}-${index}`} className="grid gap-2 md:grid-cols-[96px_1fr_auto] md:items-center">
-            <img src={imageSrc(slide)} alt="" className="h-16 w-24 rounded-lg object-cover border border-gray-200" />
-            <input value={slide} onChange={e => updateAt(index, e.target.value)} className="input" />
-            <div className="flex gap-1">
-              <button type="button" onClick={() => move(index, -1)} className="rounded border px-2 py-1 text-sm">↑</button>
-              <button type="button" onClick={() => move(index, 1)} className="rounded border px-2 py-1 text-sm">↓</button>
-              <button type="button" onClick={() => onChange(values.filter((_, i) => i !== index))} className="rounded border border-red-200 px-2 py-1 text-sm text-red-600">Eliminar</button>
+          <div key={`${slide.src}-${index}`} className="rounded-lg border border-gray-200 p-3">
+            <div className="grid gap-3 md:grid-cols-[160px_1fr_auto] md:items-start">
+              <div className="overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
+                <div className={slide.fit === 'natural' ? '' : 'aspect-[16/10]'}>
+                  <img
+                    src={imageSrc(slide.src)}
+                    alt=""
+                    className={slide.fit === 'natural' ? 'block w-full h-auto' : 'h-full w-full'}
+                    style={{
+                      objectFit: slide.fit === 'contain' ? 'contain' : 'cover',
+                      objectPosition: `${slide.x}% ${slide.y}%`,
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="space-y-3">
+                <input value={slide.src} onChange={e => updateAt(index, { src: e.target.value })} className="input" />
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                  <label className="text-sm font-medium text-gray-700">
+                    Modo
+                    <select value={slide.fit} onChange={e => updateAt(index, { fit: e.target.value })} className="input mt-1">
+                      <option value="natural">Alto natural</option>
+                      <option value="cover">Rellenar sin margen</option>
+                      <option value="contain">Foto completa</option>
+                    </select>
+                  </label>
+                  <label className="text-sm font-medium text-gray-700">
+                    Horizontal: {slide.x}%
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={slide.x}
+                      onChange={e => updateAt(index, { x: Number(e.target.value) })}
+                      className="mt-3 w-full accent-primary"
+                    />
+                  </label>
+                  <label className="text-sm font-medium text-gray-700">
+                    Vertical: {slide.y}%
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={slide.y}
+                      onChange={e => updateAt(index, { y: Number(e.target.value) })}
+                      className="mt-3 w-full accent-primary"
+                    />
+                  </label>
+                </div>
+                <p className="text-xs text-gray-500">
+                  “Rellenar sin margen” permite mover el recorte. “Foto completa” muestra todo aunque pueda dejar espacio. “Alto natural” usa la foto tal cual.
+                </p>
+              </div>
+              <div className="flex gap-1">
+                <button type="button" onClick={() => move(index, -1)} className="rounded border px-2 py-1 text-sm">↑</button>
+                <button type="button" onClick={() => move(index, 1)} className="rounded border px-2 py-1 text-sm">↓</button>
+                <button type="button" onClick={() => onChange(values.filter((_, i) => i !== index))} className="rounded border border-red-200 px-2 py-1 text-sm text-red-600">Eliminar</button>
+              </div>
             </div>
           </div>
         ))}
@@ -284,7 +353,16 @@ function InicioEditor() {
   const save = async () => {
     setSaving(true);
     try {
-      await api.put('/pages/inicio', { contenido });
+      await api.put('/pages/inicio', {
+        contenido: {
+          ...contenido,
+          heroSlides: (contenido.heroSlides || []).map(slide => cleanSlide(slide, { fit: 'cover', x: 50, y: 52 })).filter(Boolean),
+          modalidades: (contenido.modalidades || []).map(modalidad => ({
+            ...modalidad,
+            slides: (modalidad.slides || []).map(slide => cleanSlide(slide, { fit: 'natural', x: 50, y: 50 })).filter(Boolean),
+          })),
+        },
+      });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } finally {
@@ -319,7 +397,14 @@ function InicioEditor() {
         </div>
       </div>
 
-      <SlidesEditor title="Slide principal del inicio" id="hero" slides={contenido.heroSlides} onChange={slides => setField('heroSlides', slides)} />
+      <SlidesEditor
+        title="Slide principal del inicio"
+        id="hero"
+        slides={contenido.heroSlides}
+        defaultFit="cover"
+        defaultY={52}
+        onChange={slides => setField('heroSlides', slides)}
+      />
 
       <div className="rounded-xl border border-gray-200 p-4">
         <p className="mb-4 font-bold text-gray-800">Bloque “No necesitás experiencia”</p>
