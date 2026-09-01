@@ -88,6 +88,39 @@ const DEFAULT_EXPERIENCE = {
   to: '/inscripcion',
 };
 
+const DEFAULT_HOME_TEXT = {
+  heroMeta: 'Est. 2016 · Mar del Plata · Argentina',
+  heroPrimaryCta: 'SUMATE',
+  heroPrimaryTo: '/inscripcion',
+  heroStoreCta: 'Ir a la Tienda',
+  heroStoreTo: '/tienda',
+  heroShirtCta: 'Diseña tu remera',
+  heroShirtTo: '/remeras',
+  welcomeTitle: 'Bienvenidos a la Liga',
+  modalitiesEyebrow: 'Entrená con nosotros',
+  modalitiesTitle: 'Elegí tu modalidad',
+  modalitiesAllTeamsLabel: 'Ver todos los equipos →',
+  modalitiesAllTeamsTo: '/equipos',
+  modalitiesExplanationCta: 'Ver explicación',
+  howToPlayEyebrow: 'Cómo se juega',
+  trainingEyebrow: 'Lugares de entrenamiento',
+  trainingTitle: 'Dónde nos encontrás',
+  newsTitle: 'Últimas Noticias',
+  newsAllLabel: 'Ver todas →',
+  newsAllTo: '/noticias',
+  eventTitle: 'Último Evento',
+  eventAllLabel: 'Ver todos →',
+  eventAllTo: '/eventos',
+  eventPhotosLabel: 'Ver fotos →',
+  galleryTitle: 'Momentos de la Liga',
+  galleryAllLabel: 'Ver todos →',
+  galleryAllTo: '/eventos',
+  contactTitle: '¿Querés sumarte a la liga?',
+  contactText: 'Contactanos y te informamos sobre cómo participar.',
+  contactCta: 'Contactanos',
+  contactTo: '/contacto',
+};
+
 function fotoSrc(f) {
   if (f?.startsWith('/eventos/')) return f;
   return f?.startsWith('http') ? f : `${API_URL}${f}`;
@@ -172,6 +205,7 @@ export default function Inicio() {
     modalidades: DEFAULT_MODALIDADES,
     experience: DEFAULT_EXPERIENCE,
     trainingPlaces: DEFAULT_TRAINING_PLACES,
+    homeText: DEFAULT_HOME_TEXT,
   });
   const [fotos, setFotos] = useState([]);
   const [ultimoEvento, setUltimoEvento] = useState(null);
@@ -183,6 +217,7 @@ export default function Inicio() {
   const modalidades = mergeModalidades(data.modalidades);
   const trainingPlaces = nonEmptyArray(data.trainingPlaces, DEFAULT_TRAINING_PLACES);
   const experience = { ...DEFAULT_EXPERIENCE, ...(data.experience || {}) };
+  const homeText = { ...DEFAULT_HOME_TEXT, ...(data.homeText || {}) };
   const modalidadActiva = modalidades.find(modalidad => modalidad.id === selectedModalidad) || modalidades[0];
   const modalidadSlides = nonEmptyArray(modalidadActiva.slides, [modalidadActiva.image]);
 
@@ -248,19 +283,19 @@ export default function Inicio() {
         <div className="absolute inset-0 bg-gradient-to-b from-primary/45 via-primary/15 to-primary/70" />
         <div className="relative max-w-4xl mx-auto text-center mt-8 md:mt-12">
           <img src="/logo.png" alt="Logo Liga" className="h-36 w-36 object-contain mx-auto mb-8 drop-shadow-2xl" />
-          <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-4">Est. 2016 · Mar del Plata · Argentina</p>
+          <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-4">{homeText.heroMeta}</p>
           <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4 text-white">{data.titulo}</h1>
           <h2 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 text-white">{data.titulo2}</h2>
           <p className="text-xl text-white/75 mb-10">{data.subtitulo}</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link to="/inscripcion" className="bg-accent text-white font-bold px-8 py-3 rounded-full hover:bg-accent-light transition shadow-lg shadow-accent/30">
-              SUMATE
+            <Link to={homeText.heroPrimaryTo} className="bg-accent text-white font-bold px-8 py-3 rounded-full hover:bg-accent-light transition shadow-lg shadow-accent/30">
+              {homeText.heroPrimaryCta}
             </Link>
-            <Link to="/tienda" className="border-2 border-accent/60 text-white font-bold px-8 py-3 rounded-full hover:bg-accent/20 transition">
-              Ir a la Tienda
+            <Link to={homeText.heroStoreTo} className="border-2 border-accent/60 text-white font-bold px-8 py-3 rounded-full hover:bg-accent/20 transition">
+              {homeText.heroStoreCta}
             </Link>
-            <Link to="/remeras" className="border-2 border-white/30 text-white font-bold px-8 py-3 rounded-full hover:bg-white/10 transition">
-              Diseña tu remera
+            <Link to={homeText.heroShirtTo} className="border-2 border-white/30 text-white font-bold px-8 py-3 rounded-full hover:bg-white/10 transition">
+              {homeText.heroShirtCta}
             </Link>
           </div>
         </div>
@@ -269,7 +304,7 @@ export default function Inicio() {
       {/* Descripción */}
       <section className="bg-secondary py-20 px-4 text-center border-y border-accent/10">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold text-white mb-4">Bienvenidos a la Liga</h2>
+          <h2 className="text-3xl font-bold text-white mb-4">{homeText.welcomeTitle}</h2>
           <div className="w-16 h-1 bg-accent mx-auto mb-6 rounded" />
           <p className="text-white/60 text-lg leading-relaxed">{data.descripcion}</p>
         </div>
@@ -280,11 +315,11 @@ export default function Inicio() {
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
             <div>
-              <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-2">Entrená con nosotros</p>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-white">Elegí tu modalidad</h2>
+              <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-2">{homeText.modalitiesEyebrow}</p>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-white">{homeText.modalitiesTitle}</h2>
             </div>
-            <Link to="/equipos" className="text-accent hover:text-accent-light text-sm font-semibold transition">
-              Ver todos los equipos →
+            <Link to={homeText.modalitiesAllTeamsTo} className="text-accent hover:text-accent-light text-sm font-semibold transition">
+              {homeText.modalitiesAllTeamsLabel}
             </Link>
           </div>
           <div className="flex gap-5 overflow-x-auto snap-x pb-2 md:grid md:grid-cols-3 md:overflow-visible">
@@ -305,7 +340,7 @@ export default function Inicio() {
                       onClick={() => setSelectedModalidad(modalidad.id)}
                       className="inline-flex items-center justify-center bg-accent text-white font-bold px-5 py-2.5 rounded-full hover:bg-accent-light transition"
                     >
-                      Ver explicación
+                      {homeText.modalitiesExplanationCta}
                     </button>
                     <Link
                       to={modalidad.to}
@@ -368,7 +403,7 @@ export default function Inicio() {
               )}
             </div>
             <div className="bg-secondary border border-accent/20 rounded-xl p-6 md:p-8">
-              <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-3">Cómo se juega</p>
+              <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-3">{homeText.howToPlayEyebrow}</p>
               <h3 className="text-3xl font-extrabold text-white">{modalidadActiva.title}</h3>
               <p className="text-white/65 text-lg leading-relaxed mt-4">{modalidadActiva.detail}</p>
               <div className="grid sm:grid-cols-3 gap-4 mt-6">
@@ -407,8 +442,8 @@ export default function Inicio() {
       <section className="py-16 px-4 bg-primary">
         <div className="max-w-6xl mx-auto grid lg:grid-cols-[1fr_1.1fr] gap-8 items-stretch">
           <div>
-            <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-2">Lugares de entrenamiento</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-6">Dónde nos encontrás</h2>
+            <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-2">{homeText.trainingEyebrow}</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-6">{homeText.trainingTitle}</h2>
             <div className="space-y-3">
               {trainingPlaces.map(([place, mode, schedule]) => (
                 <div key={place} className="border border-accent/20 bg-secondary/80 rounded-xl p-5">
@@ -443,11 +478,11 @@ export default function Inicio() {
           <div className="max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h2 className="text-3xl font-bold text-white">Últimas Noticias</h2>
+                <h2 className="text-3xl font-bold text-white">{homeText.newsTitle}</h2>
                 <div className="w-12 h-1 bg-accent mt-2 rounded" />
               </div>
-              <Link to="/noticias" className="text-accent hover:text-accent-light text-sm font-semibold transition">
-                Ver todas →
+              <Link to={homeText.newsAllTo} className="text-accent hover:text-accent-light text-sm font-semibold transition">
+                {homeText.newsAllLabel}
               </Link>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -477,11 +512,11 @@ export default function Inicio() {
           <div className="max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h2 className="text-3xl font-bold text-white">Último Evento</h2>
+                <h2 className="text-3xl font-bold text-white">{homeText.eventTitle}</h2>
                 <div className="w-12 h-1 bg-accent mt-2 rounded" />
               </div>
-              <Link to="/eventos" className="text-accent hover:text-accent-light text-sm font-semibold transition">
-                Ver todos →
+              <Link to={homeText.eventAllTo} className="text-accent hover:text-accent-light text-sm font-semibold transition">
+                {homeText.eventAllLabel}
               </Link>
             </div>
             <Link
@@ -508,7 +543,7 @@ export default function Inicio() {
                 {ultimoEvento.descripcion && (
                   <p className="text-white/55 mt-4 leading-relaxed line-clamp-3">{ultimoEvento.descripcion}</p>
                 )}
-                <span className="text-accent font-semibold text-sm mt-6">Ver fotos →</span>
+                <span className="text-accent font-semibold text-sm mt-6">{homeText.eventPhotosLabel}</span>
               </div>
             </Link>
           </div>
@@ -521,11 +556,11 @@ export default function Inicio() {
           <div className="max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h2 className="text-3xl font-bold text-white">Momentos de la Liga</h2>
+                <h2 className="text-3xl font-bold text-white">{homeText.galleryTitle}</h2>
                 <div className="w-12 h-1 bg-accent mt-2 rounded" />
               </div>
-              <Link to="/eventos" className="text-accent hover:text-accent-light text-sm font-semibold transition">
-                Ver todos →
+              <Link to={homeText.galleryAllTo} className="text-accent hover:text-accent-light text-sm font-semibold transition">
+                {homeText.galleryAllLabel}
               </Link>
             </div>
             <div className="grid grid-cols-3 md:grid-cols-3 gap-2 md:gap-3">
@@ -556,10 +591,10 @@ export default function Inicio() {
 
       {/* CTA contacto */}
       <section className="bg-secondary border-t border-accent/20 py-16 px-4 text-center">
-        <h2 className="text-3xl font-extrabold text-white mb-4">¿Querés sumarte a la liga?</h2>
-        <p className="text-white/50 text-lg mb-8">Contactanos y te informamos sobre cómo participar.</p>
-        <Link to="/contacto" className="bg-accent text-white font-bold px-10 py-3 rounded-full hover:bg-accent-light transition shadow-lg shadow-accent/30">
-          Contactanos
+        <h2 className="text-3xl font-extrabold text-white mb-4">{homeText.contactTitle}</h2>
+        <p className="text-white/50 text-lg mb-8">{homeText.contactText}</p>
+        <Link to={homeText.contactTo} className="bg-accent text-white font-bold px-10 py-3 rounded-full hover:bg-accent-light transition shadow-lg shadow-accent/30">
+          {homeText.contactCta}
         </Link>
       </section>
     </div>

@@ -86,6 +86,92 @@ const DEFAULT_EXPERIENCE = {
   to: '/inscripcion',
 };
 
+const DEFAULT_HOME_TEXT = {
+  heroMeta: 'Est. 2016 · Mar del Plata · Argentina',
+  heroPrimaryCta: 'SUMATE',
+  heroPrimaryTo: '/inscripcion',
+  heroStoreCta: 'Ir a la Tienda',
+  heroStoreTo: '/tienda',
+  heroShirtCta: 'Diseña tu remera',
+  heroShirtTo: '/remeras',
+  welcomeTitle: 'Bienvenidos a la Liga',
+  modalitiesEyebrow: 'Entrená con nosotros',
+  modalitiesTitle: 'Elegí tu modalidad',
+  modalitiesAllTeamsLabel: 'Ver todos los equipos →',
+  modalitiesAllTeamsTo: '/equipos',
+  modalitiesExplanationCta: 'Ver explicación',
+  howToPlayEyebrow: 'Cómo se juega',
+  trainingEyebrow: 'Lugares de entrenamiento',
+  trainingTitle: 'Dónde nos encontrás',
+  newsTitle: 'Últimas Noticias',
+  newsAllLabel: 'Ver todas →',
+  newsAllTo: '/noticias',
+  eventTitle: 'Último Evento',
+  eventAllLabel: 'Ver todos →',
+  eventAllTo: '/eventos',
+  eventPhotosLabel: 'Ver fotos →',
+  galleryTitle: 'Momentos de la Liga',
+  galleryAllLabel: 'Ver todos →',
+  galleryAllTo: '/eventos',
+  contactTitle: '¿Querés sumarte a la liga?',
+  contactText: 'Contactanos y te informamos sobre cómo participar.',
+  contactCta: 'Contactanos',
+  contactTo: '/contacto',
+};
+
+const HOME_TEXT_GROUPS = [
+  {
+    title: 'Portada principal',
+    fields: [
+      ['heroMeta', 'Texto superior'],
+      ['heroPrimaryCta', 'Botón principal'],
+      ['heroPrimaryTo', 'Link botón principal'],
+      ['heroStoreCta', 'Botón tienda'],
+      ['heroStoreTo', 'Link botón tienda'],
+      ['heroShirtCta', 'Botón remeras'],
+      ['heroShirtTo', 'Link botón remeras'],
+    ],
+  },
+  {
+    title: 'Bienvenida y modalidades',
+    fields: [
+      ['welcomeTitle', 'Título bienvenida'],
+      ['modalitiesEyebrow', 'Etiqueta modalidades'],
+      ['modalitiesTitle', 'Título modalidades'],
+      ['modalitiesAllTeamsLabel', 'Link ver equipos'],
+      ['modalitiesAllTeamsTo', 'Destino ver equipos'],
+      ['modalitiesExplanationCta', 'Botón explicación'],
+      ['howToPlayEyebrow', 'Etiqueta explicación'],
+    ],
+  },
+  {
+    title: 'Entrenamientos, noticias y eventos',
+    fields: [
+      ['trainingEyebrow', 'Etiqueta entrenamientos'],
+      ['trainingTitle', 'Título entrenamientos'],
+      ['newsTitle', 'Título noticias'],
+      ['newsAllLabel', 'Link todas las noticias'],
+      ['newsAllTo', 'Destino noticias'],
+      ['eventTitle', 'Título evento'],
+      ['eventAllLabel', 'Link todos los eventos'],
+      ['eventAllTo', 'Destino eventos'],
+      ['eventPhotosLabel', 'Texto ver fotos'],
+      ['galleryTitle', 'Título galería'],
+      ['galleryAllLabel', 'Link galería'],
+      ['galleryAllTo', 'Destino galería'],
+    ],
+  },
+  {
+    title: 'Contacto final',
+    fields: [
+      ['contactTitle', 'Título contacto'],
+      ['contactText', 'Texto contacto', 'textarea'],
+      ['contactCta', 'Botón contacto'],
+      ['contactTo', 'Link contacto'],
+    ],
+  },
+];
+
 const SIMPLE_PAGES = [
   {
     key: 'historia',
@@ -352,6 +438,7 @@ function InicioEditor() {
         modalidades: mergeModalidades(data.modalidades),
         experience: { ...DEFAULT_EXPERIENCE, ...(data.experience || {}) },
         trainingPlaces: Array.isArray(data.trainingPlaces) && data.trainingPlaces.length ? data.trainingPlaces : DEFAULT_TRAINING_PLACES,
+        homeText: { ...DEFAULT_HOME_TEXT, ...(data.homeText || {}) },
       });
     });
   }, []);
@@ -360,6 +447,10 @@ function InicioEditor() {
   const setExperience = (name, value) => setContenido(current => ({
     ...current,
     experience: { ...current.experience, [name]: value },
+  }));
+  const setHomeText = (name, value) => setContenido(current => ({
+    ...current,
+    homeText: { ...current.homeText, [name]: value },
   }));
   const setModalidad = (index, nextModalidad) => setContenido(current => ({
     ...current,
@@ -421,6 +512,38 @@ function InicioEditor() {
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">Descripción bienvenida</label>
           <textarea value={contenido.descripcion} onChange={e => setField('descripcion', e.target.value)} className="input resize-none" rows={3} />
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-gray-200 p-4">
+        <p className="mb-4 font-bold text-gray-800">Textos y botones del inicio</p>
+        <div className="space-y-5">
+          {HOME_TEXT_GROUPS.map(group => (
+            <div key={group.title}>
+              <p className="mb-3 text-sm font-bold uppercase tracking-wide text-gray-500">{group.title}</p>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {group.fields.map(([name, label, type]) => (
+                  <label key={name} className={type === 'textarea' ? 'md:col-span-2' : ''}>
+                    <span className="mb-1 block text-sm font-medium text-gray-700">{label}</span>
+                    {type === 'textarea' ? (
+                      <textarea
+                        value={contenido.homeText[name] || ''}
+                        onChange={e => setHomeText(name, e.target.value)}
+                        className="input resize-none"
+                        rows={3}
+                      />
+                    ) : (
+                      <input
+                        value={contenido.homeText[name] || ''}
+                        onChange={e => setHomeText(name, e.target.value)}
+                        className="input"
+                      />
+                    )}
+                  </label>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
