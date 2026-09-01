@@ -11,6 +11,11 @@ const TEAM_COVERS = {
 };
 
 const TEAM_COVER_SLIDES = {
+  krakens: [
+    '/equipos/krakens-slide-1.jpg',
+    '/equipos/krakens-slide-2.jpg',
+    '/equipos/krakens-slide-3.jpg',
+  ],
   tridentes: [
     '/equipos/tridentes-slide-1.jpg',
     '/equipos/tridentes-slide-2.jpg',
