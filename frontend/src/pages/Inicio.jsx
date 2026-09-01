@@ -5,15 +5,12 @@ import api from '../api';
 import { API_URL } from '../config.js';
 import { FALLBACK_EVENTS } from '../data/events.js';
 
-const HERO_SLIDES = [
+const DEFAULT_HERO_SLIDES = [
   '/hero/portada-slide-mariscal.jpg',
   '/hero/portada-slide-chicas.jpg',
 ];
-const HERO_TITLE = 'Fútbol Americano';
-const HERO_TITLE_2 = 'Mar del Plata';
-const HERO_SUBTITLE = 'Football Equipado – Flag Football 5vs5 Femenino y Masculino';
 
-const MODALIDADES = [
+const DEFAULT_MODALIDADES = [
   {
     id: 'equipado',
     title: 'Football Equipado',
@@ -70,7 +67,7 @@ const MODALIDADES = [
   },
 ];
 
-const TRAINING_PLACES = [
+const DEFAULT_TRAINING_PLACES = [
   [
     'Centro Naval',
     'Entrenamientos y partidos',
@@ -83,9 +80,45 @@ const TRAINING_PLACES = [
   ],
 ];
 
+const DEFAULT_EXPERIENCE = {
+  eyebrow: 'Probá una clase',
+  title: 'No necesitás experiencia',
+  text: 'Entrená con nosotros aunque nunca hayas jugado. Te prestamos una bandera, te enseñamos desde cero y podés probar una clase.',
+  cta: 'Quiero probar',
+  to: '/inscripcion',
+};
+
 function fotoSrc(f) {
   if (f?.startsWith('/eventos/')) return f;
   return f?.startsWith('http') ? f : `${API_URL}${f}`;
+}
+
+function pageImageSrc(src) {
+  if (!src) return '';
+  if (src.startsWith('http')) return src;
+  if (
+    src.startsWith('/hero') ||
+    src.startsWith('/historia') ||
+    src.startsWith('/eventos') ||
+    src.startsWith('/equipos') ||
+    src.startsWith('/tienda') ||
+    src.startsWith('/remeras') ||
+    src.startsWith('/jugadores') ||
+    src === '/logo.png'
+  ) return src;
+  return src.startsWith('/') ? `${API_URL}${src}` : src;
+}
+
+function nonEmptyArray(value, fallback) {
+  return Array.isArray(value) && value.length > 0 ? value : fallback;
+}
+
+function mergeModalidades(custom = []) {
+  if (!Array.isArray(custom)) return DEFAULT_MODALIDADES;
+  return DEFAULT_MODALIDADES.map(defaultModalidad => ({
+    ...defaultModalidad,
+    ...(custom.find(item => item?.id === defaultModalidad.id) || {}),
+  }));
 }
 
 function sortByCreated(events = []) {
@@ -108,18 +141,26 @@ export default function Inicio() {
     titulo2: 'Mar del Plata',
     subtitulo: 'Football Equipado – Flag Football 5vs5 Femenino y Masculino',
     descripcion: 'Somos la liga oficial de Football Americano de Mar del Plata.',
+    heroSlides: DEFAULT_HERO_SLIDES,
+    modalidades: DEFAULT_MODALIDADES,
+    experience: DEFAULT_EXPERIENCE,
+    trainingPlaces: DEFAULT_TRAINING_PLACES,
   });
   const [fotos, setFotos] = useState([]);
   const [ultimoEvento, setUltimoEvento] = useState(null);
   const [noticias, setNoticias] = useState([]);
   const [heroSlide, setHeroSlide] = useState(0);
-  const [selectedModalidad, setSelectedModalidad] = useState(MODALIDADES[0].id);
+  const [selectedModalidad, setSelectedModalidad] = useState(DEFAULT_MODALIDADES[0].id);
   const [modalidadSlide, setModalidadSlide] = useState(0);
-  const modalidadActiva = MODALIDADES.find(modalidad => modalidad.id === selectedModalidad) || MODALIDADES[0];
-  const modalidadSlides = modalidadActiva.slides || [modalidadActiva.image];
+  const heroSlides = nonEmptyArray(data.heroSlides, DEFAULT_HERO_SLIDES);
+  const modalidades = mergeModalidades(data.modalidades);
+  const trainingPlaces = nonEmptyArray(data.trainingPlaces, DEFAULT_TRAINING_PLACES);
+  const experience = { ...DEFAULT_EXPERIENCE, ...(data.experience || {}) };
+  const modalidadActiva = modalidades.find(modalidad => modalidad.id === selectedModalidad) || modalidades[0];
+  const modalidadSlides = nonEmptyArray(modalidadActiva.slides, [modalidadActiva.image]);
 
   useEffect(() => {
-    api.get('/pages/inicio').then(r => { if (r.data?.contenido) setData(r.data.contenido); });
+    api.get('/pages/inicio').then(r => { if (r.data?.contenido) setData(current => ({ ...current, ...r.data.contenido })); });
     api.get('/eventos').then(r => {
       const eventos = r.data || [];
       const ordenados = sortVisibleEvents(eventos);
@@ -136,14 +177,14 @@ export default function Inicio() {
   }, []);
 
   useEffect(() => {
-    if (HERO_SLIDES.length === 0) return undefined;
+    if (heroSlides.length < 2) return undefined;
 
     const interval = setInterval(() => {
-      setHeroSlide(current => (current + 1) % HERO_SLIDES.length);
+      setHeroSlide(current => (current + 1) % heroSlides.length);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [heroSlides.length]);
 
   useEffect(() => {
     setModalidadSlide(0);
@@ -163,10 +204,10 @@ export default function Inicio() {
     <div className="bg-primary text-white">
       {/* Hero */}
       <section className="relative h-[72vh] min-h-[640px] max-h-[760px] px-4 pt-24 md:pt-28 pb-24 md:pb-28 overflow-hidden flex items-center">
-        {HERO_SLIDES.map((slide, index) => (
+        {heroSlides.map((slide, index) => (
           <img
             key={slide}
-            src={slide}
+            src={pageImageSrc(slide)}
             alt=""
             aria-hidden="true"
             className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${heroSlide === index ? 'opacity-100' : 'opacity-0'}`}
@@ -178,9 +219,9 @@ export default function Inicio() {
         <div className="relative max-w-4xl mx-auto text-center mt-8 md:mt-12">
           <img src="/logo.png" alt="Logo Liga" className="h-36 w-36 object-contain mx-auto mb-8 drop-shadow-2xl" />
           <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-4">Est. 2016 · Mar del Plata · Argentina</p>
-          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4 text-white">{HERO_TITLE}</h1>
-          <h2 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 text-white">{HERO_TITLE_2}</h2>
-          <p className="text-xl text-white/75 mb-10">{HERO_SUBTITLE}</p>
+          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4 text-white">{data.titulo}</h1>
+          <h2 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 text-white">{data.titulo2}</h2>
+          <p className="text-xl text-white/75 mb-10">{data.subtitulo}</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link to="/inscripcion" className="bg-accent text-white font-bold px-8 py-3 rounded-full hover:bg-accent-light transition shadow-lg shadow-accent/30">
               SUMATE
@@ -217,13 +258,13 @@ export default function Inicio() {
             </Link>
           </div>
           <div className="flex gap-5 overflow-x-auto snap-x pb-2 md:grid md:grid-cols-3 md:overflow-visible">
-            {MODALIDADES.map(modalidad => (
+            {modalidades.map(modalidad => (
               <article
                 key={modalidad.id}
                 className={`min-w-[82%] snap-start bg-secondary border rounded-xl overflow-hidden md:min-w-0 transition ${selectedModalidad === modalidad.id ? 'border-accent shadow-lg shadow-accent/15' : 'border-accent/20'}`}
               >
                 <div className="h-56 bg-primary/50 overflow-hidden">
-                  <img src={modalidad.image} alt={modalidad.title} className="w-full h-full object-cover" />
+                  <img src={pageImageSrc(modalidad.image)} alt={modalidad.title} className="w-full h-full object-cover" />
                 </div>
                 <div className="p-6">
                   <h3 className="text-2xl font-extrabold text-white">{modalidad.title}</h3>
@@ -251,7 +292,7 @@ export default function Inicio() {
             <div className="relative overflow-hidden rounded-xl border border-accent/20 bg-primary/70">
               <img
                 key={modalidadSlides[modalidadSlide]}
-                src={modalidadSlides[modalidadSlide]}
+                src={pageImageSrc(modalidadSlides[modalidadSlide])}
                 alt={modalidadActiva.title}
                 className="block w-full h-auto"
               />
@@ -308,17 +349,17 @@ export default function Inicio() {
       <section className="bg-secondary border-y border-accent/10 py-16 px-4">
         <div className="max-w-5xl mx-auto grid md:grid-cols-[1fr_auto] gap-8 items-center">
           <div>
-            <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-3">Probá una clase</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white">No necesitás experiencia</h2>
+            <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-3">{experience.eyebrow}</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white">{experience.title}</h2>
             <p className="text-white/64 text-lg leading-relaxed mt-4">
-              Entrená con nosotros aunque nunca hayas jugado. Te prestamos una bandera, te enseñamos desde cero y podés probar una clase.
+              {experience.text}
             </p>
           </div>
           <Link
-            to="/inscripcion"
+            to={experience.to}
             className="inline-flex items-center justify-center bg-accent text-white font-bold px-8 py-3 rounded-full hover:bg-accent-light transition shadow-lg shadow-accent/25"
           >
-            Quiero probar
+            {experience.cta}
           </Link>
         </div>
       </section>
@@ -330,7 +371,7 @@ export default function Inicio() {
             <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-2">Lugares de entrenamiento</p>
             <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-6">Dónde nos encontrás</h2>
             <div className="space-y-3">
-              {TRAINING_PLACES.map(([place, mode, schedule]) => (
+              {trainingPlaces.map(([place, mode, schedule]) => (
                 <div key={place} className="border border-accent/20 bg-secondary/80 rounded-xl p-5">
                   <p className="text-white font-extrabold text-xl">{place}</p>
                   <p className="text-accent font-semibold mt-1">{mode}</p>
