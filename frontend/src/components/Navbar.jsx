@@ -7,6 +7,7 @@ const links = [
   { to: '/fixture', label: 'Fixture' },
   { to: '/equipos', label: 'Equipos' },
   { to: '/jugadores', label: 'Jugadores' },
+  { to: '/estadisticas', label: 'Estadísticas' },
   { to: '/eventos', label: 'Eventos' },
   { to: '/tienda', label: 'Tienda' },
   { to: '/remeras', label: 'Remeras' },

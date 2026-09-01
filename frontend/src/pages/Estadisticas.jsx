@@ -5,14 +5,11 @@ import {
   FALLBACK_EQUIPADOS,
   FALLBACK_HISTORICOS,
   FALLBACK_LIDERES,
-  FALLBACK_STATS,
   FALLBACK_TEMPORADAS,
   fallbackLideresByTemporada,
   mergeFallbackLideres,
   mergeFallbackTemporadas,
 } from '../data/stats.js';
-
-const COLS_STATS = ['Equipo', 'PJ', 'PG', 'PP', 'PF', 'PC', 'Pts'];
 
 const TIPOS = {
   touchdowns:    { label: 'Touchdowns',    cols: ['TD'],                              keys: ['td'] },
@@ -206,43 +203,6 @@ function CampeonTemporada({ temporada }) {
       <span className={`self-start sm:self-center text-xs font-extrabold px-3 py-1 rounded-full text-white ${CAMPEON_COLORS[campeon] || 'bg-white/20'}`}>
         {temporada}
       </span>
-    </div>
-  );
-}
-
-function TablaStandings({ stat }) {
-  return (
-    <div className="bg-secondary border border-accent/20 rounded-xl overflow-hidden">
-      <div className="px-6 py-4 border-b border-accent/10">
-        <h2 className="text-xl font-bold text-white">{stat.temporada} · {stat.categoria}</h2>
-        {stat.descripcion && <p className="text-white/40 text-sm mt-1">{stat.descripcion}</p>}
-      </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-accent/10">
-              <th className="text-left px-6 py-3 text-accent/70 font-semibold uppercase tracking-wide text-xs">Pos</th>
-              {COLS_STATS.map(c => (
-                <th key={c} className={`py-3 px-3 text-accent/70 font-semibold uppercase tracking-wide text-xs ${c === 'Equipo' ? 'text-left' : 'text-center'}`}>{c}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {stat.tabla.slice().sort((a, b) => b.Pts - a.Pts).map((fila, i) => (
-              <tr key={i} className={`border-b border-white/5 hover:bg-white/5 transition ${i === 0 ? 'bg-accent/5' : ''}`}>
-                <td className="px-6 py-3"><span className={`font-bold ${i === 0 ? 'text-accent' : 'text-white/30'}`}>{i + 1}</span></td>
-                <td className="px-3 py-3 font-semibold text-white">{fila.equipo}</td>
-                <td className="px-3 py-3 text-center text-white/60">{fila.PJ}</td>
-                <td className="px-3 py-3 text-center text-green-400">{fila.PG}</td>
-                <td className="px-3 py-3 text-center text-red-400">{fila.PP}</td>
-                <td className="px-3 py-3 text-center text-white/60">{fila.PF}</td>
-                <td className="px-3 py-3 text-center text-white/60">{fila.PC}</td>
-                <td className="px-3 py-3 text-center font-extrabold text-accent">{fila.Pts}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
     </div>
   );
 }
@@ -663,16 +623,17 @@ function PremiosSection({ deporte = 'flag' }) {
 
 export default function Estadisticas() {
   const [searchParams] = useSearchParams();
-  const [stats, setStats] = useState([]);
   const [lideres, setLideres] = useState([]);
   const [temporadas, setTemporadas] = useState([]);
   const [temporadaActiva, setTemporadaActiva] = useState('');
-  const initialSeccion = searchParams.get('seccion') === 'equipados' ? 'lideres' : (searchParams.get('seccion') || 'premios');
+  const requestedSeccion = searchParams.get('seccion');
+  const initialSeccion = ['premios', 'lideres', 'historicos'].includes(requestedSeccion)
+    ? requestedSeccion
+    : requestedSeccion === 'equipados' ? 'lideres' : 'premios';
   const initialDeporte = searchParams.get('deporte') || (searchParams.get('seccion') === 'equipados' ? 'equipados' : 'flag');
   const [seccion, setSeccion] = useState(initialSeccion);
   const [deporte, setDeporte] = useState(initialDeporte === 'equipados' ? 'equipados' : 'flag');
   const [loading, setLoading] = useState(true);
-  const [activaStat, setActivaStat] = useState(0);
   const temporadasConLideres = temporadas.filter(temporada =>
     fallbackLideresByTemporada(temporada).some(lider => TIPOS[lider.tipo])
     || (temporada === temporadaActiva && lideres.some(lider => TIPOS[lider.tipo]))
@@ -683,19 +644,13 @@ export default function Estadisticas() {
   const temporadasLideresOrdenadas = [...temporadasTazones, ...temporadasFinales, ...temporadasOtras];
 
   useEffect(() => {
-    Promise.all([
-      api.get('/estadisticas'),
-      api.get('/lideres/temporadas'),
-    ]).then(([s, t]) => {
-      const statsData = s.data?.length ? s.data : FALLBACK_STATS;
-      const temporadasData = t.data?.length ? mergeFallbackTemporadas(t.data) : FALLBACK_TEMPORADAS;
-      setStats(statsData);
+    api.get('/lideres/temporadas').then(r => {
+      const temporadasData = r.data?.length ? mergeFallbackTemporadas(r.data) : FALLBACK_TEMPORADAS;
       setTemporadas(temporadasData);
       const paramTemporada = searchParams.get('temporada');
       const defaultTemporada = paramTemporada && temporadasData.includes(paramTemporada) ? paramTemporada : temporadasData[0];
       if (temporadasData.length > 0) setTemporadaActiva(defaultTemporada || temporadasData[0]);
     }).catch(() => {
-      setStats(FALLBACK_STATS);
       setTemporadas(FALLBACK_TEMPORADAS);
       const paramTemporada = searchParams.get('temporada');
       const defaultTemporada = paramTemporada && FALLBACK_TEMPORADAS.includes(paramTemporada) ? paramTemporada : FALLBACK_TEMPORADAS[0];
@@ -739,7 +694,7 @@ export default function Estadisticas() {
       <section className="bg-secondary border-b border-accent/20 py-20 px-4 text-center">
         <h1 className="text-4xl md:text-5xl font-extrabold text-white">Estadísticas</h1>
         <div className="w-16 h-1 bg-accent mx-auto mt-4 rounded" />
-        <p className="text-white/50 mt-4 text-lg">Posiciones y líderes estadísticos</p>
+        <p className="text-white/50 mt-4 text-lg">Premios, líderes e históricos</p>
       </section>
 
       <section className="max-w-5xl mx-auto py-12 px-4">
@@ -749,7 +704,7 @@ export default function Estadisticas() {
           <>
             {/* Selector sección */}
             <div className="flex flex-wrap gap-3 mb-8 justify-center">
-              {[['premios','🏅 Premios'], ['lideres','📈 Líderes'], ['historicos','🏛️ Históricos'], ['posiciones','📊 Estadísticas']].map(([v, l]) => (
+              {[['premios','🏅 Premios'], ['lideres','📈 Líderes'], ['historicos','🏛️ Históricos']].map(([v, l]) => (
                 <button key={v} onClick={() => setSeccion(v)}
                   className={`px-6 py-2 rounded-lg font-bold transition ${seccion === v ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/60 hover:text-white'}`}>
                   {l}
@@ -807,38 +762,6 @@ export default function Estadisticas() {
             {/* HISTÓRICOS */}
             {seccion === 'historicos' && (
               <TablaHistoricos deporte={deporte} />
-            )}
-
-            {/* POSICIONES */}
-            {seccion === 'posiciones' && deporte === 'equipados' && (
-              <EquipadosSection />
-            )}
-
-            {seccion === 'posiciones' && deporte === 'flag' && (
-              <>
-                {stats.length === 0 && <p className="text-center text-white/40">No hay tablas de posiciones cargadas aún.</p>}
-                {stats.length > 0 && (
-                  <>
-                    <div className="flex flex-wrap gap-2 mb-8">
-                      {stats.map((s, i) => (
-                        <button
-                          key={s._id}
-                          onClick={() => setActivaStat(i)}
-                          className={`px-4 py-2 rounded-lg font-medium text-sm transition ${activaStat === i ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/60 hover:border-accent/50 hover:text-white'}`}
-                        >
-                          {s.temporada} — {s.categoria}
-                        </button>
-                      ))}
-                    </div>
-                    {stats[activaStat] && (
-                      <>
-                        <CampeonTemporada temporada={stats[activaStat].temporada} />
-                        <TablaStandings stat={stats[activaStat]} />
-                      </>
-                    )}
-                  </>
-                )}
-              </>
             )}
           </>
         )}
