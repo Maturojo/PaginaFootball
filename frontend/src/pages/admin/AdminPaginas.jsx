@@ -204,6 +204,14 @@ function SlidesEditor({ title, slides, onChange, id, defaultFit = 'natural', def
     onChange(values.map((slide, i) => (i === index ? { ...slide, ...changes } : slide)));
   };
 
+  const updatePosition = (index, changes) => {
+    onChange(values.map((slide, i) => (
+      i === index
+        ? { ...slide, fit: slide.fit === 'natural' ? 'cover' : slide.fit, ...changes }
+        : slide
+    )));
+  };
+
   const move = (index, direction) => {
     const nextIndex = index + direction;
     if (nextIndex < 0 || nextIndex >= values.length) return;
@@ -267,7 +275,7 @@ function SlidesEditor({ title, slides, onChange, id, defaultFit = 'natural', def
                       min="0"
                       max="100"
                       value={slide.x}
-                      onChange={e => updateAt(index, { x: Number(e.target.value) })}
+                      onChange={e => updatePosition(index, { x: Number(e.target.value) })}
                       className="mt-3 w-full accent-primary"
                     />
                   </label>
@@ -278,13 +286,13 @@ function SlidesEditor({ title, slides, onChange, id, defaultFit = 'natural', def
                       min="0"
                       max="100"
                       value={slide.y}
-                      onChange={e => updateAt(index, { y: Number(e.target.value) })}
+                      onChange={e => updatePosition(index, { y: Number(e.target.value) })}
                       className="mt-3 w-full accent-primary"
                     />
                   </label>
                 </div>
                 <p className="text-xs text-gray-500">
-                  “Rellenar sin margen” permite mover el recorte. “Foto completa” muestra todo aunque pueda dejar espacio. “Alto natural” usa la foto tal cual.
+                  Al mover Horizontal o Vertical, la foto pasa a “Rellenar sin margen” para que el encuadre tenga efecto.
                 </p>
               </div>
               <div className="flex gap-1">
