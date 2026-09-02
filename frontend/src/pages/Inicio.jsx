@@ -249,6 +249,12 @@ function mergeCalendarItems(manualItems = [], partidos = []) {
   });
 }
 
+function mergeFixturePartidos(apiPartidos = []) {
+  const existing = new Set(apiPartidos.map(partido => partido._id));
+  const missingFallbacks = FALLBACK_PARTIDOS.filter(partido => !existing.has(partido._id));
+  return [...apiPartidos, ...missingFallbacks];
+}
+
 function isUpcomingCalendarItem(item) {
   const date = new Date(item.fechaOrden || item.fecha);
   if (!Number.isFinite(date.getTime())) return item.estado !== 'finalizado';
@@ -295,7 +301,7 @@ export default function Inicio() {
       api.get('/partidos').catch(() => ({ data: [] })),
     ]).then(([pageResponse, partidosResponse]) => {
       const manualItems = pageResponse.data?.contenido?.items || [];
-      const partidos = partidosResponse.data?.length ? partidosResponse.data : FALLBACK_PARTIDOS;
+      const partidos = mergeFixturePartidos(partidosResponse.data || []);
       setCalendario(mergeCalendarItems(manualItems, partidos));
     });
     api.get('/pages/testimonios').then(r => setTestimonios((r.data?.contenido?.items || []).filter(item => item.activo !== false)));
