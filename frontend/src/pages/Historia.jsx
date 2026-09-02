@@ -3,6 +3,7 @@ import api from '../api';
 import { API_URL } from '../config.js';
 
 const FALLBACK_TITLE = 'Historia';
+const FALLBACK_SUBTITLE = 'De las primeras prácticas en Parque Camet a una comunidad con flag masculino, flag femenino y football equipado.';
 const FALLBACK_BACKGROUND = '/historia/fondo-historia.jpg';
 
 const FALLBACK_TEXT = `El desarrollo del Fútbol Americano en la ciudad de Mar del Plata es un proceso reciente, caracterizado por un crecimiento sostenido a partir de iniciativas locales y un fuerte componente comunitario. Fútbol Americano Mar del Plata nació en 2016 cuando un grupo de jóvenes empezaron con las primeras prácticas deportivas en Parque Camet. Estas primeras convocatorias, organizadas de manera independiente, lograron reunir rápidamente a un número significativo de participantes, evidenciando el interés existente y el potencial de desarrollo del deporte a nivel local.
@@ -59,8 +60,17 @@ const SECTION_STARTS = [
 function normalizeHistoriaText(text) {
   return String(text || FALLBACK_TEXT)
     .replace(/^\s*HISTORIA\s*/i, '')
-    .replace(/\s+/g, ' ')
+    .replace(/\r\n/g, '\n')
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
     .trim();
+}
+
+function normalizeTitle(value) {
+  const title = String(value || '').trim();
+  if (!title) return FALLBACK_TITLE;
+  if (title.length > 90 || title.includes('\n')) return FALLBACK_TITLE;
+  return title;
 }
 
 function splitBySectionStarts(text) {
@@ -94,15 +104,22 @@ function splitBySectionStarts(text) {
 }
 
 export default function Historia() {
-  const [data, setData] = useState({ titulo: FALLBACK_TITLE, texto: FALLBACK_TEXT, imagen: '' });
+  const [data, setData] = useState({
+    titulo: FALLBACK_TITLE,
+    subtitulo: FALLBACK_SUBTITLE,
+    texto: FALLBACK_TEXT,
+    imagen: '',
+  });
 
   useEffect(() => {
     api.get('/pages/historia')
       .then(r => {
         const contenido = r.data?.contenido;
         if (!contenido) return;
+        const title = normalizeTitle(contenido.titulo);
         setData({
-          titulo: contenido.titulo || FALLBACK_TITLE,
+          titulo: title,
+          subtitulo: contenido.subtitulo || FALLBACK_SUBTITLE,
           texto: contenido.texto || FALLBACK_TEXT,
           imagen: contenido.imagen || '',
         });
@@ -133,7 +150,7 @@ export default function Historia() {
           <p className="text-accent font-bold uppercase tracking-[0.32em] text-sm mb-5">Fútbol Americano Mar del Plata</p>
           <h1 className="text-5xl md:text-7xl font-extrabold leading-none max-w-3xl">{data.titulo || FALLBACK_TITLE}</h1>
           <p className="text-white/72 text-lg md:text-xl leading-relaxed max-w-3xl mt-7">
-            De las primeras prácticas en Parque Camet a una comunidad con flag masculino, flag femenino y football equipado.
+            {data.subtitulo || FALLBACK_SUBTITLE}
           </p>
         </div>
       </section>
@@ -171,7 +188,11 @@ export default function Historia() {
               className="border-b border-white/8 pb-8 last:border-b-0"
             >
               {section.title && <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-4">{section.title}</h2>}
-              <p className="text-white/76 text-base md:text-lg leading-8">{section.body}</p>
+              <div className="space-y-4">
+                {section.body.split(/\n{2,}/).map((paragraph, paragraphIndex) => (
+                  <p key={paragraphIndex} className="text-white/76 text-base md:text-lg leading-8">{paragraph}</p>
+                ))}
+              </div>
             </section>
           ))}
         </article>

@@ -179,6 +179,7 @@ const SIMPLE_PAGES = [
     label: 'Historia',
     fields: [
       { name: 'titulo', label: 'Título', type: 'text' },
+      { name: 'subtitulo', label: 'Texto corto de portada', type: 'textarea', rows: 3 },
       { name: 'texto', label: 'Texto de la historia', type: 'textarea', rows: 8 },
       { name: 'imagen', label: 'Imagen de portada', type: 'image' },
     ],
