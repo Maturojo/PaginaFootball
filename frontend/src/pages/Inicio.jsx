@@ -249,6 +249,15 @@ function mergeCalendarItems(manualItems = [], partidos = []) {
   });
 }
 
+function isUpcomingCalendarItem(item) {
+  const date = new Date(item.fechaOrden || item.fecha);
+  if (!Number.isFinite(date.getTime())) return item.estado !== 'finalizado';
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return date >= today;
+}
+
 export default function Inicio() {
   const [data, setData] = useState({
     titulo: 'Fútbol Americano',
@@ -277,7 +286,7 @@ export default function Inicio() {
   const homeText = { ...DEFAULT_HOME_TEXT, ...(data.homeText || {}) };
   const modalidadActiva = modalidades.find(modalidad => modalidad.id === selectedModalidad) || modalidades[0];
   const modalidadSlides = nonEmptyArray(modalidadActiva.slides, [modalidadActiva.image]);
-  const calendarioInicio = calendario.filter(item => item.estado !== 'finalizado').slice(0, 6);
+  const calendarioInicio = calendario.filter(isUpcomingCalendarItem).slice(0, 6);
 
   useEffect(() => {
     api.get('/pages/inicio').then(r => { if (r.data?.contenido) setData(current => ({ ...current, ...r.data.contenido })); });
