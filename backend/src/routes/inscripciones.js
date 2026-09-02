@@ -1,21 +1,27 @@
 const router = require('express').Router();
 const Inscripcion = require('../models/Inscripcion');
 const auth = require('../middleware/auth');
-const { sendInscripcionConfirmation } = require('../services/confirmationEmail');
+const { sendInscripcionEmails } = require('../services/confirmationEmail');
 
 router.post('/', async (req, res) => {
   try {
     const inscripcion = await Inscripcion.create(req.body);
-    let confirmacion = { sent: false };
+    let emails = {
+      confirmacion: { sent: false },
+      aviso: { sent: false },
+    };
 
     try {
-      confirmacion = await sendInscripcionConfirmation(inscripcion);
+      emails = await sendInscripcionEmails(inscripcion);
     } catch (emailError) {
-      console.error('Error al enviar confirmacion de inscripcion:', emailError.message);
-      confirmacion = { sent: false, reason: emailError.message };
+      console.error('Error al enviar emails de inscripcion:', emailError.message);
+      emails = {
+        confirmacion: { sent: false, reason: emailError.message },
+        aviso: { sent: false, reason: emailError.message },
+      };
     }
 
-    res.status(201).json({ inscripcion, confirmacion });
+    res.status(201).json({ inscripcion, confirmacion: emails.confirmacion, aviso: emails.aviso });
   }
   catch (err) { res.status(400).json({ message: err.message }); }
 });

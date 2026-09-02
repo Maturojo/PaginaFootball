@@ -53,6 +53,42 @@ function buildConfirmationMessage(inscripcion) {
   };
 }
 
+function buildNotificationMessage(inscripcion) {
+  const nombre = inscripcion.nombre?.trim() || 'Sin nombre';
+  const rows = [
+    ['Nombre', nombre],
+    ['Email', inscripcion.email],
+    ['Teléfono / WhatsApp', inscripcion.telefono],
+    ['Edad', inscripcion.edad || 'No informado'],
+    ['Posición', inscripcion.posicion || 'No informado'],
+    ['Equipo preferido', inscripcion.equipoPreferido || 'No informado'],
+    ['Experiencia', inscripcion.experiencia || 'No informado'],
+    ['Mensaje', inscripcion.mensaje || 'Sin mensaje'],
+  ];
+
+  return {
+    subject: `Nueva inscripción - ${nombre}`,
+    text: [
+      'Nueva inscripción recibida desde la web.',
+      '',
+      ...rows.map(([label, value]) => `${label}: ${value}`),
+    ].join('\n'),
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #172033; line-height: 1.5;">
+        <h2 style="margin: 0 0 12px; color: #172033;">Nueva inscripción recibida</h2>
+        <table style="border-collapse: collapse; width: 100%; max-width: 640px;">
+          ${rows.map(([label, value]) => `
+            <tr>
+              <td style="border-bottom: 1px solid #e5e7eb; padding: 8px 12px; font-weight: bold; width: 180px;">${escapeHtml(label)}</td>
+              <td style="border-bottom: 1px solid #e5e7eb; padding: 8px 12px;">${escapeHtml(value)}</td>
+            </tr>
+          `).join('')}
+        </table>
+      </div>
+    `,
+  };
+}
+
 async function sendInscripcionConfirmation(inscripcion) {
   if (!isEmailConfigured()) {
     return { sent: false, reason: 'SMTP no configurado' };
@@ -72,7 +108,55 @@ async function sendInscripcionConfirmation(inscripcion) {
   return { sent: true };
 }
 
+async function sendInscripcionNotification(inscripcion) {
+  if (!isEmailConfigured()) {
+    return { sent: false, reason: 'SMTP no configurado' };
+  }
+
+  const to = process.env.INSCRIPCIONES_NOTIFY_TO || process.env.SMTP_FROM || process.env.SMTP_USER;
+  if (!to) {
+    return { sent: false, reason: 'Email de aviso no configurado' };
+  }
+
+  const transporter = createTransporter();
+  const message = buildNotificationMessage(inscripcion);
+
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+    to,
+    replyTo: inscripcion.email,
+    subject: message.subject,
+    text: message.text,
+    html: message.html,
+  });
+
+  return { sent: true };
+}
+
+async function sendInscripcionEmails(inscripcion) {
+  const result = {
+    confirmacion: { sent: false },
+    aviso: { sent: false },
+  };
+
+  try {
+    result.confirmacion = await sendInscripcionConfirmation(inscripcion);
+  } catch (error) {
+    result.confirmacion = { sent: false, reason: error.message };
+  }
+
+  try {
+    result.aviso = await sendInscripcionNotification(inscripcion);
+  } catch (error) {
+    result.aviso = { sent: false, reason: error.message };
+  }
+
+  return result;
+}
+
 module.exports = {
   isEmailConfigured,
   sendInscripcionConfirmation,
+  sendInscripcionNotification,
+  sendInscripcionEmails,
 };

@@ -27,7 +27,7 @@ npm run dev       # App en http://localhost:5173
 - Contraseña: Admin1234!
 
 ## Email de confirmación de inscripciones
-Para que cada persona reciba el mensaje automático al inscribirse, configurar estas variables de entorno en el backend/Vercel:
+Para que cada persona reciba el mensaje automático al inscribirse, y para que la liga reciba un aviso interno con los datos de la inscripción, configurar estas variables de entorno en el backend/Vercel:
 
 ```bash
 SMTP_HOST=smtp.tu-proveedor.com
@@ -35,9 +35,10 @@ SMTP_PORT=587
 SMTP_USER=tu-email@dominio.com
 SMTP_PASS=tu-password-o-app-password
 SMTP_FROM="Liga Football MDP <tu-email@dominio.com>"
+INSCRIPCIONES_NOTIFY_TO=inscripciones@dominio.com
 ```
 
-Si estas variables no están configuradas, la inscripción igual se guarda, pero no se envía email automático.
+Si `INSCRIPCIONES_NOTIFY_TO` no está configurado, el aviso interno se manda a `SMTP_FROM` o `SMTP_USER`. Si SMTP no está configurado, la inscripción igual se guarda, pero no se envían emails automáticos.
 
 ## Estructura
 ```
