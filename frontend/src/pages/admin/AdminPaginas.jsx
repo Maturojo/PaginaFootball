@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import api from '../../api';
 import { API_URL } from '../../config.js';
+import { FALLBACK_PARTIDOS } from '../../data/stats.js';
 
 const DEFAULT_HERO_SLIDES = [
   '/hero/portada-slide-mariscal.jpg',
@@ -299,6 +300,59 @@ function normalizeSlide(slide, defaults = {}) {
     y: Number.isFinite(Number(slide?.y)) ? Number(slide.y) : fallback.y,
     zoom: Number.isFinite(Number(slide?.zoom)) ? Number(slide.zoom) : fallback.zoom,
   };
+}
+
+function calendarKey(item) {
+  return String(item.sourceId || `${item.titulo}|${item.fecha}|${item.hora || ''}`).toLowerCase();
+}
+
+function formatCalendarDate(value) {
+  if (!value) return '';
+  return new Date(value).toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function partidoToCalendarItem(partido) {
+  const isAgenda = partido.tipo === 'agenda';
+  const titulo = isAgenda
+    ? (partido.titulo || partido.jornada)
+    : `${partido.equipoLocal} vs ${partido.equipoVisitante}`;
+  const marcador = partido.estado === 'finalizado' && partido.golesLocal !== null && partido.golesVisitante !== null
+    ? `Resultado: ${partido.golesLocal} - ${partido.golesVisitante}`
+    : '';
+
+  return {
+    sourceId: `fixture-${partido._id}`,
+    titulo,
+    tipo: partido.categoria || 'Fixture',
+    fecha: partido.fechaTexto || formatCalendarDate(partido.fecha),
+    fechaOrden: partido.fecha,
+    hora: partido.hora ? `${partido.hora} hs` : '',
+    lugar: partido.lugar || '',
+    descripcion: [partido.jornada, marcador].filter(Boolean).join(' · '),
+    activo: partido.activo !== false,
+    fromFixture: true,
+  };
+}
+
+function mergeCalendarItems(manualItems = [], partidos = []) {
+  const merged = new Map();
+
+  partidos
+    .filter(partido => partido.activo !== false)
+    .map(partidoToCalendarItem)
+    .forEach(item => merged.set(calendarKey(item), item));
+
+  manualItems
+    .filter(item => item.activo !== false)
+    .forEach(item => merged.set(calendarKey(item), item));
+
+  return [...merged.values()].sort((a, b) => {
+    const dateA = new Date(a.fechaOrden || a.fecha);
+    const dateB = new Date(b.fechaOrden || b.fecha);
+    const timeA = Number.isFinite(dateA.getTime()) ? dateA.getTime() : Number.MAX_SAFE_INTEGER;
+    const timeB = Number.isFinite(dateB.getTime()) ? dateB.getTime() : Number.MAX_SAFE_INTEGER;
+    return timeA - timeB;
+  });
 }
 
 function cleanSlide(slide, defaults) {
@@ -743,8 +797,22 @@ function ContentListEditor({ pageKey }) {
 
   useEffect(() => {
     setLoading(true);
-    api.get(`/pages/${pageKey}`).then(r => {
-      setItems(Array.isArray(r.data?.contenido?.items) ? r.data.contenido.items : []);
+    const pageRequest = api.get(`/pages/${pageKey}`);
+    const request = pageKey === 'calendario'
+      ? Promise.all([pageRequest, api.get('/partidos').catch(() => ({ data: [] }))])
+      : pageRequest;
+
+    request.then(response => {
+      if (pageKey === 'calendario') {
+        const [pageResponse, partidosResponse] = response;
+        const manualItems = Array.isArray(pageResponse.data?.contenido?.items) ? pageResponse.data.contenido.items : [];
+        const partidos = partidosResponse.data?.length ? partidosResponse.data : FALLBACK_PARTIDOS;
+        setItems(mergeCalendarItems(manualItems, partidos));
+        setLoading(false);
+        return;
+      }
+
+      setItems(Array.isArray(response.data?.contenido?.items) ? response.data.contenido.items : []);
       setLoading(false);
     });
   }, [pageKey]);
@@ -784,7 +852,10 @@ function ContentListEditor({ pageKey }) {
       {items.map((item, index) => (
         <div key={index} className="rounded-xl border border-gray-200 p-4">
           <div className="mb-4 flex items-center justify-between gap-3">
-            <p className="font-bold text-gray-700">{item.titulo || item.nombre || `Item ${index + 1}`}</p>
+            <div>
+              <p className="font-bold text-gray-700">{item.titulo || item.nombre || `Item ${index + 1}`}</p>
+              {item.fromFixture && <p className="text-xs font-semibold text-blue-500">Desde fixture</p>}
+            </div>
             <div className="flex flex-wrap gap-2">
               <label className="flex items-center gap-2 text-sm text-gray-600">
                 <input type="checkbox" checked={item.activo !== false} onChange={e => updateItem(index, 'activo', e.target.checked)} className="h-4 w-4 accent-primary" />

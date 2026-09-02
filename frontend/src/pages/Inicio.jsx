@@ -4,6 +4,7 @@ import api from '../api';
 
 import { API_URL } from '../config.js';
 import { FALLBACK_EVENTS } from '../data/events.js';
+import { FALLBACK_PARTIDOS } from '../data/stats.js';
 
 const DEFAULT_HERO_SLIDES = [
   '/hero/portada-slide-mariscal.jpg',
@@ -195,6 +196,58 @@ function sortVisibleEvents(events = []) {
   });
 }
 
+function calendarKey(item) {
+  return String(item.sourceId || `${item.titulo}|${item.fecha}|${item.hora || ''}`).toLowerCase();
+}
+
+function formatCalendarDate(value) {
+  if (!value) return '';
+  return new Date(value).toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function partidoToCalendarItem(partido) {
+  const isAgenda = partido.tipo === 'agenda';
+  const titulo = isAgenda
+    ? (partido.titulo || partido.jornada)
+    : `${partido.equipoLocal} vs ${partido.equipoVisitante}`;
+  const marcador = partido.estado === 'finalizado' && partido.golesLocal !== null && partido.golesVisitante !== null
+    ? `Resultado: ${partido.golesLocal} - ${partido.golesVisitante}`
+    : '';
+
+  return {
+    sourceId: `fixture-${partido._id}`,
+    titulo,
+    tipo: partido.categoria || 'Fixture',
+    fecha: partido.fechaTexto || formatCalendarDate(partido.fecha),
+    fechaOrden: partido.fecha,
+    hora: partido.hora ? `${partido.hora} hs` : '',
+    lugar: partido.lugar || '',
+    descripcion: [partido.jornada, marcador].filter(Boolean).join(' · '),
+    activo: partido.activo !== false,
+  };
+}
+
+function mergeCalendarItems(manualItems = [], partidos = []) {
+  const merged = new Map();
+
+  partidos
+    .filter(partido => partido.activo !== false)
+    .map(partidoToCalendarItem)
+    .forEach(item => merged.set(calendarKey(item), item));
+
+  manualItems
+    .filter(item => item.activo !== false)
+    .forEach(item => merged.set(calendarKey(item), item));
+
+  return [...merged.values()].sort((a, b) => {
+    const dateA = new Date(a.fechaOrden || a.fecha);
+    const dateB = new Date(b.fechaOrden || b.fecha);
+    const timeA = Number.isFinite(dateA.getTime()) ? dateA.getTime() : Number.MAX_SAFE_INTEGER;
+    const timeB = Number.isFinite(dateB.getTime()) ? dateB.getTime() : Number.MAX_SAFE_INTEGER;
+    return timeA - timeB;
+  });
+}
+
 export default function Inicio() {
   const [data, setData] = useState({
     titulo: 'Fútbol Americano',
@@ -226,7 +279,14 @@ export default function Inicio() {
 
   useEffect(() => {
     api.get('/pages/inicio').then(r => { if (r.data?.contenido) setData(current => ({ ...current, ...r.data.contenido })); });
-    api.get('/pages/calendario').then(r => setCalendario((r.data?.contenido?.items || []).filter(item => item.activo !== false)));
+    Promise.all([
+      api.get('/pages/calendario'),
+      api.get('/partidos').catch(() => ({ data: [] })),
+    ]).then(([pageResponse, partidosResponse]) => {
+      const manualItems = pageResponse.data?.contenido?.items || [];
+      const partidos = partidosResponse.data?.length ? partidosResponse.data : FALLBACK_PARTIDOS;
+      setCalendario(mergeCalendarItems(manualItems, partidos));
+    });
     api.get('/pages/testimonios').then(r => setTestimonios((r.data?.contenido?.items || []).filter(item => item.activo !== false)));
     api.get('/pages/sponsors').then(r => setSponsors((r.data?.contenido?.items || []).filter(item => item.activo !== false)));
     api.get('/eventos').then(r => {
@@ -438,7 +498,7 @@ export default function Inicio() {
               </Link>
             </div>
             <div className="grid gap-4 md:grid-cols-3">
-              {calendario.slice(0, 3).map((item, index) => (
+              {calendario.map((item, index) => (
                 <article key={`${item.titulo}-${index}`} className="rounded-xl border border-accent/20 bg-primary/55 p-5">
                   <p className="text-xs font-bold uppercase tracking-widest text-accent">{item.tipo || 'Actividad'}</p>
                   <h3 className="mt-3 text-xl font-extrabold text-white">{item.titulo}</h3>
