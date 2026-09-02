@@ -6,6 +6,7 @@ import { teamLogoSrc } from '../utils/teamLogo.js';
 
 const CATS = ['Todos', 'Liga Football Flag', 'Football Flag Femenino', 'Football Americano 7vs7'];
 const ESTADOS = { programado: { label: 'Programado', color: 'bg-blue-500/20 text-blue-300' }, en_juego: { label: 'En juego', color: 'bg-green-500/20 text-green-300 animate-pulse' }, finalizado: { label: 'Finalizado', color: 'bg-white/10 text-white/50' }, cancelado: { label: 'Cancelado', color: 'bg-red-500/20 text-red-400' } };
+const TAZON_LOGO = '/fixture/logo-tazon-del-mar.jpg';
 
 function TeamLogo({ nombre, logoMap }) {
   const logo = logoMap[nombre] || teamLogoSrc({ nombre });
@@ -49,6 +50,16 @@ function SectionTitle({ children, count }) {
   );
 }
 
+function TazonBadge() {
+  return (
+    <img
+      src={TAZON_LOGO}
+      alt="Tazón del Mar"
+      className="h-10 w-10 rounded-full border border-accent/30 bg-white object-contain p-0.5 shadow-lg shadow-black/20"
+    />
+  );
+}
+
 function PartidoCard({ p, logoMap }) {
   const finalizado = p.estado === 'finalizado';
   const estado = ESTADOS[p.estado] || ESTADOS.programado;
@@ -57,8 +68,11 @@ function PartidoCard({ p, logoMap }) {
     return (
       <div className="bg-secondary border border-accent/20 rounded-xl p-5 hover:border-accent/40 transition">
         <div className="flex items-center justify-between gap-3 mb-4">
-          <span className="text-xs text-white/40">{p.jornada}</span>
-          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${estado.color}`}>{estado.label}</span>
+          <div className="flex items-center gap-3 min-w-0">
+            <TazonBadge />
+            <span className="text-xs text-white/40 truncate">{p.jornada}</span>
+          </div>
+          <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${estado.color}`}>{estado.label}</span>
         </div>
         <div className="flex items-center gap-5">
           <div className="w-24 min-h-20 rounded-lg bg-accent/10 border border-accent/20 flex flex-col items-center justify-center text-center flex-shrink-0">
@@ -77,8 +91,11 @@ function PartidoCard({ p, logoMap }) {
   return (
     <div className="bg-secondary border border-accent/20 rounded-xl p-5 hover:border-accent/40 transition">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs text-white/40">{p.jornada}</span>
-        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${estado.color}`}>{estado.label}</span>
+        <div className="flex items-center gap-3 min-w-0">
+          <TazonBadge />
+          <span className="text-xs text-white/40 truncate">{p.jornada}</span>
+        </div>
+        <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${estado.color}`}>{estado.label}</span>
       </div>
       <div className="flex items-center justify-between gap-4">
         {/* Local */}
