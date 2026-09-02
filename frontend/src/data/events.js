@@ -1,5 +1,15 @@
 export const FALLBACK_EVENTS = [
   {
+    _id: 'xi-tazon-del-mar-2026',
+    titulo: 'XI Tazón del Mar',
+    descripcion: 'Nuevo Tazón del Mar de Flag Football. Fecha inicial: 5 de septiembre de 2026 en Mar del Plata.',
+    fecha: '2026-09-05',
+    lugar: 'Mar del Plata',
+    fotos: ['/eventos/xi-tazon-del-mar-2026.png'],
+    fijado: true,
+    orden: -10,
+  },
+  {
     _id: 'agenda-flag-masculino-2026',
     titulo: 'Agenda 2026 - Flag Masculino',
     descripcion: 'XI Tazón del Mar: 5, 12 y 19 de septiembre; 3, 17 y 24 de octubre; final el 7 de noviembre. Torneo Nacional FABA el 21 y 22 de noviembre en Buenos Aires.',

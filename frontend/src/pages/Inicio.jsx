@@ -196,6 +196,11 @@ function sortVisibleEvents(events = []) {
   });
 }
 
+function mergeEvents(apiEvents = []) {
+  const ids = new Set(apiEvents.map(evento => evento._id));
+  return [...apiEvents, ...FALLBACK_EVENTS.filter(evento => !ids.has(evento._id))];
+}
+
 function calendarKey(item) {
   return String(item.sourceId || `${item.titulo}|${item.fecha}|${item.hora || ''}`).toLowerCase();
 }
@@ -307,15 +312,15 @@ export default function Inicio() {
     api.get('/pages/testimonios').then(r => setTestimonios((r.data?.contenido?.items || []).filter(item => item.activo !== false)));
     api.get('/pages/sponsors').then(r => setSponsors((r.data?.contenido?.items || []).filter(item => item.activo !== false)));
     api.get('/eventos').then(r => {
-      const eventos = r.data || [];
+      const eventos = mergeEvents(r.data || []);
       const ordenados = sortVisibleEvents(eventos);
       const todas = ordenados.flatMap(e => (e.fotos || []).map(f => ({ src: f, titulo: e.titulo, id: e._id })));
-      setUltimoEvento(sortByCreated(eventos)[0] || null);
+      setUltimoEvento(ordenados[0] || sortByCreated(eventos)[0] || null);
       setFotos(todas.slice(0, 9));
     }).catch(() => {
       const ordenados = sortVisibleEvents(FALLBACK_EVENTS);
       const todas = ordenados.flatMap(e => (e.fotos || []).map(f => ({ src: f, titulo: e.titulo, id: e._id })));
-      setUltimoEvento(sortByCreated(FALLBACK_EVENTS)[0] || null);
+      setUltimoEvento(ordenados[0] || sortByCreated(FALLBACK_EVENTS)[0] || null);
       setFotos(todas.slice(0, 9));
     });
     api.get('/noticias').then(r => setNoticias(r.data.slice(0, 3)));
