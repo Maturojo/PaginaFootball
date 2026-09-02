@@ -15,8 +15,8 @@ export default function Footer() {
         <div>
           <h4 className="font-semibold mb-3 text-accent uppercase tracking-wide text-sm">Navegación</h4>
           <ul className="space-y-1 text-sm text-white/60">
-            {['/', '/historia', '/equipos', '/estadisticas', '/eventos', '/tienda', '/remeras', '/contacto'].map((to, i) => (
-              <li key={to}><Link to={to} className="hover:text-accent transition">{['Inicio','Historia','Equipos','Estadísticas','Eventos','Tienda','Remeras','Contacto'][i]}</Link></li>
+            {['/', '/historia', '/equipos', '/estadisticas', '/eventos', '/tienda', '/contacto'].map((to, i) => (
+              <li key={to}><Link to={to} className="hover:text-accent transition">{['Inicio','Historia','Equipos','Estadísticas','Eventos','Tienda','Contacto'][i]}</Link></li>
             ))}
           </ul>
         </div>
