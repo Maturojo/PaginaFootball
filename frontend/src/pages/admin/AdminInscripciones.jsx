@@ -3,6 +3,23 @@ import api from '../../api';
 
 const ESTADOS = { pendiente: 'bg-yellow-100 text-yellow-700', contactado: 'bg-blue-100 text-blue-700', aceptado: 'bg-green-100 text-green-700', rechazado: 'bg-red-100 text-red-600' };
 
+function whatsappNumber(phone = '') {
+  const digits = String(phone).replace(/\D/g, '');
+  if (!digits) return '';
+  if (digits.startsWith('54')) return digits;
+  if (digits.startsWith('9') && digits.length >= 11) return `54${digits}`;
+  if (digits.length >= 10) return `549${digits.replace(/^0+/, '')}`;
+  return digits;
+}
+
+function whatsappLink(inscripcion) {
+  const phone = whatsappNumber(inscripcion.telefono);
+  const message = encodeURIComponent(
+    `Hola ${inscripcion.nombre || ''}, ¿cómo estás? Te escribimos de la Liga de Football Americano Mar del Plata por tu inscripción.`
+  );
+  return phone ? `https://wa.me/${phone}?text=${message}` : '';
+}
+
 export default function AdminInscripciones() {
   const [insc, setInsc] = useState([]);
   const load = () => api.get('/inscripciones/all').then(r => setInsc(r.data));
@@ -44,6 +61,16 @@ export default function AdminInscripciones() {
                   <option value="aceptado">Aceptado</option>
                   <option value="rechazado">Rechazado</option>
                 </select>
+                {whatsappLink(i) && (
+                  <a
+                    href={whatsappLink(i)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="rounded-lg bg-green-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-green-600"
+                  >
+                    WhatsApp
+                  </a>
+                )}
                 <button onClick={() => handleDelete(i._id)} className="text-red-400 text-xs hover:text-red-600">Eliminar</button>
               </div>
             </div>

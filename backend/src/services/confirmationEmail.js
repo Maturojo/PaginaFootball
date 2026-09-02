@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const Page = require('../models/Page');
 
 const SMTP_PORT = Number(process.env.SMTP_PORT || 587);
 
@@ -27,34 +28,73 @@ function escapeHtml(value) {
     .replace(/'/g, '&#039;');
 }
 
-function buildConfirmationMessage(inscripcion) {
+function interpolate(template, values) {
+  return String(template || '').replace(/\{(\w+)\}/g, (_, key) => values[key] ?? '');
+}
+
+function inscripcionValues(inscripcion) {
+  return {
+    nombre: inscripcion.nombre?.trim() || '',
+    email: inscripcion.email || '',
+    telefono: inscripcion.telefono || '',
+    edad: inscripcion.edad || '',
+    posicion: inscripcion.posicion || '',
+    equipoPreferido: inscripcion.equipoPreferido || '',
+    experiencia: inscripcion.experiencia || '',
+    mensaje: inscripcion.mensaje || '',
+  };
+}
+
+async function getEmailSettings() {
+  const page = await Page.findOne({ key: 'emails' }).lean();
+  return page?.contenido || {};
+}
+
+function bodyToHtml(body) {
+  return escapeHtml(body)
+    .split('\n')
+    .filter(Boolean)
+    .map(line => `<p>${line}</p>`)
+    .join('');
+}
+
+function buildConfirmationMessage(inscripcion, settings = {}) {
   const nombre = inscripcion.nombre?.trim() || 'tu inscripción';
   const nombreHtml = escapeHtml(nombre);
+  const values = inscripcionValues(inscripcion);
+  const subject = interpolate(
+    settings.confirmationSubject || 'Recibimos tu inscripción - Liga de Football Americano MDP',
+    values
+  );
+  const text = interpolate(settings.confirmationBody || [
+    'Hola {nombre},',
+    '',
+    'Tu inscripción en la Liga de Football Americano Mar del Plata se registró correctamente.',
+    'Gracias por sumarte. Te vamos a escribir o llamar en cualquier momento para contarte los próximos pasos.',
+    '',
+    'Liga de Football Americano Mar del Plata',
+  ].join('\n'), values);
 
   return {
-    subject: 'Recibimos tu inscripción - Liga de Football Americano MDP',
-    text: [
-      `Hola ${nombre},`,
-      '',
-      'Tu inscripción en la Liga de Football Americano Mar del Plata se registró correctamente.',
-      'Gracias por sumarte. Te vamos a escribir o llamar en cualquier momento para contarte los próximos pasos.',
-      '',
-      'Liga de Football Americano Mar del Plata',
-    ].join('\n'),
+    subject,
+    text,
     html: `
       <div style="font-family: Arial, sans-serif; color: #172033; line-height: 1.5;">
         <h2 style="margin: 0 0 12px; color: #172033;">Inscripción recibida</h2>
-        <p>Hola ${nombreHtml},</p>
-        <p>Tu inscripción en la <strong>Liga de Football Americano Mar del Plata</strong> se registró correctamente.</p>
-        <p>Gracias por sumarte. Te vamos a escribir o llamar en cualquier momento para contarte los próximos pasos.</p>
-        <p style="margin-top: 24px;">Liga de Football Americano Mar del Plata</p>
+        ${settings.confirmationBody ? bodyToHtml(text) : `
+          <p>Hola ${nombreHtml},</p>
+          <p>Tu inscripción en la <strong>Liga de Football Americano Mar del Plata</strong> se registró correctamente.</p>
+          <p>Gracias por sumarte. Te vamos a escribir o llamar en cualquier momento para contarte los próximos pasos.</p>
+          <p style="margin-top: 24px;">Liga de Football Americano Mar del Plata</p>
+        `}
       </div>
     `,
   };
 }
 
-function buildNotificationMessage(inscripcion) {
+function buildNotificationMessage(inscripcion, settings = {}) {
   const nombre = inscripcion.nombre?.trim() || 'Sin nombre';
+  const values = inscripcionValues(inscripcion);
   const rows = [
     ['Nombre', nombre],
     ['Email', inscripcion.email],
@@ -65,17 +105,19 @@ function buildNotificationMessage(inscripcion) {
     ['Experiencia', inscripcion.experiencia || 'No informado'],
     ['Mensaje', inscripcion.mensaje || 'Sin mensaje'],
   ];
+  const intro = interpolate(settings.notificationIntro || 'Nueva inscripción recibida desde la web.', values);
 
   return {
-    subject: `Nueva inscripción - ${nombre}`,
+    subject: interpolate(settings.notificationSubject || 'Nueva inscripción - {nombre}', values),
     text: [
-      'Nueva inscripción recibida desde la web.',
+      intro,
       '',
       ...rows.map(([label, value]) => `${label}: ${value}`),
     ].join('\n'),
     html: `
       <div style="font-family: Arial, sans-serif; color: #172033; line-height: 1.5;">
         <h2 style="margin: 0 0 12px; color: #172033;">Nueva inscripción recibida</h2>
+        <p>${escapeHtml(intro)}</p>
         <table style="border-collapse: collapse; width: 100%; max-width: 640px;">
           ${rows.map(([label, value]) => `
             <tr>
@@ -95,7 +137,8 @@ async function sendInscripcionConfirmation(inscripcion) {
   }
 
   const transporter = createTransporter();
-  const message = buildConfirmationMessage(inscripcion);
+  const settings = await getEmailSettings();
+  const message = buildConfirmationMessage(inscripcion, settings);
 
   await transporter.sendMail({
     from: process.env.SMTP_FROM || process.env.SMTP_USER,
@@ -119,7 +162,8 @@ async function sendInscripcionNotification(inscripcion) {
   }
 
   const transporter = createTransporter();
-  const message = buildNotificationMessage(inscripcion);
+  const settings = await getEmailSettings();
+  const message = buildNotificationMessage(inscripcion, settings);
 
   await transporter.sendMail({
     from: process.env.SMTP_FROM || process.env.SMTP_USER,

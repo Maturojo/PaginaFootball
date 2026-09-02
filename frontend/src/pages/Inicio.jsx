@@ -210,6 +210,9 @@ export default function Inicio() {
   const [fotos, setFotos] = useState([]);
   const [ultimoEvento, setUltimoEvento] = useState(null);
   const [noticias, setNoticias] = useState([]);
+  const [calendario, setCalendario] = useState([]);
+  const [testimonios, setTestimonios] = useState([]);
+  const [sponsors, setSponsors] = useState([]);
   const [heroSlide, setHeroSlide] = useState(0);
   const [selectedModalidad, setSelectedModalidad] = useState(DEFAULT_MODALIDADES[0].id);
   const [modalidadSlide, setModalidadSlide] = useState(0);
@@ -223,6 +226,9 @@ export default function Inicio() {
 
   useEffect(() => {
     api.get('/pages/inicio').then(r => { if (r.data?.contenido) setData(current => ({ ...current, ...r.data.contenido })); });
+    api.get('/pages/calendario').then(r => setCalendario((r.data?.contenido?.items || []).filter(item => item.activo !== false)));
+    api.get('/pages/testimonios').then(r => setTestimonios((r.data?.contenido?.items || []).filter(item => item.activo !== false)));
+    api.get('/pages/sponsors').then(r => setSponsors((r.data?.contenido?.items || []).filter(item => item.activo !== false)));
     api.get('/eventos').then(r => {
       const eventos = r.data || [];
       const ordenados = sortVisibleEvents(eventos);
@@ -419,6 +425,33 @@ export default function Inicio() {
         </div>
       </section>
 
+      {calendario.length > 0 && (
+        <section className="bg-secondary border-y border-accent/10 py-16 px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+              <div>
+                <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-2">Agenda</p>
+                <h2 className="text-3xl md:text-4xl font-extrabold text-white">Próximos entrenamientos y partidos</h2>
+              </div>
+              <Link to="/fixture" className="text-accent hover:text-accent-light text-sm font-semibold transition">
+                Ver fixture →
+              </Link>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              {calendario.slice(0, 3).map((item, index) => (
+                <article key={`${item.titulo}-${index}`} className="rounded-xl border border-accent/20 bg-primary/55 p-5">
+                  <p className="text-xs font-bold uppercase tracking-widest text-accent">{item.tipo || 'Actividad'}</p>
+                  <h3 className="mt-3 text-xl font-extrabold text-white">{item.titulo}</h3>
+                  <p className="mt-2 text-white/55">{[item.fecha, item.hora].filter(Boolean).join(' · ')}</p>
+                  {item.lugar && <p className="mt-1 text-white/45">📍 {item.lugar}</p>}
+                  {item.descripcion && <p className="mt-4 text-sm leading-relaxed text-white/55">{item.descripcion}</p>}
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* No necesitás experiencia */}
       <section className="bg-secondary border-y border-accent/10 py-16 px-4">
         <div className="max-w-5xl mx-auto grid md:grid-cols-[1fr_auto] gap-8 items-center">
@@ -584,6 +617,60 @@ export default function Inicio() {
                   </div>
                 </Link>
               ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {testimonios.length > 0 && (
+        <section className="py-16 px-4 bg-primary">
+          <div className="max-w-6xl mx-auto">
+            <div className="mb-8 text-center">
+              <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-2">Comunidad</p>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-white">Por qué se suman</h2>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              {testimonios.slice(0, 3).map((item, index) => (
+                <article key={`${item.nombre}-${index}`} className="rounded-xl border border-accent/20 bg-secondary p-6">
+                  <p className="text-white/65 leading-relaxed">“{item.texto}”</p>
+                  <div className="mt-5 border-t border-white/10 pt-4">
+                    <p className="font-extrabold text-white">{item.nombre}</p>
+                    {item.rol && <p className="text-sm text-accent">{item.rol}</p>}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {sponsors.length > 0 && (
+        <section className="bg-secondary border-y border-accent/10 py-16 px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="mb-8 text-center">
+              <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-2">Aliados</p>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-white">Sponsors y aliados</h2>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+              {sponsors.map((item, index) => {
+                const content = (
+                  <article className="h-full rounded-xl border border-accent/20 bg-primary/55 p-5 text-center hover:border-accent/50 transition">
+                    {item.imagen ? (
+                      <img src={pageImageSrc(item.imagen)} alt={item.nombre} className="mx-auto h-20 w-full object-contain" />
+                    ) : (
+                      <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-accent/10 text-3xl">★</div>
+                    )}
+                    <h3 className="mt-4 font-extrabold text-white">{item.nombre}</h3>
+                    {item.descripcion && <p className="mt-2 text-sm text-white/50">{item.descripcion}</p>}
+                  </article>
+                );
+
+                return item.web ? (
+                  <a key={`${item.nombre}-${index}`} href={item.web} target="_blank" rel="noreferrer">{content}</a>
+                ) : (
+                  <div key={`${item.nombre}-${index}`}>{content}</div>
+                );
+              })}
             </div>
           </div>
         </section>

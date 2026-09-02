@@ -196,7 +196,62 @@ const SIMPLE_PAGES = [
   },
 ];
 
-const PAGES = [{ key: 'inicio', label: 'Inicio' }, ...SIMPLE_PAGES];
+const CUSTOM_PAGES = [
+  { key: 'calendario', label: 'Calendario' },
+  { key: 'testimonios', label: 'Testimonios' },
+  { key: 'sponsors', label: 'Sponsors' },
+  { key: 'emails', label: 'Emails' },
+];
+
+const PAGES = [{ key: 'inicio', label: 'Inicio' }, ...SIMPLE_PAGES, ...CUSTOM_PAGES];
+
+const LIST_CONFIG = {
+  calendario: {
+    title: 'Calendario simple',
+    emptyItem: { titulo: '', tipo: 'Entrenamiento', fecha: '', hora: '', lugar: 'Centro Naval', descripcion: '', activo: true },
+    fields: [
+      ['titulo', 'Título'],
+      ['tipo', 'Tipo'],
+      ['fecha', 'Fecha'],
+      ['hora', 'Hora'],
+      ['lugar', 'Lugar'],
+      ['descripcion', 'Descripción', 'textarea'],
+    ],
+  },
+  testimonios: {
+    title: 'Testimonios',
+    emptyItem: { nombre: '', rol: '', texto: '', activo: true },
+    fields: [
+      ['nombre', 'Nombre'],
+      ['rol', 'Rol / equipo'],
+      ['texto', 'Frase', 'textarea'],
+    ],
+  },
+  sponsors: {
+    title: 'Sponsors y aliados',
+    emptyItem: { nombre: '', descripcion: '', web: '', imagen: '', activo: true },
+    fields: [
+      ['nombre', 'Nombre'],
+      ['web', 'Link'],
+      ['descripcion', 'Descripción', 'textarea'],
+      ['imagen', 'Logo / imagen', 'image'],
+    ],
+  },
+};
+
+const DEFAULT_EMAILS = {
+  confirmationSubject: 'Recibimos tu inscripción - Liga de Football Americano MDP',
+  confirmationBody: [
+    'Hola {nombre},',
+    '',
+    'Tu inscripción en la Liga de Football Americano Mar del Plata se registró correctamente.',
+    'Gracias por sumarte. Te vamos a escribir o llamar en cualquier momento para contarte los próximos pasos.',
+    '',
+    'Liga de Football Americano Mar del Plata',
+  ].join('\n'),
+  notificationSubject: 'Nueva inscripción - {nombre}',
+  notificationIntro: 'Nueva inscripción recibida desde la web.',
+};
 
 function imageSrc(src) {
   if (!src) return '';
@@ -680,6 +735,151 @@ function SimplePageEditor({ page }) {
   );
 }
 
+function ContentListEditor({ pageKey }) {
+  const config = LIST_CONFIG[pageKey];
+  const [items, setItems] = useState([]);
+  const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    api.get(`/pages/${pageKey}`).then(r => {
+      setItems(Array.isArray(r.data?.contenido?.items) ? r.data.contenido.items : []);
+      setLoading(false);
+    });
+  }, [pageKey]);
+
+  const updateItem = (index, name, value) => {
+    setItems(current => current.map((item, i) => (i === index ? { ...item, [name]: value } : item)));
+  };
+
+  const move = (index, direction) => {
+    const nextIndex = index + direction;
+    if (nextIndex < 0 || nextIndex >= items.length) return;
+    const next = [...items];
+    const [item] = next.splice(index, 1);
+    next.splice(nextIndex, 0, item);
+    setItems(next);
+  };
+
+  const save = async () => {
+    await api.put(`/pages/${pageKey}`, { contenido: { items } });
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  if (loading) return <p className="text-gray-400">Cargando...</p>;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-xl font-bold text-primary">{config.title}</h2>
+        <button type="button" onClick={() => setItems(current => [...current, { ...config.emptyItem }])} className="rounded-lg bg-primary px-4 py-2 font-bold text-white hover:bg-blue-900">
+          + Agregar
+        </button>
+      </div>
+
+      {items.length === 0 && <p className="rounded-xl border border-dashed border-gray-200 p-8 text-center text-gray-400">Todavía no hay contenido cargado.</p>}
+
+      {items.map((item, index) => (
+        <div key={index} className="rounded-xl border border-gray-200 p-4">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <p className="font-bold text-gray-700">{item.titulo || item.nombre || `Item ${index + 1}`}</p>
+            <div className="flex flex-wrap gap-2">
+              <label className="flex items-center gap-2 text-sm text-gray-600">
+                <input type="checkbox" checked={item.activo !== false} onChange={e => updateItem(index, 'activo', e.target.checked)} className="h-4 w-4 accent-primary" />
+                Visible
+              </label>
+              <button type="button" onClick={() => move(index, -1)} className="rounded border px-2 py-1 text-sm">↑</button>
+              <button type="button" onClick={() => move(index, 1)} className="rounded border px-2 py-1 text-sm">↓</button>
+              <button type="button" onClick={() => setItems(current => current.filter((_, i) => i !== index))} className="rounded border border-red-200 px-3 py-1 text-sm text-red-600">
+                Eliminar
+              </button>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {config.fields.map(([name, label, type]) => (
+              <div key={name} className={type === 'textarea' || type === 'image' ? 'md:col-span-2' : ''}>
+                {type === 'image' ? (
+                  <ImageValueEditor
+                    label={label}
+                    id={`${pageKey}-${index}-${name}`}
+                    value={item[name] || ''}
+                    onChange={value => updateItem(index, name, value)}
+                  />
+                ) : (
+                  <>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">{label}</label>
+                    {type === 'textarea' ? (
+                      <textarea value={item[name] || ''} onChange={e => updateItem(index, name, e.target.value)} className="input resize-none" rows={3} />
+                    ) : (
+                      <input value={item[name] || ''} onChange={e => updateItem(index, name, e.target.value)} className="input" />
+                    )}
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      <button type="button" onClick={save} className="bg-primary text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-900 transition">
+        {saved ? '✓ Guardado' : 'Guardar cambios'}
+      </button>
+    </div>
+  );
+}
+
+function EmailsEditor() {
+  const [contenido, setContenido] = useState(DEFAULT_EMAILS);
+  const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/pages/emails').then(r => {
+      setContenido({ ...DEFAULT_EMAILS, ...(r.data?.contenido || {}) });
+      setLoading(false);
+    });
+  }, []);
+
+  const setField = (name, value) => setContenido(current => ({ ...current, [name]: value }));
+
+  const save = async () => {
+    await api.put('/pages/emails', { contenido });
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  if (loading) return <p className="text-gray-400">Cargando...</p>;
+
+  return (
+    <div className="space-y-5">
+      <div className="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-800">
+        Podés usar: {'{nombre}'}, {'{email}'}, {'{telefono}'}, {'{edad}'}, {'{posicion}'}, {'{equipoPreferido}'}, {'{experiencia}'} y {'{mensaje}'}.
+      </div>
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700">Asunto para quien se inscribe</label>
+        <input value={contenido.confirmationSubject} onChange={e => setField('confirmationSubject', e.target.value)} className="input" />
+      </div>
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700">Mensaje para quien se inscribe</label>
+        <textarea value={contenido.confirmationBody} onChange={e => setField('confirmationBody', e.target.value)} className="input resize-none font-mono text-sm" rows={8} />
+      </div>
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700">Asunto del aviso interno</label>
+        <input value={contenido.notificationSubject} onChange={e => setField('notificationSubject', e.target.value)} className="input" />
+      </div>
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700">Texto inicial del aviso interno</label>
+        <textarea value={contenido.notificationIntro} onChange={e => setField('notificationIntro', e.target.value)} className="input resize-none" rows={3} />
+      </div>
+      <button type="button" onClick={save} className="bg-primary text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-900 transition">
+        {saved ? '✓ Guardado' : 'Guardar cambios'}
+      </button>
+    </div>
+  );
+}
+
 export default function AdminPaginas() {
   const [active, setActive] = useState(0);
   const page = PAGES[active];
@@ -699,9 +899,10 @@ export default function AdminPaginas() {
         ))}
       </div>
       <div className="bg-white rounded-xl shadow p-6">
-        {page.key === 'inicio'
-          ? <InicioEditor />
-          : <SimplePageEditor key={page.key} page={SIMPLE_PAGES.find(item => item.key === page.key)} />}
+        {page.key === 'inicio' && <InicioEditor />}
+        {SIMPLE_PAGES.some(item => item.key === page.key) && <SimplePageEditor key={page.key} page={SIMPLE_PAGES.find(item => item.key === page.key)} />}
+        {LIST_CONFIG[page.key] && <ContentListEditor key={page.key} pageKey={page.key} />}
+        {page.key === 'emails' && <EmailsEditor />}
       </div>
     </div>
   );
