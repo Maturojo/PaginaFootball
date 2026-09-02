@@ -50,6 +50,15 @@ function SectionTitle({ children, count }) {
   );
 }
 
+function isTazonMatch(partido) {
+  return [partido.jornada, partido.titulo]
+    .some(value => String(value || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .includes('tazon'));
+}
+
 function TazonBadge() {
   return (
     <img
@@ -63,13 +72,14 @@ function TazonBadge() {
 function PartidoCard({ p, logoMap }) {
   const finalizado = p.estado === 'finalizado';
   const estado = ESTADOS[p.estado] || ESTADOS.programado;
+  const showTazonBadge = isTazonMatch(p);
 
   if (p.tipo === 'agenda') {
     return (
       <div className="bg-secondary border border-accent/20 rounded-xl p-5 hover:border-accent/40 transition">
         <div className="flex items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-3 min-w-0">
-            <TazonBadge />
+            {showTazonBadge && <TazonBadge />}
             <span className="text-xs text-white/40 truncate">{p.jornada}</span>
           </div>
           <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${estado.color}`}>{estado.label}</span>
@@ -92,7 +102,7 @@ function PartidoCard({ p, logoMap }) {
     <div className="bg-secondary border border-accent/20 rounded-xl p-5 hover:border-accent/40 transition">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3 min-w-0">
-          <TazonBadge />
+          {showTazonBadge && <TazonBadge />}
           <span className="text-xs text-white/40 truncate">{p.jornada}</span>
         </div>
         <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${estado.color}`}>{estado.label}</span>
