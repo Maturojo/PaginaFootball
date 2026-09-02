@@ -223,6 +223,7 @@ function partidoToCalendarItem(partido) {
     hora: partido.hora ? `${partido.hora} hs` : '',
     lugar: partido.lugar || '',
     descripcion: [partido.jornada, marcador].filter(Boolean).join(' · '),
+    estado: partido.estado || 'programado',
     activo: partido.activo !== false,
   };
 }
@@ -276,11 +277,12 @@ export default function Inicio() {
   const homeText = { ...DEFAULT_HOME_TEXT, ...(data.homeText || {}) };
   const modalidadActiva = modalidades.find(modalidad => modalidad.id === selectedModalidad) || modalidades[0];
   const modalidadSlides = nonEmptyArray(modalidadActiva.slides, [modalidadActiva.image]);
+  const calendarioInicio = calendario.filter(item => item.estado !== 'finalizado').slice(0, 6);
 
   useEffect(() => {
     api.get('/pages/inicio').then(r => { if (r.data?.contenido) setData(current => ({ ...current, ...r.data.contenido })); });
     Promise.all([
-      api.get('/pages/calendario'),
+      api.get('/pages/calendario').catch(() => ({ data: { contenido: { items: [] } } })),
       api.get('/partidos').catch(() => ({ data: [] })),
     ]).then(([pageResponse, partidosResponse]) => {
       const manualItems = pageResponse.data?.contenido?.items || [];
@@ -485,7 +487,7 @@ export default function Inicio() {
         </div>
       </section>
 
-      {calendario.length > 0 && (
+      {calendarioInicio.length > 0 && (
         <section className="bg-secondary border-y border-accent/10 py-16 px-4">
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
@@ -498,7 +500,7 @@ export default function Inicio() {
               </Link>
             </div>
             <div className="grid gap-4 md:grid-cols-3">
-              {calendario.map((item, index) => (
+              {calendarioInicio.map((item, index) => (
                 <article key={`${item.titulo}-${index}`} className="rounded-xl border border-accent/20 bg-primary/55 p-5">
                   <p className="text-xs font-bold uppercase tracking-widest text-accent">{item.tipo || 'Actividad'}</p>
                   <h3 className="mt-3 text-xl font-extrabold text-white">{item.titulo}</h3>
