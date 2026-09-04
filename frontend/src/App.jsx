@@ -21,6 +21,7 @@ import ProductoDetalle from './pages/ProductoDetalle';
 import Remeras from './pages/Remeras';
 import Contacto from './pages/Contacto';
 import Inscripcion from './pages/Inscripcion';
+import Testimonios from './pages/Testimonios';
 
 import Login from './pages/admin/Login';
 import Dashboard from './pages/admin/Dashboard';
@@ -68,6 +69,7 @@ export default function App() {
           <Route path="/remeras" element={<PublicLayout><Remeras /></PublicLayout>} />
           <Route path="/contacto" element={<PublicLayout><Contacto /></PublicLayout>} />
           <Route path="/inscripcion" element={<PublicLayout><Inscripcion /></PublicLayout>} />
+          <Route path="/testimonios" element={<PublicLayout><Testimonios /></PublicLayout>} />
 
           <Route path="/admin" element={<Login />} />
           <Route path="/admin/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>}>

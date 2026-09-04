@@ -734,6 +734,12 @@ export default function Inicio() {
             <div className="mb-8 text-center">
               <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-2">Comunidad</p>
               <h2 className="text-3xl md:text-4xl font-extrabold text-white">Por qué se suman</h2>
+              <Link
+                to="/testimonios"
+                className="mt-5 inline-flex items-center justify-center rounded-full border border-accent/40 px-5 py-2 text-sm font-bold text-white transition hover:bg-accent/20"
+              >
+                Dejar testimonio
+              </Link>
             </div>
             <div className="grid gap-4 md:grid-cols-3">
               {testimonios.slice(0, 3).map((item, index) => (
