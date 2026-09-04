@@ -222,11 +222,12 @@ const LIST_CONFIG = {
   },
   testimonios: {
     title: 'Testimonios',
-    emptyItem: { nombre: '', rol: '', texto: '', activo: true },
+    emptyItem: { nombre: '', rol: '', texto: '', imagen: '', activo: true },
     fields: [
       ['nombre', 'Nombre'],
       ['rol', 'Rol / equipo'],
       ['texto', 'Frase', 'textarea'],
+      ['imagen', 'Foto', 'image'],
     ],
   },
   sponsors: {

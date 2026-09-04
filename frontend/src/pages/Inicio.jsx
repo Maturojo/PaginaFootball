@@ -125,7 +125,8 @@ const DEFAULT_HOME_TEXT = {
 const DEFAULT_TESTIMONIOS = [
   {
     nombre: 'Lucas Gabotto',
-    rol: 'Jugador',
+    rol: 'Fue preselección Argentina · 5 MVPs en la liga',
+    imagen: '/jugadores/lucas-gabotto.png',
     texto: 'Estos diez años en la liga fueron una experiencia muy buena para mí. Fui mejorando de a poco, pasando de tener un desempeño más bajo a sentirme cada vez más cómodo y rendir mejor dentro de la cancha. Además, me quedo con la buena onda y todos los momentos compartidos con mis amigos y compañeros durante estos años.',
     activo: true,
   },
@@ -271,9 +272,14 @@ function mergeFixturePartidos(apiPartidos = []) {
 
 function mergeTestimonios(items = []) {
   const visibles = items.filter(item => item.activo !== false);
-  const nombres = new Set(visibles.map(item => item.nombre?.toLowerCase()));
+  const defaultsByName = new Map(DEFAULT_TESTIMONIOS.map(item => [item.nombre.toLowerCase(), item]));
+  const enriched = visibles.map(item => {
+    const fallback = defaultsByName.get(item.nombre?.toLowerCase());
+    return fallback ? { ...fallback, ...item, rol: fallback.rol, imagen: item.imagen || fallback.imagen } : item;
+  });
+  const nombres = new Set(enriched.map(item => item.nombre?.toLowerCase()));
   const faltantes = DEFAULT_TESTIMONIOS.filter(item => !nombres.has(item.nombre.toLowerCase()));
-  return [...faltantes, ...visibles];
+  return [...faltantes, ...enriched];
 }
 
 function isUpcomingCalendarItem(item) {
@@ -732,11 +738,24 @@ export default function Inicio() {
             <div className="grid gap-4 md:grid-cols-3">
               {testimonios.slice(0, 3).map((item, index) => (
                 <article key={`${item.nombre}-${index}`} className="rounded-xl border border-accent/20 bg-secondary p-6">
-                  <p className="text-white/65 leading-relaxed">“{item.texto}”</p>
-                  <div className="mt-5 border-t border-white/10 pt-4">
-                    <p className="font-extrabold text-white">{item.nombre}</p>
-                    {item.rol && <p className="text-sm text-accent">{item.rol}</p>}
+                  <div className="mb-5 flex items-center gap-4">
+                    {item.imagen ? (
+                      <img
+                        src={pageImageSrc(item.imagen)}
+                        alt={item.nombre}
+                        className="h-16 w-16 rounded-full border-2 border-accent/25 object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-16 w-16 items-center justify-center rounded-full border border-accent/20 bg-primary/60 text-xl font-extrabold text-accent">
+                        {item.nombre?.charAt(0) || '?'}
+                      </div>
+                    )}
+                    <div>
+                      <p className="font-extrabold text-white">{item.nombre}</p>
+                      {item.rol && <p className="text-sm text-accent">{item.rol}</p>}
+                    </div>
                   </div>
+                  <p className="text-white/65 leading-relaxed">“{item.texto}”</p>
                 </article>
               ))}
             </div>

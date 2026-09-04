@@ -117,7 +117,8 @@ async function seed() {
   // Páginas
   const lucasTestimonio = {
     nombre: 'Lucas Gabotto',
-    rol: 'Jugador',
+    rol: 'Fue preselección Argentina · 5 MVPs en la liga',
+    imagen: '/jugadores/lucas-gabotto.png',
     texto: 'Estos diez años en la liga fueron una experiencia muy buena para mí. Fui mejorando de a poco, pasando de tener un desempeño más bajo a sentirme cada vez más cómodo y rendir mejor dentro de la cancha. Además, me quedo con la buena onda y todos los momentos compartidos con mis amigos y compañeros durante estos años.',
     activo: true,
   };
@@ -160,12 +161,19 @@ async function seed() {
   const testimoniosPage = await Page.findOne({ key: 'testimonios' });
   const existingTestimonios = Array.isArray(testimoniosPage?.contenido?.items) ? testimoniosPage.contenido.items : [];
   const hasLucasTestimonio = existingTestimonios.some(item => item.nombre?.toLowerCase() === lucasTestimonio.nombre.toLowerCase());
+  const updatedTestimonios = hasLucasTestimonio
+    ? existingTestimonios.map(item => (
+      item.nombre?.toLowerCase() === lucasTestimonio.nombre.toLowerCase()
+        ? { ...item, rol: lucasTestimonio.rol, imagen: item.imagen || lucasTestimonio.imagen }
+        : item
+    ))
+    : [lucasTestimonio, ...existingTestimonios];
   await Page.findOneAndUpdate(
     { key: 'testimonios' },
     {
       contenido: {
         ...(testimoniosPage?.contenido || {}),
-        items: hasLucasTestimonio ? existingTestimonios : [lucasTestimonio, ...existingTestimonios],
+        items: updatedTestimonios,
       },
     },
     { upsert: true }
