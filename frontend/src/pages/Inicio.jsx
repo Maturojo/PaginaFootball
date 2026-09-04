@@ -125,7 +125,7 @@ const DEFAULT_HOME_TEXT = {
 const DEFAULT_TESTIMONIOS = [
   {
     nombre: 'Lucas Gabotto',
-    rol: 'Fue preselección Argentina · 5 MVPs en la liga',
+    rol: 'Pre-selección Argentina · 5 MVPs del Tazon del Mar',
     imagen: '/jugadores/lucas-gabotto.png',
     texto: 'Estos diez años en la liga fueron una experiencia muy buena para mí. Fui mejorando de a poco, pasando de tener un desempeño más bajo a sentirme cada vez más cómodo y rendir mejor dentro de la cancha. Además, me quedo con la buena onda y todos los momentos compartidos con mis amigos y compañeros durante estos años.',
     activo: true,
