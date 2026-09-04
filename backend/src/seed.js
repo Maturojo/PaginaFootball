@@ -99,12 +99,7 @@ async function seed() {
   const fixedProducts = [anniversaryShirt, cityHallTrainingShirt];
   const productCount = await Product.countDocuments();
   if (productCount === 0) {
-    await Product.insertMany([
-      ...fixedProducts,
-      { nombre: 'Camiseta Oficial Liga', precio: 3500, descripcion: 'Camiseta oficial de la Liga de Football Americano MDP.', categoria: 'Indumentaria', stock: 20, whatsapp: '5492236661385' },
-      { nombre: 'Gorra Liga MDP', precio: 1800, descripcion: 'Gorra bordada con el logo de la liga.', categoria: 'Accesorios', stock: 15, whatsapp: '5492236661385' },
-      { nombre: 'Pelota Oficial', precio: 4200, descripcion: 'Pelota reglamentaria para entrenamiento.', categoria: 'Equipamiento', stock: 5, whatsapp: '5492236661385' },
-    ]);
+    await Product.insertMany(fixedProducts);
     console.log('Productos creados');
   }
   for (const product of fixedProducts) {
@@ -114,8 +109,19 @@ async function seed() {
       { upsert: true, new: true }
     );
   }
+  await Product.updateMany(
+    { nombre: { $nin: fixedProducts.map(product => product.nombre) } },
+    { $set: { activo: false } }
+  );
 
   // Páginas
+  const lucasTestimonio = {
+    nombre: 'Lucas Gabotto',
+    rol: 'Jugador',
+    texto: 'Estos diez años en la liga fueron una experiencia muy buena para mí. Fui mejorando de a poco, pasando de tener un desempeño más bajo a sentirme cada vez más cómodo y rendir mejor dentro de la cancha. Además, me quedo con la buena onda y todos los momentos compartidos con mis amigos y compañeros durante estos años.',
+    activo: true,
+  };
+
   const pages = [
     {
       key: 'inicio',
@@ -151,6 +157,19 @@ async function seed() {
   for (const p of pages) {
     await Page.findOneAndUpdate({ key: p.key }, { contenido: p.contenido }, { upsert: true });
   }
+  const testimoniosPage = await Page.findOne({ key: 'testimonios' });
+  const existingTestimonios = Array.isArray(testimoniosPage?.contenido?.items) ? testimoniosPage.contenido.items : [];
+  const hasLucasTestimonio = existingTestimonios.some(item => item.nombre?.toLowerCase() === lucasTestimonio.nombre.toLowerCase());
+  await Page.findOneAndUpdate(
+    { key: 'testimonios' },
+    {
+      contenido: {
+        ...(testimoniosPage?.contenido || {}),
+        items: hasLucasTestimonio ? existingTestimonios : [lucasTestimonio, ...existingTestimonios],
+      },
+    },
+    { upsert: true }
+  );
   console.log('Páginas inicializadas');
 
   await mongoose.disconnect();

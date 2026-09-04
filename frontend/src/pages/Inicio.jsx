@@ -122,6 +122,15 @@ const DEFAULT_HOME_TEXT = {
   contactTo: '/contacto',
 };
 
+const DEFAULT_TESTIMONIOS = [
+  {
+    nombre: 'Lucas Gabotto',
+    rol: 'Jugador',
+    texto: 'Estos diez años en la liga fueron una experiencia muy buena para mí. Fui mejorando de a poco, pasando de tener un desempeño más bajo a sentirme cada vez más cómodo y rendir mejor dentro de la cancha. Además, me quedo con la buena onda y todos los momentos compartidos con mis amigos y compañeros durante estos años.',
+    activo: true,
+  },
+];
+
 function fotoSrc(f) {
   if (f?.startsWith('/eventos/')) return f;
   return f?.startsWith('http') ? f : `${API_URL}${f}`;
@@ -260,6 +269,13 @@ function mergeFixturePartidos(apiPartidos = []) {
   return [...apiPartidos, ...missingFallbacks];
 }
 
+function mergeTestimonios(items = []) {
+  const visibles = items.filter(item => item.activo !== false);
+  const nombres = new Set(visibles.map(item => item.nombre?.toLowerCase()));
+  const faltantes = DEFAULT_TESTIMONIOS.filter(item => !nombres.has(item.nombre.toLowerCase()));
+  return [...faltantes, ...visibles];
+}
+
 function isUpcomingCalendarItem(item) {
   const date = new Date(item.fechaOrden || item.fecha);
   if (!Number.isFinite(date.getTime())) return item.estado !== 'finalizado';
@@ -309,7 +325,9 @@ export default function Inicio() {
       const partidos = mergeFixturePartidos(partidosResponse.data || []);
       setCalendario(mergeCalendarItems(manualItems, partidos));
     });
-    api.get('/pages/testimonios').then(r => setTestimonios((r.data?.contenido?.items || []).filter(item => item.activo !== false)));
+    api.get('/pages/testimonios')
+      .then(r => setTestimonios(mergeTestimonios(r.data?.contenido?.items || [])))
+      .catch(() => setTestimonios(DEFAULT_TESTIMONIOS));
     api.get('/pages/sponsors').then(r => setSponsors((r.data?.contenido?.items || []).filter(item => item.activo !== false)));
     api.get('/eventos').then(r => {
       const eventos = mergeEvents(r.data || []);
