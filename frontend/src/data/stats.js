@@ -10,7 +10,7 @@ export const FALLBACK_PARTIDOS = [
     golesLocal: 21,
     golesVisitante: 28,
     lugar: 'Mar del Plata',
-    notas: 'LIEBRES\n• Agustín Luporini: 19/30, 148 yds, 2 TDs · 5 rush, 57 yds, 1 TD · 1 int defensiva\n• Matías Rojo: 10 rec, 88 yds, 1 TD · 1/1, 1 yd, 1 TD\n• Emiliano Sánchez: 5 rec, 37 yds, 1 TD\n• Lucas Yuntunen: 3 sacks, 1 safety\n\nTRIDENTES\n• Profe: 24/37, 246 yds, 3 TDs, 2 ints lanzadas · 1 rush, 10 yds\n• Emanuel Rodriguez: 6 rec, 77 yds, 1 TD\n• Pablo Corva: 5 rec, 72 yds\n• Iñaki Irurzun: 7 rec, 37 yds, 1 TD · 2 sacks',
+    notas: 'LIEBRES\n• Agustín Luporini: 19/30, 148 yds, 2 TDs · 5 rush, 57 yds, 1 TD · 1 int defensiva\n• Matías Rojo: 10 rec, 88 yds, 1 TD · 1/1, 1 yd, 1 TD\n• Emiliano Sánchez: 5 rec, 37 yds, 1 TD\n• Lucas Yuntunen: 3 sacks, 1 safety\n\nTRIDENTES\n• Javier Papagni: 24/37, 246 yds, 3 TDs, 2 ints lanzadas · 1 rush, 10 yds\n• Emanuel Rodriguez: 6 rec, 77 yds, 1 TD\n• Pablo Corva: 5 rec, 72 yds\n• Iñaki Irurzun: 7 rec, 37 yds, 1 TD · 2 sacks',
   },
   {
     _id: 'flag-masculino-2026-fecha-2',
@@ -488,7 +488,7 @@ export const FALLBACK_LIDERES = [
     temporada: 'Tazón del Mar XI',
     tipo: 'pase',
     jugadores: [
-      { pos: 1, nombre: 'Profe', equipo: 'TRI', pas: 37, com: 24, pct: 64, yds: 246, td: 3, int: 2 },
+      { pos: 1, nombre: 'Javier Papagni', equipo: 'TRI', pas: 37, com: 24, pct: 64, yds: 246, td: 3, int: 2 },
       { pos: 2, nombre: 'Agustín Luporini', equipo: 'LIE', pas: 30, com: 19, pct: 63, yds: 148, td: 2, int: 0 },
       { pos: 3, nombre: 'Matías Rojo', equipo: 'LIE', pas: 1, com: 1, pct: 100, yds: 1, td: 1, int: 0 },
     ],
@@ -499,7 +499,7 @@ export const FALLBACK_LIDERES = [
     jugadores: [
       { pos: 1, nombre: 'Agustín Luporini', equipo: 'LIE', int: 5, yds: 57, prom: 11.4, td: 1 },
       { pos: 2, nombre: 'Matías Rojo', equipo: 'LIE', int: 2, yds: 12, prom: 6.0, td: 0 },
-      { pos: 3, nombre: 'Profe', equipo: 'TRI', int: 1, yds: 10, prom: 10.0, td: 0 },
+      { pos: 3, nombre: 'Javier Papagni', equipo: 'TRI', int: 1, yds: 10, prom: 10.0, td: 0 },
       { pos: 4, nombre: 'Emanuel Rodriguez', equipo: 'TRI', int: 1, yds: 5, prom: 5.0, td: 0 },
     ],
   },
