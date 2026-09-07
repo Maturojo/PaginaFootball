@@ -791,6 +791,19 @@ function SimplePageEditor({ page }) {
   );
 }
 
+function formatAdminDate(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return '';
+  return date.toLocaleString('es-AR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
 function ContentListEditor({ pageKey }) {
   const config = LIST_CONFIG[pageKey];
   const [items, setItems] = useState([]);
@@ -857,6 +870,11 @@ function ContentListEditor({ pageKey }) {
             <div>
               <p className="font-bold text-gray-700">{item.titulo || item.nombre || `Item ${index + 1}`}</p>
               {item.fromFixture && <p className="text-xs font-semibold text-blue-500">Desde fixture</p>}
+              {pageKey === 'testimonios' && item.enviadoDesdeWeb && (
+                <p className="text-xs font-semibold text-green-600">
+                  Formulario web{formatAdminDate(item.createdAt) ? ` · ${formatAdminDate(item.createdAt)}` : ''}
+                </p>
+              )}
             </div>
             <div className="flex flex-wrap gap-2">
               <label className="flex items-center gap-2 text-sm text-gray-600">

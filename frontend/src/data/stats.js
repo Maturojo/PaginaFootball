@@ -6,8 +6,11 @@ export const FALLBACK_PARTIDOS = [
     equipoLocal: 'Tridentes',
     equipoVisitante: 'Liebres',
     fecha: '2026-09-05',
-    estado: 'programado',
+    estado: 'finalizado',
+    golesLocal: 21,
+    golesVisitante: 28,
     lugar: 'Mar del Plata',
+    notas: 'LIEBRES\n• Agustín Luporini: 19/30, 148 yds, 2 TDs · 5 rush, 57 yds, 1 TD · 1 int defensiva\n• Matías Rojo: 10 rec, 88 yds, 1 TD · 1/1, 1 yd, 1 TD\n• Emiliano Sánchez: 5 rec, 37 yds, 1 TD\n• Lucas Yuntunen: 3 sacks, 1 safety\n\nTRIDENTES\n• Profe: 24/37, 246 yds, 3 TDs, 2 ints lanzadas · 1 rush, 10 yds\n• Emanuel Rodriguez: 6 rec, 77 yds, 1 TD\n• Pablo Corva: 5 rec, 72 yds\n• Iñaki Irurzun: 7 rec, 37 yds, 1 TD · 2 sacks',
   },
   {
     _id: 'flag-masculino-2026-fecha-2',
@@ -398,6 +401,17 @@ export const FALLBACK_PARTIDOS = [
 
 export const FALLBACK_STATS = [
   {
+    _id: 'posiciones-tazon-del-mar-xi-fecha-1',
+    temporada: 'Tazón del Mar XI',
+    categoria: 'Liga Football Flag',
+    descripcion: 'Posiciones acumuladas hasta la Fecha 1 - FAMDQ',
+    tabla: [
+      { equipo: 'Liebres', PJ: 1, PG: 1, PP: 0, PF: 28, PC: 21, Pts: 3 },
+      { equipo: 'Krakens', PJ: 0, PG: 0, PP: 0, PF: 0, PC: 0, Pts: 0 },
+      { equipo: 'Tridentes', PJ: 1, PG: 0, PP: 1, PF: 21, PC: 28, Pts: 0 },
+    ],
+  },
+  {
     _id: 'posiciones-tazon-del-mar-x-fecha-6',
     temporada: 'Tazón del Mar X',
     categoria: 'Liga Football Flag',
@@ -470,6 +484,71 @@ export const FALLBACK_STATS = [
 ];
 
 export const FALLBACK_LIDERES = [
+  {
+    temporada: 'Tazón del Mar XI',
+    tipo: 'pase',
+    jugadores: [
+      { pos: 1, nombre: 'Profe', equipo: 'TRI', pas: 37, com: 24, pct: 64, yds: 246, td: 3, int: 2 },
+      { pos: 2, nombre: 'Agustín Luporini', equipo: 'LIE', pas: 30, com: 19, pct: 63, yds: 148, td: 2, int: 0 },
+      { pos: 3, nombre: 'Matías Rojo', equipo: 'LIE', pas: 1, com: 1, pct: 100, yds: 1, td: 1, int: 0 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar XI',
+    tipo: 'corrida',
+    jugadores: [
+      { pos: 1, nombre: 'Agustín Luporini', equipo: 'LIE', int: 5, yds: 57, prom: 11.4, td: 1 },
+      { pos: 2, nombre: 'Matías Rojo', equipo: 'LIE', int: 2, yds: 12, prom: 6.0, td: 0 },
+      { pos: 3, nombre: 'Profe', equipo: 'TRI', int: 1, yds: 10, prom: 10.0, td: 0 },
+      { pos: 4, nombre: 'Emanuel Rodriguez', equipo: 'TRI', int: 1, yds: 5, prom: 5.0, td: 0 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar XI',
+    tipo: 'recepcion',
+    jugadores: [
+      { pos: 1, nombre: 'Matías Rojo', equipo: 'LIE', rec: 10, yds: 88, prom: 8.8, td: 1 },
+      { pos: 2, nombre: 'Emanuel Rodriguez', equipo: 'TRI', rec: 6, yds: 77, prom: 12.8, td: 1 },
+      { pos: 3, nombre: 'Pablo Corva', equipo: 'TRI', rec: 5, yds: 72, prom: 14.4, td: 0 },
+      { pos: 4, nombre: 'Emiliano Sánchez', equipo: 'LIE', rec: 5, yds: 37, prom: 7.4, td: 1 },
+      { pos: 5, nombre: 'Iñaki Irurzun', equipo: 'TRI', rec: 7, yds: 37, prom: 5.3, td: 1 },
+      { pos: 6, nombre: 'Mauro Castillo', equipo: 'TRI', rec: 3, yds: 35, prom: 11.7, td: 0 },
+      { pos: 7, nombre: 'Lauro Ibarra', equipo: 'LIE', rec: 5, yds: 24, prom: 4.8, td: 1 },
+      { pos: 8, nombre: 'Ignacio Cuesta', equipo: 'TRI', rec: 3, yds: 20, prom: 6.7, td: 1 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar XI',
+    tipo: 'intercepciones',
+    jugadores: [
+      { pos: 1, nombre: 'Agustín Luporini', equipo: 'LIE', ints: 1, pickSix: 0 },
+      { pos: 1, nombre: 'Gustavo Duarte', equipo: 'LIE', ints: 1, pickSix: 0 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar XI',
+    tipo: 'sacks',
+    jugadores: [
+      { pos: 1, nombre: 'Lucas Yuntunen', equipo: 'LIE', sacks: 3, safety: 1 },
+      { pos: 2, nombre: 'Iñaki Irurzun', equipo: 'TRI', sacks: 2, safety: 0 },
+    ],
+  },
+  {
+    temporada: 'Tazón del Mar XI',
+    tipo: 'flags',
+    jugadores: [
+      { pos: 1, nombre: 'Agustín Luporini', equipo: 'LIE', flags: 8 },
+      { pos: 2, nombre: 'Ignacio Cuesta', equipo: 'TRI', flags: 5 },
+      { pos: 2, nombre: 'Gero', equipo: 'TRI', flags: 5 },
+      { pos: 4, nombre: 'Matías Rojo', equipo: 'LIE', flags: 4 },
+      { pos: 4, nombre: 'Emiliano Sánchez', equipo: 'LIE', flags: 4 },
+      { pos: 6, nombre: 'Rubén Gabotto', equipo: 'TRI', flags: 3 },
+      { pos: 6, nombre: 'Gabriel Sosa', equipo: 'TRI', flags: 3 },
+      { pos: 6, nombre: 'Gustavo Duarte', equipo: 'LIE', flags: 3 },
+      { pos: 9, nombre: 'Emanuel Rodriguez', equipo: 'TRI', flags: 1 },
+      { pos: 9, nombre: 'Iñaki Irurzun', equipo: 'TRI', flags: 1 },
+    ],
+  },
   {
     temporada: 'Tazón del Mar X',
     tipo: 'premios',
@@ -1887,6 +1966,7 @@ const ROMAN_SEASONS = {
   VIII: 8,
   IX: 9,
   X: 10,
+  XI: 11,
 };
 
 function seasonRank(temporada) {
