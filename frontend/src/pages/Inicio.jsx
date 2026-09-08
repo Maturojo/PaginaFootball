@@ -4,7 +4,9 @@ import api from '../api';
 
 import { API_URL } from '../config.js';
 import { FALLBACK_EVENTS } from '../data/events.js';
-import { FALLBACK_PARTIDOS } from '../data/stats.js';
+import { FALLBACK_PARTIDOS, FALLBACK_STATS } from '../data/stats.js';
+import { FALLBACK_TEAMS, mergeTeams } from '../data/teams.js';
+import { teamLogoSrc } from '../utils/teamLogo.js';
 
 const DEFAULT_HERO_SLIDES = [
   '/hero/portada-slide-mariscal.jpg',
@@ -291,6 +293,47 @@ function isUpcomingCalendarItem(item) {
   return date >= today;
 }
 
+function matchTime(partido) {
+  const date = new Date(partido.fecha);
+  return Number.isFinite(date.getTime()) ? date.getTime() : Number.MAX_SAFE_INTEGER;
+}
+
+function isUpcomingMatch(partido) {
+  if (partido.estado === 'finalizado' || partido.estado === 'cancelado') return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return matchTime(partido) >= today.getTime();
+}
+
+function formatMatchDate(value, fallback = '') {
+  if (fallback) return fallback;
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return '';
+  return date.toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric', month: 'short' });
+}
+
+function mergeStats(apiStats = []) {
+  const existing = new Set(apiStats.map(item => item._id));
+  return [...apiStats, ...FALLBACK_STATS.filter(item => !existing.has(item._id))];
+}
+
+function latestStanding(stats = []) {
+  return [...stats]
+    .filter(item => Array.isArray(item.tabla) && item.tabla.length > 0)
+    .sort((a, b) => String(b.temporada || '').localeCompare(String(a.temporada || '')))[0] || null;
+}
+
+function teamAbbr(name = '') {
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .split(/\s+/)
+    .map(part => part[0])
+    .join('')
+    .slice(0, 3)
+    .toUpperCase();
+}
+
 function formatTestimonioDate(value) {
   if (!value) return '';
   const date = new Date(value);
@@ -314,6 +357,9 @@ export default function Inicio() {
   const [ultimoEvento, setUltimoEvento] = useState(null);
   const [noticias, setNoticias] = useState([]);
   const [calendario, setCalendario] = useState([]);
+  const [partidos, setPartidos] = useState(FALLBACK_PARTIDOS);
+  const [posiciones, setPosiciones] = useState(FALLBACK_STATS);
+  const [teams, setTeams] = useState(FALLBACK_TEAMS);
   const [testimonios, setTestimonios] = useState([]);
   const [sponsors, setSponsors] = useState([]);
   const [heroSlide, setHeroSlide] = useState(0);
@@ -328,6 +374,20 @@ export default function Inicio() {
   const modalidadActiva = modalidades.find(modalidad => modalidad.id === selectedModalidad) || modalidades[0];
   const modalidadSlides = nonEmptyArray(modalidadActiva.slides, [modalidadActiva.image]);
   const calendarioInicio = calendario.filter(isUpcomingCalendarItem).slice(0, 6);
+  const activeTeams = teams.filter(team => !team.oculto);
+  const proximoPartido = [...partidos]
+    .filter(partido => isUpcomingMatch(partido) && partido.tipo !== 'agenda')
+    .sort((a, b) => matchTime(a) - matchTime(b))[0];
+  const proximaActividad = [...partidos]
+    .filter(isUpcomingMatch)
+    .sort((a, b) => matchTime(a) - matchTime(b))[0];
+  const nextFeature = proximoPartido || proximaActividad;
+  const resultadosRecientes = [...partidos]
+    .filter(partido => partido.estado === 'finalizado' && partido.tipo !== 'agenda')
+    .sort((a, b) => matchTime(b) - matchTime(a))
+    .slice(0, 3);
+  const posicionesActuales = latestStanding(posiciones);
+  const categoriasActivas = [...new Set(activeTeams.map(team => team.categoria).filter(Boolean))];
 
   const scrollTestimonios = (direction) => {
     const carousel = testimoniosCarouselRef.current;
@@ -348,19 +408,30 @@ export default function Inicio() {
   };
 
   useEffect(() => {
-    api.get('/pages/inicio').then(r => { if (r.data?.contenido) setData(current => ({ ...current, ...r.data.contenido })); });
+    api.get('/pages/inicio')
+      .then(r => { if (r.data?.contenido) setData(current => ({ ...current, ...r.data.contenido })); })
+      .catch(() => {});
     Promise.all([
       api.get('/pages/calendario').catch(() => ({ data: { contenido: { items: [] } } })),
       api.get('/partidos').catch(() => ({ data: [] })),
     ]).then(([pageResponse, partidosResponse]) => {
       const manualItems = pageResponse.data?.contenido?.items || [];
       const partidos = mergeFixturePartidos(partidosResponse.data || []);
+      setPartidos(partidos);
       setCalendario(mergeCalendarItems(manualItems, partidos));
     });
+    api.get('/estadisticas')
+      .then(r => setPosiciones(mergeStats(r.data || [])))
+      .catch(() => setPosiciones(FALLBACK_STATS));
+    api.get('/teams')
+      .then(r => setTeams(mergeTeams(r.data || [])))
+      .catch(() => setTeams(FALLBACK_TEAMS));
     api.get('/pages/testimonios')
       .then(r => setTestimonios(mergeTestimonios(r.data?.contenido?.items || [])))
       .catch(() => setTestimonios(DEFAULT_TESTIMONIOS));
-    api.get('/pages/sponsors').then(r => setSponsors((r.data?.contenido?.items || []).filter(item => item.activo !== false)));
+    api.get('/pages/sponsors')
+      .then(r => setSponsors((r.data?.contenido?.items || []).filter(item => item.activo !== false)))
+      .catch(() => setSponsors([]));
     api.get('/eventos').then(r => {
       const eventos = mergeEvents(r.data || []);
       const ordenados = sortVisibleEvents(eventos);
@@ -373,7 +444,9 @@ export default function Inicio() {
       setUltimoEvento(ordenados[0] || sortByCreated(FALLBACK_EVENTS)[0] || null);
       setFotos(todas.slice(0, 9));
     });
-    api.get('/noticias').then(r => setNoticias(r.data.slice(0, 3)));
+    api.get('/noticias')
+      .then(r => setNoticias(r.data.slice(0, 3)))
+      .catch(() => setNoticias([]));
   }, []);
 
   useEffect(() => {
@@ -385,10 +458,6 @@ export default function Inicio() {
 
     return () => clearInterval(interval);
   }, [heroSlides.length]);
-
-  useEffect(() => {
-    setModalidadSlide(0);
-  }, [selectedModalidad]);
 
   useEffect(() => {
     if (modalidadSlides.length < 2) return undefined;
@@ -413,7 +482,7 @@ export default function Inicio() {
   return (
     <div className="bg-primary text-white">
       {/* Hero */}
-      <section className="relative h-[72vh] min-h-[640px] max-h-[760px] px-4 pt-24 md:pt-28 pb-24 md:pb-28 overflow-hidden flex items-center">
+      <section className="relative min-h-[82vh] overflow-hidden px-4 pb-14 pt-24 md:pt-28 lg:flex lg:items-center">
         {heroSlides.map((slide, index) => {
           const normalizedSlide = normalizeSlide(slide, { fit: 'cover', x: 50, y: 52, zoom: 100 });
           return (
@@ -427,34 +496,176 @@ export default function Inicio() {
             />
           );
         })}
-        <div className="absolute inset-0 bg-primary/25" />
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/45 via-primary/15 to-primary/70" />
-        <div className="relative max-w-4xl mx-auto text-center mt-8 md:mt-12">
-          <img src="/logo.png" alt="Logo Liga" className="h-36 w-36 object-contain mx-auto mb-8 drop-shadow-2xl" />
-          <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-4">{homeText.heroMeta}</p>
-          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4 text-white">{data.titulo}</h1>
-          <h2 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 text-white">{data.titulo2}</h2>
-          <p className="text-xl text-white/75 mb-10">{data.subtitulo}</p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link to={homeText.heroPrimaryTo} className="bg-accent text-white font-bold px-8 py-3 rounded-full hover:bg-accent-light transition shadow-lg shadow-accent/30">
-              {homeText.heroPrimaryCta}
-            </Link>
-            <Link to={homeText.heroStoreTo} className="border-2 border-accent/60 text-white font-bold px-8 py-3 rounded-full hover:bg-accent/20 transition">
-              {homeText.heroStoreCta}
-            </Link>
-            <Link to={homeText.heroShirtTo} className="border-2 border-white/30 text-white font-bold px-8 py-3 rounded-full hover:bg-white/10 transition">
-              {homeText.heroShirtCta}
-            </Link>
+        <div className="absolute inset-0 bg-primary/45" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/72 to-primary/15" />
+        <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-primary to-transparent" />
+        <div className="relative mx-auto grid w-full max-w-7xl items-end gap-10 lg:grid-cols-[minmax(0,1fr)_390px]">
+          <div className="max-w-4xl">
+            <img src="/logo.png" alt="Logo Liga de Football Americano Mar del Plata" className="mb-6 h-20 w-20 object-contain drop-shadow-2xl md:h-28 md:w-28" />
+            <p className="mb-4 text-[11px] font-extrabold uppercase tracking-[0.28em] text-accent-light md:text-xs">{homeText.heroMeta}</p>
+            <h1 className="max-w-4xl text-4xl font-black uppercase leading-[0.96] text-white md:text-6xl lg:text-7xl">
+              Liga de Football Americano
+              <span className="mt-3 block text-accent-light">Mar del Plata</span>
+            </h1>
+            <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/78 md:text-lg">
+              Competencia, comunidad y crecimiento del football americano en la ciudad.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link to="/fixture" className="inline-flex min-h-11 items-center justify-center rounded-full bg-accent px-7 py-2.5 text-sm font-extrabold uppercase tracking-wide text-white shadow-lg shadow-accent/25 transition hover:bg-accent-light focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
+                Ver partidos
+              </Link>
+              <Link to={homeText.heroPrimaryTo} className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/40 bg-white/10 px-7 py-2.5 text-sm font-extrabold uppercase tracking-wide text-white backdrop-blur transition hover:bg-white/18 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-light">
+                Quiero jugar
+              </Link>
+            </div>
           </div>
+
+          <aside className="border border-white/15 bg-primary/78 p-5 shadow-2xl shadow-black/30 backdrop-blur md:p-6">
+            <p className="text-xs font-extrabold uppercase tracking-[0.28em] text-accent-light">Temporada activa</p>
+            <div className="mt-5 grid grid-cols-3 gap-3">
+              <div>
+                <p className="text-3xl font-black text-white">{activeTeams.length}</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Equipos</p>
+              </div>
+              <div>
+                <p className="text-3xl font-black text-white">{categoriasActivas.length}</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Modalidades</p>
+              </div>
+              <div>
+                <p className="text-3xl font-black text-white">{resultadosRecientes.length}</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-white/45">Últimos</p>
+              </div>
+            </div>
+            {nextFeature && (
+              <div className="mt-6 border-t border-white/10 pt-5">
+                <p className="text-xs font-bold uppercase tracking-widest text-white/40">Próxima actividad</p>
+                <p className="mt-2 text-xl font-black text-white">{nextFeature.tipo === 'agenda' ? nextFeature.titulo : `${nextFeature.equipoLocal} vs ${nextFeature.equipoVisitante}`}</p>
+                <p className="mt-2 text-sm text-white/55">{formatMatchDate(nextFeature.fecha, nextFeature.fechaTexto)}{nextFeature.lugar ? ` · ${nextFeature.lugar}` : ''}</p>
+              </div>
+            )}
+            <div className="mt-6 flex gap-2">
+              {heroSlides.map((slide, index) => (
+                <button
+                  key={`${slideKey(slide, index)}-hero-dot`}
+                  type="button"
+                  onClick={() => setHeroSlide(index)}
+                  className={`h-1.5 flex-1 transition ${heroSlide === index ? 'bg-accent-light' : 'bg-white/25 hover:bg-white/45'}`}
+                  aria-label={`Ver foto principal ${index + 1}`}
+                />
+              ))}
+            </div>
+          </aside>
         </div>
       </section>
 
+      {nextFeature && (
+        <section className="border-y border-accent/10 bg-secondary px-4 py-12">
+          <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+            <div>
+              <p className="text-xs font-extrabold uppercase tracking-[0.3em] text-accent">Próxima fecha</p>
+              <h2 className="mt-3 text-2xl font-black uppercase text-white md:text-4xl">
+                {nextFeature.tipo === 'agenda' ? nextFeature.titulo : nextFeature.jornada}
+              </h2>
+              <p className="mt-4 max-w-xl text-white/55">
+                {nextFeature.tipo === 'agenda'
+                  ? 'Actividad cargada en el calendario oficial de la liga.'
+                  : 'El próximo cruce disponible del fixture publicado.'}
+              </p>
+            </div>
+
+            <article className="border border-accent/25 bg-primary p-5 shadow-xl shadow-black/20 md:p-7">
+              {nextFeature.tipo === 'agenda' ? (
+                <div className="grid gap-5 md:grid-cols-[auto_1fr_auto] md:items-center">
+                  <div className="border border-accent/25 bg-accent/10 px-5 py-4 text-center">
+                    <p className="text-2xl font-black text-accent-light">{formatMatchDate(nextFeature.fecha, nextFeature.fechaTexto)}</p>
+                    <p className="mt-1 text-xs font-bold uppercase tracking-widest text-white/40">{nextFeature.categoria}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-white">{nextFeature.titulo}</h3>
+                    {nextFeature.notas && <p className="mt-2 text-sm text-white/55">{nextFeature.notas}</p>}
+                    {nextFeature.lugar && <p className="mt-3 text-sm font-semibold text-white/45">{nextFeature.lugar}</p>}
+                  </div>
+                  <Link to="/fixture" className="inline-flex min-h-11 items-center justify-center rounded-full bg-accent px-6 py-2.5 text-sm font-extrabold uppercase text-white transition hover:bg-accent-light">
+                    Ver fecha
+                  </Link>
+                </div>
+              ) : (
+                <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 md:gap-6">
+                  <div className="text-center">
+                    <img
+                      src={teamLogoSrc({ nombre: nextFeature.equipoLocal }) || '/logo.png'}
+                      alt={nextFeature.equipoLocal}
+                      className="mx-auto h-20 w-20 object-contain md:h-24 md:w-24"
+                      loading="lazy"
+                    />
+                    <h3 className="mt-3 text-lg font-black text-white md:text-2xl">{nextFeature.equipoLocal}</h3>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xs font-extrabold uppercase tracking-widest text-accent-light">{formatMatchDate(nextFeature.fecha, nextFeature.fechaTexto)}</p>
+                    <p className="my-2 text-4xl font-black text-white/25">VS</p>
+                    {nextFeature.lugar && <p className="max-w-28 text-xs font-semibold text-white/45">{nextFeature.lugar}</p>}
+                  </div>
+                  <div className="text-center">
+                    <img
+                      src={teamLogoSrc({ nombre: nextFeature.equipoVisitante }) || '/logo.png'}
+                      alt={nextFeature.equipoVisitante}
+                      className="mx-auto h-20 w-20 object-contain md:h-24 md:w-24"
+                      loading="lazy"
+                    />
+                    <h3 className="mt-3 text-lg font-black text-white md:text-2xl">{nextFeature.equipoVisitante}</h3>
+                  </div>
+                  <div className="col-span-3 mt-5 flex justify-center border-t border-white/10 pt-5">
+                    <Link to="/fixture" className="inline-flex min-h-11 items-center justify-center rounded-full bg-accent px-7 py-2.5 text-sm font-extrabold uppercase text-white transition hover:bg-accent-light">
+                      Ver fecha
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </article>
+          </div>
+        </section>
+      )}
+
       {/* Descripción */}
-      <section className="bg-secondary py-20 px-4 text-center border-y border-accent/10">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold text-white mb-4">{homeText.welcomeTitle}</h2>
-          <div className="w-16 h-1 bg-accent mx-auto mb-6 rounded" />
-          <p className="text-white/60 text-lg leading-relaxed">{data.descripcion}</p>
+      <section className="bg-primary px-4 py-16">
+        <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-[0.75fr_1.25fr] md:items-end">
+          <div>
+            <p className="text-xs font-extrabold uppercase tracking-[0.3em] text-accent">{homeText.welcomeTitle}</p>
+            <h2 className="mt-3 text-2xl font-black uppercase text-white md:text-3xl">Football americano en Mar del Plata</h2>
+          </div>
+          <p className="text-lg leading-relaxed text-white/62">{data.descripcion}</p>
+        </div>
+      </section>
+
+      <section className="border-y border-accent/10 bg-secondary px-4 py-10">
+        <div className="mx-auto grid max-w-6xl gap-4 md:grid-cols-2">
+          <Link
+            to="/tienda"
+            className="group border border-accent/20 bg-primary p-6 transition hover:-translate-y-0.5 hover:border-accent/55"
+          >
+            <p className="text-xs font-extrabold uppercase tracking-[0.3em] text-accent">Tienda oficial</p>
+            <h2 className="mt-3 text-xl font-black uppercase text-white md:text-2xl">Indumentaria de la liga</h2>
+            <p className="mt-3 text-sm leading-relaxed text-white/55">
+              Remeras y productos disponibles cargados en la tienda del proyecto.
+            </p>
+            <span className="mt-5 inline-flex text-sm font-extrabold uppercase tracking-wide text-accent-light transition group-hover:text-white">
+              Ir a la tienda
+            </span>
+          </Link>
+
+          <Link
+            to="/contacto"
+            className="group border border-accent/20 bg-primary p-6 transition hover:-translate-y-0.5 hover:border-accent/55"
+          >
+            <p className="text-xs font-extrabold uppercase tracking-[0.3em] text-accent">Contacto</p>
+            <h2 className="mt-3 text-xl font-black uppercase text-white md:text-2xl">Hablá con la liga</h2>
+            <p className="mt-3 text-sm leading-relaxed text-white/55">
+              Consultas, inscripción y comunicación directa con la organización.
+            </p>
+            <span className="mt-5 inline-flex text-sm font-extrabold uppercase tracking-wide text-accent-light transition group-hover:text-white">
+              Ver contacto
+            </span>
+          </Link>
         </div>
       </section>
 
@@ -470,7 +681,7 @@ export default function Inicio() {
               {homeText.modalitiesAllTeamsLabel}
             </Link>
           </div>
-          <div className="flex gap-5 overflow-x-auto snap-x pb-2 md:grid md:grid-cols-3 md:overflow-visible">
+          <div className="flex max-w-full gap-5 overflow-x-auto snap-x pb-2 md:grid md:grid-cols-3 md:overflow-visible">
             {modalidades.map(modalidad => (
               <article
                 key={modalidad.id}
@@ -485,7 +696,10 @@ export default function Inicio() {
                   <div className="mt-5 flex flex-wrap gap-3">
                     <button
                       type="button"
-                      onClick={() => setSelectedModalidad(modalidad.id)}
+                      onClick={() => {
+                        setSelectedModalidad(modalidad.id);
+                        setModalidadSlide(0);
+                      }}
                       className="inline-flex items-center justify-center bg-accent text-white font-bold px-5 py-2.5 rounded-full hover:bg-accent-light transition"
                     >
                       {homeText.modalitiesExplanationCta}
@@ -566,6 +780,96 @@ export default function Inicio() {
           </div>
         </div>
       </section>
+
+      {(posicionesActuales || resultadosRecientes.length > 0) && (
+        <section className="border-y border-accent/10 bg-secondary px-4 py-16">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div>
+                <p className="text-xs font-extrabold uppercase tracking-[0.3em] text-accent">Competencia</p>
+                <h2 className="mt-3 text-3xl font-black uppercase text-white md:text-4xl">Resultados y posiciones</h2>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <Link to="/fixture" className="inline-flex min-h-10 items-center border border-accent/35 px-5 text-sm font-bold text-white transition hover:bg-accent/20">
+                  Ver fixture
+                </Link>
+                <Link to="/estadisticas" className="inline-flex min-h-10 items-center bg-accent px-5 text-sm font-bold text-white transition hover:bg-accent-light">
+                  Ver estadísticas
+                </Link>
+              </div>
+            </div>
+
+            <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+              {posicionesActuales && (
+                <article className="min-w-0 overflow-hidden border border-accent/20 bg-primary">
+                  <div className="border-b border-white/10 px-5 py-4 md:px-6">
+                    <p className="text-xs font-bold uppercase tracking-widest text-accent-light">{posicionesActuales.categoria}</p>
+                    <h3 className="mt-1 text-2xl font-black text-white">{posicionesActuales.temporada}</h3>
+                    {posicionesActuales.descripcion && <p className="mt-1 text-sm text-white/45">{posicionesActuales.descripcion}</p>}
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full min-w-[560px] text-sm">
+                      <thead>
+                        <tr className="border-b border-white/10 text-left text-xs font-extrabold uppercase tracking-widest text-white/42">
+                          <th className="px-5 py-3">Equipo</th>
+                          {['PJ', 'PG', 'PP', 'PF', 'PC', 'Pts'].map(col => (
+                            <th key={col} className="px-3 py-3 text-center">{col}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {posicionesActuales.tabla.map((row, index) => (
+                          <tr key={row.equipo} className="border-b border-white/5 last:border-0">
+                            <td className="px-5 py-4">
+                              <div className="flex items-center gap-3">
+                                <span className={`flex h-8 w-8 items-center justify-center text-sm font-black ${index === 0 ? 'bg-accent text-white' : 'bg-white/10 text-white/55'}`}>
+                                  {index + 1}
+                                </span>
+                                <img src={teamLogoSrc({ nombre: row.equipo }) || '/logo.png'} alt={row.equipo} className="h-9 w-9 object-contain" loading="lazy" />
+                                <span className="font-extrabold text-white">{row.equipo}</span>
+                              </div>
+                            </td>
+                            {['PJ', 'PG', 'PP', 'PF', 'PC', 'Pts'].map(col => (
+                              <td key={col} className={`px-3 py-4 text-center font-bold ${col === 'Pts' ? 'text-accent-light' : 'text-white/65'}`}>
+                                {row[col]}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </article>
+              )}
+
+              {resultadosRecientes.length > 0 && (
+                <div className="space-y-3">
+                  {resultadosRecientes.map(partido => (
+                    <article key={partido._id} className="border border-accent/20 bg-primary p-5">
+                      <p className="text-xs font-bold uppercase tracking-widest text-white/35">{partido.jornada}</p>
+                      <div className="mt-4 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-extrabold text-white">{partido.equipoLocal}</p>
+                          <p className="mt-1 text-xs font-bold text-white/35">{teamAbbr(partido.equipoLocal)}</p>
+                        </div>
+                        <div className="flex items-center gap-2 text-3xl font-black">
+                          <span className={partido.golesLocal > partido.golesVisitante ? 'text-accent-light' : 'text-white/55'}>{partido.golesLocal}</span>
+                          <span className="text-white/20">-</span>
+                          <span className={partido.golesVisitante > partido.golesLocal ? 'text-accent-light' : 'text-white/55'}>{partido.golesVisitante}</span>
+                        </div>
+                        <div className="min-w-0 text-right">
+                          <p className="truncate text-sm font-extrabold text-white">{partido.equipoVisitante}</p>
+                          <p className="mt-1 text-xs font-bold text-white/35">{teamAbbr(partido.equipoVisitante)}</p>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       {calendarioInicio.length > 0 && (
         <section className="bg-secondary border-y border-accent/10 py-16 px-4">

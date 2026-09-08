@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/useAuth.js';
 
 export default function Login() {
   const { login } = useAuth();

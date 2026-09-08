@@ -3,11 +3,39 @@
 @tailwind utilities;
 
 @layer base {
-  body {
-    @apply m-0 bg-gray-50 text-gray-800 font-sans;
+  html {
+    scroll-behavior: smooth;
   }
+
+  body {
+    @apply m-0 bg-primary text-gray-800 font-sans antialiased;
+  }
+
   #root {
     @apply min-h-screen;
+  }
+
+  img {
+    @apply max-w-full;
+  }
+
+  :focus-visible {
+    @apply outline outline-2 outline-offset-2 outline-accent-light;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 

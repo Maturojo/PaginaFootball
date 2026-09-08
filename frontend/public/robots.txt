@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://football-two-rouge.vercel.app/sitemap.xml

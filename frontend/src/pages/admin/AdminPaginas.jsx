@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import api from '../../api';
 import { API_URL } from '../../config.js';
 import { FALLBACK_PARTIDOS } from '../../data/stats.js';
@@ -748,10 +748,11 @@ function InicioEditor() {
 function SimplePageEditor({ page }) {
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState(false);
-  const { register, handleSubmit, reset, setValue, watch } = useForm();
+  const { register, handleSubmit, reset, setValue, control } = useForm();
+  const watchedValues = useWatch({ control });
 
   useEffect(() => {
-    setLoading(true);
+    queueMicrotask(() => setLoading(true));
     api.get(`/pages/${page.key}`).then(r => {
       reset(r.data?.contenido || {});
       setLoading(false);
@@ -771,7 +772,7 @@ function SimplePageEditor({ page }) {
       {page.fields.map(f => (
         <div key={f.name}>
           {f.type === 'image' ? (
-            <ImageValueEditor label={f.label} id={`${page.key}-${f.name}`} value={watch(f.name) || ''} onChange={value => setValue(f.name, value)} />
+            <ImageValueEditor label={f.label} id={`${page.key}-${f.name}`} value={watchedValues?.[f.name] || ''} onChange={value => setValue(f.name, value)} />
           ) : (
             <>
               <label className="block text-sm font-medium text-gray-700 mb-1">{f.label}</label>
@@ -811,7 +812,7 @@ function ContentListEditor({ pageKey }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
+    queueMicrotask(() => setLoading(true));
     const pageRequest = api.get(`/pages/${pageKey}`);
     const request = pageKey === 'calendario'
       ? Promise.all([pageRequest, api.get('/partidos').catch(() => ({ data: [] }))])

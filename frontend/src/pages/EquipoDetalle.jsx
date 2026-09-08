@@ -59,7 +59,7 @@ export default function EquipoDetalle() {
         else setNotFound(true);
       })
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, team]);
 
   useEffect(() => {
     api.get('/jugadores')
@@ -72,7 +72,6 @@ export default function EquipoDetalle() {
 
     const teamId = slugify(team.nombre);
     const slides = TEAM_COVER_SLIDES[teamId] || (TEAM_COVERS[teamId] ? [TEAM_COVERS[teamId]] : []);
-    setCoverSlide(0);
 
     if (slides.length < 2) return;
 
@@ -101,6 +100,7 @@ export default function EquipoDetalle() {
   const teamId = slugify(team.nombre);
   const coverSlides = TEAM_COVER_SLIDES[teamId] || (TEAM_COVERS[teamId] ? [TEAM_COVERS[teamId]] : []);
   const hasCover = coverSlides.length > 0;
+  const activeCoverSlide = hasCover ? coverSlide % coverSlides.length : 0;
   const roster = playersForTeam(team.nombre, players);
 
   return (
@@ -115,7 +115,7 @@ export default function EquipoDetalle() {
                 src={slide}
                 alt=""
                 aria-hidden="true"
-                className={`absolute inset-0 h-full w-full object-cover object-[center_35%] transition-opacity duration-1000 ${coverSlide === index ? 'opacity-[.55]' : 'opacity-0'}`}
+                className={`absolute inset-0 h-full w-full object-cover object-[center_35%] transition-opacity duration-1000 ${activeCoverSlide === index ? 'opacity-[.55]' : 'opacity-0'}`}
               />
             ))}
             <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/80 to-primary/45" />
@@ -165,7 +165,7 @@ export default function EquipoDetalle() {
                 {coverSlides.map((slide, index) => (
                   <span
                     key={`${slide}-dot`}
-                    className={`h-1.5 rounded-full transition-all ${coverSlide === index ? 'w-8 bg-accent' : 'w-3 bg-white/35'}`}
+                    className={`h-1.5 rounded-full transition-all ${activeCoverSlide === index ? 'w-8 bg-accent' : 'w-3 bg-white/35'}`}
                   />
                 ))}
               </div>

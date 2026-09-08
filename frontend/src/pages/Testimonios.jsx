@@ -1,15 +1,62 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
+import { API_URL } from '../config.js';
+
+const DEFAULT_TESTIMONIOS = [
+  {
+    nombre: 'Lucas Gabotto',
+    rol: 'Pre-selección Argentina · 5 MVPs del Tazon del Mar',
+    imagen: '/jugadores/lucas-gabotto.png',
+    texto: 'Estos diez años en la liga fueron una experiencia muy buena para mí. Fui mejorando de a poco, pasando de tener un desempeño más bajo a sentirme cada vez más cómodo y rendir mejor dentro de la cancha. Además, me quedo con la buena onda y todos los momentos compartidos con mis amigos y compañeros durante estos años.',
+    activo: true,
+  },
+];
+
+function imageSrc(src) {
+  if (!src) return '';
+  if (src.startsWith('http')) return src;
+  if (src.startsWith('/jugadores') || src.startsWith('/hero') || src.startsWith('/equipos')) return src;
+  return src.startsWith('/') ? `${API_URL}${src}` : src;
+}
+
+function mergeTestimonios(items = []) {
+  const visibles = items.filter(item => item.activo !== false);
+  const defaultsByName = new Map(DEFAULT_TESTIMONIOS.map(item => [item.nombre.toLowerCase(), item]));
+  const enriched = visibles.map(item => {
+    const fallback = defaultsByName.get(item.nombre?.toLowerCase());
+    return fallback ? { ...fallback, ...item, rol: item.rol || fallback.rol, imagen: item.imagen || fallback.imagen } : item;
+  });
+  const names = new Set(enriched.map(item => item.nombre?.toLowerCase()));
+  const missingDefaults = DEFAULT_TESTIMONIOS.filter(item => !names.has(item.nombre.toLowerCase()));
+  return [...enriched, ...missingDefaults];
+}
 
 export default function Testimonios() {
   const [form, setForm] = useState({ nombre: '', rol: '', texto: '', imagen: null });
   const [preview, setPreview] = useState('');
+  const [testimonios, setTestimonios] = useState(DEFAULT_TESTIMONIOS);
   const [enviado, setEnviado] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingItems, setLoadingItems] = useState(true);
   const [error, setError] = useState('');
 
   const remaining = useMemo(() => 700 - form.texto.length, [form.texto.length]);
+
+  const loadTestimonios = ({ showLoading = true } = {}) => {
+    if (showLoading) setLoadingItems(true);
+    api.get('/pages/testimonios')
+      .then(r => setTestimonios(mergeTestimonios(r.data?.contenido?.items || [])))
+      .catch(() => setTestimonios(DEFAULT_TESTIMONIOS))
+      .finally(() => setLoadingItems(false));
+  };
+
+  useEffect(() => {
+    api.get('/pages/testimonios')
+      .then(r => setTestimonios(mergeTestimonios(r.data?.contenido?.items || [])))
+      .catch(() => setTestimonios(DEFAULT_TESTIMONIOS))
+      .finally(() => setLoadingItems(false));
+  }, []);
 
   const setField = (name, value) => {
     setForm(current => ({ ...current, [name]: value }));
@@ -39,6 +86,7 @@ export default function Testimonios() {
       setForm({ nombre: '', rol: '', texto: '', imagen: null });
       if (preview) URL.revokeObjectURL(preview);
       setPreview('');
+      loadTestimonios();
     } catch (e) {
       setError(e.response?.data?.message || 'No pudimos cargar el testimonio. Probá de nuevo.');
     } finally {
@@ -48,13 +96,49 @@ export default function Testimonios() {
 
   return (
     <div className="bg-primary text-white pt-16">
-      <section className="bg-secondary border-b border-accent/20 py-20 px-4 text-center">
-        <h1 className="text-4xl md:text-5xl font-extrabold">Sumá tu testimonio</h1>
+      <section className="bg-secondary border-b border-accent/20 py-16 px-4 text-center">
+        <p className="text-xs font-extrabold uppercase tracking-[0.3em] text-accent">Comunidad</p>
+        <h1 className="mt-3 text-3xl md:text-5xl font-extrabold">Testimonios</h1>
         <div className="w-16 h-1 bg-accent mx-auto mt-4 rounded" />
-        <p className="text-white/50 mt-4 text-lg">Contá qué significó la liga para vos y aparece en la página principal.</p>
+        <p className="text-white/50 mt-4 text-lg">Experiencias reales de quienes forman parte de la liga.</p>
       </section>
 
-      <section className="max-w-3xl mx-auto py-16 px-4">
+      <section className="mx-auto max-w-6xl px-4 py-14">
+        <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-extrabold uppercase tracking-[0.3em] text-accent">Voces de la liga</p>
+            <h2 className="mt-3 text-2xl font-black uppercase text-white md:text-3xl">Todos los testimonios</h2>
+          </div>
+          {loadingItems && <p className="text-sm text-white/40">Cargando testimonios...</p>}
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {testimonios.map((item, index) => (
+            <article key={`${item.nombre}-${index}`} className="rounded-2xl border border-accent/20 bg-secondary p-6">
+              <div className="mb-5 flex items-center gap-4">
+                {item.imagen ? (
+                  <img src={imageSrc(item.imagen)} alt={item.nombre} className="h-16 w-16 rounded-full border-2 border-accent/25 object-cover" loading="lazy" />
+                ) : (
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full border border-accent/20 bg-primary text-xl font-extrabold text-accent">
+                    {item.nombre?.charAt(0) || '?'}
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <h3 className="truncate font-extrabold text-white">{item.nombre}</h3>
+                  {item.rol && <p className="mt-1 text-sm text-accent">{item.rol}</p>}
+                </div>
+              </div>
+              <p className="text-sm leading-relaxed text-white/68">“{item.texto}”</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="max-w-3xl mx-auto pb-16 px-4">
+        <div className="mb-8 text-center">
+          <p className="text-xs font-extrabold uppercase tracking-[0.3em] text-accent">Participá</p>
+          <h2 className="mt-3 text-2xl font-black uppercase text-white md:text-3xl">Sumá tu testimonio</h2>
+        </div>
         {enviado ? (
           <div className="rounded-2xl border border-green-500/30 bg-green-900/30 p-10 text-center">
             <h2 className="text-2xl font-bold text-white mb-3">Testimonio cargado</h2>

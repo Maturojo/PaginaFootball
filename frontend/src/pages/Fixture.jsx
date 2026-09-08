@@ -217,18 +217,21 @@ export default function Fixture() {
 
   return (
     <div className="bg-primary text-white pt-16">
-      <section className="bg-secondary border-b border-accent/20 py-20 px-4 text-center">
-        <h1 className="text-4xl md:text-5xl font-extrabold">Fixture y Resultados</h1>
-        <div className="w-16 h-1 bg-accent mx-auto mt-4 rounded" />
-        <p className="text-white/50 mt-4 text-lg">Calendario de partidos y resultados</p>
+      <section className="relative overflow-hidden border-b border-accent/20 bg-secondary px-4 py-20 text-center">
+        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(74,140,196,0.18),transparent_55%)]" />
+        <div className="relative">
+          <p className="text-xs font-extrabold uppercase tracking-[0.3em] text-accent">Temporada oficial</p>
+          <h1 className="mt-3 text-3xl font-black uppercase md:text-5xl">Fixture y resultados</h1>
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-white/55">Calendario de partidos, actividades programadas y marcadores de la Liga Football Americano Mar del Plata.</p>
+        </div>
       </section>
 
-      <section className="max-w-3xl mx-auto py-12 px-4">
+      <section className="max-w-5xl mx-auto py-12 px-4">
         {/* Toggle próximos / resultados */}
-        <div className="flex bg-secondary border border-accent/20 rounded-xl p-1 mb-6 w-fit mx-auto">
-          {[['todos', '🗓️ Todos'], ['proximos', '📅 Próximos'], ['resultados', '🏆 Resultados']].map(([v, l]) => (
+        <div className="mx-auto mb-6 grid w-full max-w-xl grid-cols-3 border border-accent/20 bg-secondary p-1">
+          {[['todos', 'Todos'], ['proximos', 'Próximos'], ['resultados', 'Resultados']].map(([v, l]) => (
             <button key={v} onClick={() => setVista(v)}
-              className={`px-5 py-2 rounded-lg text-sm font-semibold transition ${vista === v ? 'bg-accent text-white' : 'text-white/50 hover:text-white'}`}>
+              className={`min-h-10 px-3 py-2 text-sm font-extrabold transition ${vista === v ? 'bg-accent text-white' : 'text-white/50 hover:text-white'}`}>
               {l}
             </button>
           ))}
@@ -238,7 +241,7 @@ export default function Fixture() {
         <div className="flex flex-wrap gap-2 mb-8 justify-center">
           {CATS.map(c => (
             <button key={c} onClick={() => setCat(c)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${cat === c ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/50 hover:text-white hover:border-accent/50'}`}>
+              className={`min-h-10 px-4 py-1.5 text-sm font-bold transition ${cat === c ? 'bg-accent text-white' : 'bg-secondary border border-accent/20 text-white/50 hover:text-white hover:border-accent/50'}`}>
               {c}
             </button>
           ))}

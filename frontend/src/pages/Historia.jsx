@@ -57,6 +57,18 @@ const SECTION_STARTS = [
   ['En 2023 FAMDQ', 'Asociación Civil y presente'],
 ];
 
+const SECTION_TITLES = [
+  'Orígenes en Parque Camet',
+  'Primeros equipos y competencia',
+  'Flag Football 5vs5',
+  'Argentina en el mapa internacional',
+  'Un referente marplatense',
+  'Consolidación local',
+  'Nuevas modalidades',
+  'Football equipado',
+  'Asociación Civil y presente',
+];
+
 function normalizeHistoriaText(text) {
   return String(text || FALLBACK_TEXT)
     .replace(/^\s*HISTORIA\s*/i, '')
@@ -75,6 +87,29 @@ function normalizeTitle(value) {
 
 function splitBySectionStarts(text) {
   const normalized = normalizeHistoriaText(text);
+  const paragraphs = normalized.split(/\n{2,}/).map(item => item.trim()).filter(Boolean);
+  const titledSections = [];
+  let current = null;
+
+  paragraphs.forEach(paragraph => {
+    if (SECTION_TITLES.includes(paragraph)) {
+      current = { title: paragraph, body: '' };
+      titledSections.push(current);
+      return;
+    }
+
+    if (current) {
+      current.body = [current.body, paragraph].filter(Boolean).join('\n\n');
+      return;
+    }
+
+    titledSections.push({ title: titledSections.length === 0 ? 'Historia' : '', body: paragraph });
+  });
+
+  if (titledSections.some(section => SECTION_TITLES.includes(section.title))) {
+    return titledSections.filter(section => section.body);
+  }
+
   const markers = SECTION_STARTS
     .map(([marker, title]) => ({ marker, title, index: normalized.indexOf(marker) }))
     .filter(item => item.index > 0)

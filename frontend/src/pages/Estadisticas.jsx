@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../api';
 import {
@@ -564,12 +564,7 @@ function PremiosSection({ deporte = 'flag' }) {
   const [temporadaActiva, setTemporadaActiva] = useState('');
 
   useEffect(() => {
-    if (deporte === 'equipados') {
-      setTemporadas([]);
-      setTemporadaActiva('');
-      setLideresPremios([]);
-      return;
-    }
+    if (deporte === 'equipados') return;
 
     api.get('/lideres/temporadas').then(r => {
       // Solo temporadas que tienen premios (no las de partidos individuales)
@@ -634,14 +629,27 @@ export default function Estadisticas() {
   const [seccion, setSeccion] = useState(initialSeccion);
   const [deporte, setDeporte] = useState(initialDeporte === 'equipados' ? 'equipados' : 'flag');
   const [loading, setLoading] = useState(true);
-  const temporadasConLideres = temporadas.filter(temporada =>
-    fallbackLideresByTemporada(temporada).some(lider => TIPOS[lider.tipo])
-    || (temporada === temporadaActiva && lideres.some(lider => TIPOS[lider.tipo]))
-  );
-  const temporadasTazones = ordenarTemporadasDesc(temporadasConLideres.filter(t => /^Tazón del Mar/i.test(t)));
-  const temporadasFinales = ordenarTemporadasDesc(temporadasConLideres.filter(t => /^Final/i.test(t)));
-  const temporadasOtras = temporadasConLideres.filter(t => !/^Tazón del Mar/i.test(t) && !/^Final/i.test(t));
-  const temporadasLideresOrdenadas = [...temporadasTazones, ...temporadasFinales, ...temporadasOtras];
+  const {
+    temporadasTazones,
+    temporadasFinales,
+    temporadasOtras,
+    temporadasLideresOrdenadas,
+  } = useMemo(() => {
+    const temporadasConLideres = temporadas.filter(temporada =>
+      fallbackLideresByTemporada(temporada).some(lider => TIPOS[lider.tipo])
+      || (temporada === temporadaActiva && lideres.some(lider => TIPOS[lider.tipo]))
+    );
+    const tazones = ordenarTemporadasDesc(temporadasConLideres.filter(t => /^Tazón del Mar/i.test(t)));
+    const finales = ordenarTemporadasDesc(temporadasConLideres.filter(t => /^Final/i.test(t)));
+    const otras = temporadasConLideres.filter(t => !/^Tazón del Mar/i.test(t) && !/^Final/i.test(t));
+
+    return {
+      temporadasTazones: tazones,
+      temporadasFinales: finales,
+      temporadasOtras: otras,
+      temporadasLideresOrdenadas: [...tazones, ...finales, ...otras],
+    };
+  }, [lideres, temporadaActiva, temporadas]);
 
   useEffect(() => {
     api.get('/lideres/temporadas').then(r => {
@@ -656,7 +664,7 @@ export default function Estadisticas() {
       const defaultTemporada = paramTemporada && FALLBACK_TEMPORADAS.includes(paramTemporada) ? paramTemporada : FALLBACK_TEMPORADAS[0];
       if (FALLBACK_TEMPORADAS.length > 0) setTemporadaActiva(defaultTemporada || FALLBACK_TEMPORADAS[0]);
     }).finally(() => setLoading(false));
-  }, []);
+  }, [searchParams]);
 
   useEffect(() => {
     if (temporadaActiva) {
@@ -668,7 +676,7 @@ export default function Estadisticas() {
 
   useEffect(() => {
     if (deporte === 'flag' && seccion === 'lideres' && temporadasLideresOrdenadas.length > 0 && !temporadasLideresOrdenadas.includes(temporadaActiva)) {
-      setTemporadaActiva(temporadasLideresOrdenadas[0]);
+      queueMicrotask(() => setTemporadaActiva(temporadasLideresOrdenadas[0]));
     }
   }, [deporte, seccion, temporadaActiva, temporadasLideresOrdenadas]);
 

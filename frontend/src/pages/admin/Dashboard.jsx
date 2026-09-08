@@ -1,5 +1,5 @@
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/useAuth.js';
 
 const sections = [
   { to: '/admin/dashboard', label: 'Resumen', icon: '🏠', end: true },
