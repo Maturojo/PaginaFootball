@@ -366,6 +366,7 @@ export default function Inicio() {
   const [selectedModalidad, setSelectedModalidad] = useState(DEFAULT_MODALIDADES[0].id);
   const [modalidadSlide, setModalidadSlide] = useState(0);
   const testimoniosCarouselRef = useRef(null);
+  const modalidadDetalleRef = useRef(null);
   const heroSlides = nonEmptyArray(data.heroSlides, DEFAULT_HERO_SLIDES);
   const modalidades = mergeModalidades(data.modalidades);
   const trainingPlaces = nonEmptyArray(data.trainingPlaces, DEFAULT_TRAINING_PLACES);
@@ -405,6 +406,17 @@ export default function Inicio() {
       left,
       behavior: 'smooth',
     });
+  };
+
+  const showModalidadDetail = (modalidadId) => {
+    setSelectedModalidad(modalidadId);
+    setModalidadSlide(0);
+    window.setTimeout(() => {
+      modalidadDetalleRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }, 0);
   };
 
   useEffect(() => {
@@ -696,10 +708,7 @@ export default function Inicio() {
                   <div className="mt-5 flex flex-wrap gap-3">
                     <button
                       type="button"
-                      onClick={() => {
-                        setSelectedModalidad(modalidad.id);
-                        setModalidadSlide(0);
-                      }}
+                      onClick={() => showModalidadDetail(modalidad.id)}
                       className="inline-flex items-center justify-center bg-accent text-white font-bold px-5 py-2.5 rounded-full hover:bg-accent-light transition"
                     >
                       {homeText.modalitiesExplanationCta}
@@ -715,7 +724,7 @@ export default function Inicio() {
               </article>
             ))}
           </div>
-          <div className="mt-8 grid lg:grid-cols-[0.9fr_1.1fr] gap-6 items-start">
+          <div ref={modalidadDetalleRef} className="mt-8 scroll-mt-24 grid lg:grid-cols-[0.9fr_1.1fr] gap-6 items-start">
             <div className="relative overflow-hidden rounded-xl border border-accent/20 bg-primary/70">
               {(() => {
                 const currentSlide = normalizeSlide(modalidadSlides[modalidadSlide], { fit: 'cover', x: 50, y: 50, zoom: 100 });

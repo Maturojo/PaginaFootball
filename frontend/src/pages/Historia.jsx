@@ -85,6 +85,17 @@ function normalizeTitle(value) {
   return title;
 }
 
+function isLegacyHistoriaText(text = '') {
+  const normalized = String(text)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
+  return normalized.includes('nacio en 2010')
+    || normalized.includes('tres equipos fundadores')
+    || normalized.includes('cientos de jugadores');
+}
+
 function splitBySectionStarts(text) {
   const normalized = normalizeHistoriaText(text);
   const paragraphs = normalized.split(/\n{2,}/).map(item => item.trim()).filter(Boolean);
@@ -152,10 +163,11 @@ export default function Historia() {
         const contenido = r.data?.contenido;
         if (!contenido) return;
         const title = normalizeTitle(contenido.titulo);
+        const text = isLegacyHistoriaText(contenido.texto) ? FALLBACK_TEXT : (contenido.texto || FALLBACK_TEXT);
         setData({
           titulo: title,
           subtitulo: contenido.subtitulo || FALLBACK_SUBTITLE,
-          texto: contenido.texto || FALLBACK_TEXT,
+          texto: text,
           imagen: contenido.imagen || '',
         });
       })
