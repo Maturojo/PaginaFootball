@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
 
@@ -279,7 +279,7 @@ function mergeTestimonios(items = []) {
   });
   const nombres = new Set(enriched.map(item => item.nombre?.toLowerCase()));
   const faltantes = DEFAULT_TESTIMONIOS.filter(item => !nombres.has(item.nombre.toLowerCase()));
-  return [...faltantes, ...enriched];
+  return [...enriched, ...faltantes];
 }
 
 function isUpcomingCalendarItem(item) {
@@ -289,6 +289,13 @@ function isUpcomingCalendarItem(item) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return date >= today;
+}
+
+function formatTestimonioDate(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return '';
+  return date.toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 export default function Inicio() {
@@ -312,6 +319,7 @@ export default function Inicio() {
   const [heroSlide, setHeroSlide] = useState(0);
   const [selectedModalidad, setSelectedModalidad] = useState(DEFAULT_MODALIDADES[0].id);
   const [modalidadSlide, setModalidadSlide] = useState(0);
+  const testimoniosCarouselRef = useRef(null);
   const heroSlides = nonEmptyArray(data.heroSlides, DEFAULT_HERO_SLIDES);
   const modalidades = mergeModalidades(data.modalidades);
   const trainingPlaces = nonEmptyArray(data.trainingPlaces, DEFAULT_TRAINING_PLACES);
@@ -320,6 +328,24 @@ export default function Inicio() {
   const modalidadActiva = modalidades.find(modalidad => modalidad.id === selectedModalidad) || modalidades[0];
   const modalidadSlides = nonEmptyArray(modalidadActiva.slides, [modalidadActiva.image]);
   const calendarioInicio = calendario.filter(isUpcomingCalendarItem).slice(0, 6);
+
+  const scrollTestimonios = (direction) => {
+    const carousel = testimoniosCarouselRef.current;
+    if (!carousel) return;
+
+    const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+    const nextPosition = carousel.scrollLeft + (direction * carousel.clientWidth);
+    const left = nextPosition > maxScroll
+      ? 0
+      : nextPosition < 0
+        ? maxScroll
+        : nextPosition;
+
+    carousel.scrollTo({
+      left,
+      behavior: 'smooth',
+    });
+  };
 
   useEffect(() => {
     api.get('/pages/inicio').then(r => { if (r.data?.contenido) setData(current => ({ ...current, ...r.data.contenido })); });
@@ -373,6 +399,16 @@ export default function Inicio() {
 
     return () => clearInterval(interval);
   }, [modalidadSlides.length, selectedModalidad]);
+
+  useEffect(() => {
+    if (testimonios.length <= 3) return undefined;
+
+    const interval = setInterval(() => {
+      scrollTestimonios(1);
+    }, 5500);
+
+    return () => clearInterval(interval);
+  }, [testimonios.length]);
 
   return (
     <div className="bg-primary text-white">
@@ -731,19 +767,47 @@ export default function Inicio() {
       {testimonios.length > 0 && (
         <section className="py-16 px-4 bg-primary">
           <div className="max-w-6xl mx-auto">
-            <div className="mb-8 text-center">
-              <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-2">Comunidad</p>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-white">Por qué se suman</h2>
-              <Link
-                to="/testimonios"
-                className="mt-5 inline-flex items-center justify-center rounded-full border border-accent/40 px-5 py-2 text-sm font-bold text-white transition hover:bg-accent/20"
-              >
-                Dejar testimonio
-              </Link>
+            <div className="mb-8 flex flex-col gap-5 text-center md:flex-row md:items-end md:justify-between md:text-left">
+              <div>
+                <p className="text-accent font-semibold uppercase tracking-widest text-sm mb-2">Comunidad</p>
+                <h2 className="text-3xl md:text-4xl font-extrabold text-white">Por qué se suman</h2>
+                <Link
+                  to="/testimonios"
+                  className="mt-5 inline-flex items-center justify-center rounded-full border border-accent/40 px-5 py-2 text-sm font-bold text-white transition hover:bg-accent/20"
+                >
+                  Dejar testimonio
+                </Link>
+              </div>
+              {testimonios.length > 3 && (
+                <div className="flex justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => scrollTestimonios(-1)}
+                    className="h-11 w-11 rounded-full border border-accent/30 bg-secondary text-2xl leading-none text-white transition hover:border-accent hover:bg-accent"
+                    aria-label="Ver testimonios anteriores"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => scrollTestimonios(1)}
+                    className="h-11 w-11 rounded-full border border-accent/30 bg-secondary text-2xl leading-none text-white transition hover:border-accent hover:bg-accent"
+                    aria-label="Ver más testimonios"
+                  >
+                    ›
+                  </button>
+                </div>
+              )}
             </div>
-            <div className="grid gap-4 md:grid-cols-3">
-              {testimonios.slice(0, 3).map((item, index) => (
-                <article key={`${item.nombre}-${index}`} className="rounded-xl border border-accent/20 bg-secondary p-6">
+            <div
+              ref={testimoniosCarouselRef}
+              className="scrollbar-none flex snap-x gap-4 overflow-x-auto scroll-smooth pb-3"
+            >
+              {testimonios.map((item, index) => (
+                <article
+                  key={`${item.nombre}-${index}`}
+                  className="w-[86%] flex-none snap-start rounded-xl border border-accent/20 bg-secondary p-6 sm:w-[70%] md:w-[calc((100%_-_2rem)/3)]"
+                >
                   <div className="mb-5 flex items-center gap-4">
                     {item.imagen ? (
                       <img
@@ -759,6 +823,11 @@ export default function Inicio() {
                     <div>
                       <p className="font-extrabold text-white">{item.nombre}</p>
                       {item.rol && <p className="text-sm text-accent">{item.rol}</p>}
+                      {formatTestimonioDate(item.createdAt) && (
+                        <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-white/35">
+                          {formatTestimonioDate(item.createdAt)}
+                        </p>
+                      )}
                     </div>
                   </div>
                   <p className="text-white/65 leading-relaxed">“{item.texto}”</p>
