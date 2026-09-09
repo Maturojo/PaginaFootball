@@ -12,9 +12,9 @@ const links = [
   { to: '/estadisticas', label: 'Posiciones' },
   { to: '/eventos', label: 'Eventos' },
   { to: '/jugadores', label: 'Jugadores' },
-  { to: '/comunidad', label: 'Comunidad', isCommunity: true },
   { to: '/tienda', label: 'Tienda' },
   { to: '/contacto', label: 'Contacto' },
+  { to: '/comunidad', label: 'Comunidad', isCommunity: true },
 ];
 
 export default function Navbar() {
