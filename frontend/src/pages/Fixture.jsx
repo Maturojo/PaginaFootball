@@ -176,6 +176,16 @@ function PartidoCard({ p, logoMap }) {
           </Link>
         </div>
       )}
+      {p._id && (
+        <div className="mt-2 pt-2 border-t border-white/5 text-center">
+          <Link
+            to={`/comunidad?partidoId=${p._id}`}
+            className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-white/50 hover:text-accent transition"
+          >
+            💬 Publicaciones de la comunidad sobre este partido
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

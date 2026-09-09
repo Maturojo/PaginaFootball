@@ -23,6 +23,13 @@ import Contacto from './pages/Contacto';
 import Inscripcion from './pages/Inscripcion';
 import Testimonios from './pages/Testimonios';
 
+import CommunityLayout from './pages/community/CommunityLayout';
+import CommunityFeed from './pages/community/CommunityFeed';
+import UserProfilePage from './pages/community/UserProfilePage';
+import ExplorePage from './pages/community/ExplorePage';
+import NotificationsPage from './pages/community/NotificationsPage';
+import SavedPostsPage from './pages/community/SavedPostsPage';
+
 import Login from './pages/admin/Login';
 import Dashboard from './pages/admin/Dashboard';
 import DashboardHome from './pages/admin/DashboardHome';
@@ -70,6 +77,15 @@ export default function App() {
           <Route path="/contacto" element={<PublicLayout><Contacto /></PublicLayout>} />
           <Route path="/inscripcion" element={<PublicLayout><Inscripcion /></PublicLayout>} />
           <Route path="/testimonios" element={<PublicLayout><Testimonios /></PublicLayout>} />
+          
+          {/* Módulo Social / Community Independiente */}
+          <Route path="/comunidad" element={<PublicLayout><CommunityLayout /></PublicLayout>}>
+            <Route index element={<CommunityFeed />} />
+            <Route path="explorar" element={<ExplorePage />} />
+            <Route path="perfil/:username" element={<UserProfilePage />} />
+            <Route path="notificaciones" element={<NotificationsPage />} />
+            <Route path="guardados" element={<SavedPostsPage />} />
+          </Route>
 
           <Route path="/admin" element={<Login />} />
           <Route path="/admin/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>}>

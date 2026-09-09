@@ -49,13 +49,41 @@ export default function AdminJugadores() {
   const [jugadores, setJugadores] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
+  const [socialLinks, setSocialLinks] = useState({ byId: {}, byName: {} });
+
+  const loadLinks = () => {
+    api.get('/social/player-links')
+      .then(r => setSocialLinks(r.data || { byId: {}, byName: {} }))
+      .catch(() => {});
+  };
 
   const load = () => api.get('/jugadores/all')
     .then(r => setJugadores(mergePlayers(r.data).map(j => (
       isMongoId(j._id) ? j : { ...j, __fallback: true }
     ))))
     .catch(() => setJugadores(mergePlayers([]).map(j => ({ ...j, __fallback: true }))));
-  useEffect(() => { load(); }, []);
+
+  useEffect(() => { load(); loadLinks(); }, []);
+
+  const getPlayerSocial = (player) => {
+    if (!player) return null;
+    if (player._id && socialLinks.byId?.[player._id]) return socialLinks.byId[player._id];
+    const norm = String(player.nombre || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    return socialLinks.byName?.[norm] || null;
+  };
+
+  const handleAdminUnlink = async (player, username) => {
+    if (!confirm(`¿Desvincular a @${username} de este jugador?`)) return;
+    try {
+      await api.post('/social/admin/unlink-player', {
+        jugadorId: isMongoId(player._id) ? player._id : undefined,
+        username,
+      });
+      loadLinks();
+    } catch (err) {
+      alert('Error al desvincular jugador');
+    }
+  };
 
   const handleSave = async (form) => {
     if (editing && isMongoId(editing._id)) await api.put(`/jugadores/${editing._id}`, form);
@@ -89,6 +117,22 @@ export default function AdminJugadores() {
               <p className="font-bold text-gray-800 text-sm">{j.esMVP && '⭐ '}{j.nombre} {j.numero && <span className="text-gray-400">#{j.numero}</span>}</p>
               <p className="text-xs text-gray-500">{j.equipo} · {j.posicion}</p>
             </div>
+            {(() => {
+              const social = getPlayerSocial(j);
+              if (!social) return null;
+              return (
+                <div className="flex items-center gap-1.5 bg-blue-50 border border-blue-200 rounded-lg px-2.5 py-1">
+                  <span className="text-xs font-bold text-blue-700">💬 @{social.username}</span>
+                  <button
+                    onClick={() => handleAdminUnlink(j, social.username)}
+                    className="text-[10px] text-red-500 hover:text-red-700 font-bold ml-1 hover:bg-red-100/50 rounded px-1"
+                    title="Desvincular usuario de este jugador"
+                  >
+                    Desvincular
+                  </button>
+                </div>
+              );
+            })()}
             {j.__fallback && <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700">Fijo</span>}
             <button onClick={() => { setEditing(j); setShowForm(false); }} className="text-blue-600 text-sm px-3 py-1 rounded hover:bg-blue-50">Editar</button>
             <button onClick={() => handleDelete(j._id)} className="text-red-500 text-sm px-3 py-1 rounded hover:bg-red-50">Eliminar</button>

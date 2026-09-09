@@ -59,6 +59,7 @@ app.use('/api/partidos', require('./routes/partidos'));
 app.use('/api/jugadores', require('./routes/jugadores'));
 app.use('/api/noticias', require('./routes/noticias'));
 app.use('/api/inscripciones', require('./routes/inscripciones'));
+app.use('/api/social', require('./routes/social'));
 
 if (process.env.LOCAL === 'true') {
   connectDB().then(() => {

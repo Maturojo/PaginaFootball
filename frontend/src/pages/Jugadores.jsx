@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
 import api from '../api';
 import { FALLBACK_PLAYERS, mergePlayers } from '../data/players.js';
 import { FALLBACK_LIDERES, fallbackHistoricosByJugador } from '../data/stats.js';
@@ -111,17 +112,44 @@ function HonorBadge({ icon, label, count }) {
 }
 
 export default function Jugadores() {
+  const [searchParams] = useSearchParams();
   const [jugadores, setJugadores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [equipo, setEquipo] = useState('Todos');
   const [selected, setSelected] = useState(null);
+  const [socialLinks, setSocialLinks] = useState({ byId: {}, byName: {} });
 
   useEffect(() => {
     api.get('/jugadores')
       .then(r => setJugadores(mergePlayers(r.data).filter(isActivePlayer)))
       .catch(() => setJugadores(FALLBACK_PLAYERS.filter(isActivePlayer)))
       .finally(() => setLoading(false));
+
+    api.get('/social/player-links')
+      .then(r => setSocialLinks(r.data || { byId: {}, byName: {} }))
+      .catch(() => {});
   }, []);
+
+  // Auto-seleccionar jugador si se ingresa desde el perfil social (?nombre=... o ?jugadorId=...)
+  useEffect(() => {
+    if (jugadores.length === 0) return;
+    const qId = searchParams.get('jugadorId');
+    const qNombre = searchParams.get('nombre');
+    if (qId || qNombre) {
+      const match = jugadores.find(j =>
+        (qId && String(j._id) === qId) ||
+        (qNombre && samePlayer(j.nombre, qNombre))
+      );
+      if (match) setSelected(match);
+    }
+  }, [jugadores, searchParams]);
+
+  const getPlayerSocial = (player) => {
+    if (!player) return null;
+    if (player._id && socialLinks.byId?.[player._id]) return socialLinks.byId[player._id];
+    const norm = normalizeName(player.nombre);
+    return socialLinks.byName?.[norm] || null;
+  };
 
   const filtrados = equipo === 'Todos' ? jugadores : jugadores.filter(j => j.equipo === equipo);
 
@@ -184,6 +212,15 @@ export default function Jugadores() {
               <p className="font-bold text-white text-sm text-center leading-tight">{j.nombre}</p>
               <p className="text-white/40 text-xs mt-1 text-center">{j.posicion}</p>
               {j.esMVP && <span className="mt-2 text-xs">⭐ MVP</span>}
+              {(() => {
+                const social = getPlayerSocial(j);
+                if (!social) return null;
+                return (
+                  <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-accent/20 border border-accent/40 px-2 py-0.5 text-[10px] font-bold text-accent-light truncate max-w-[120px]">
+                    💬 @{social.username}
+                  </span>
+                );
+              })()}
             </button>
           ))}
         </div>
@@ -245,6 +282,21 @@ export default function Jugadores() {
                       Historial: {honors.total} menciones entre premios y equipos ideales.
                     </div>
                   )}
+                </div>
+              );
+            })()}
+
+            {(() => {
+              const social = getPlayerSocial(selected);
+              if (!social) return null;
+              return (
+                <div className="mt-4 pt-4 border-t border-white/10 text-center">
+                  <Link
+                    to={`/comunidad/perfil/${social.username}`}
+                    className="inline-flex items-center justify-center gap-2 w-full rounded-xl bg-accent/20 border border-accent/40 py-2.5 px-4 text-xs font-bold text-accent-light hover:bg-accent hover:text-white transition shadow"
+                  >
+                    <span>💬 Conectar con @{social.username} en la Comunidad →</span>
+                  </Link>
                 </div>
               );
             })()}
